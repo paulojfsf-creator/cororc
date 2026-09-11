@@ -1,0 +1,2676 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <title>Coro Paroquial São João Batista de Rio Caldo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Lato:wght@400;700&family=Noto+Serif:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-soft: #f3f4f6;
+      --card: #ffffff;
+      --border-subtle: #d1d5db;
+      --text-main: #0f172a;
+      --text-muted: #6b7280;
+      --primary: #004b80;
+      --primary-soft: #d6e4ff;
+      --header-bg: var(--primary);
+      --header-text: #ffffff;
+      --body-bg-gradient: radial-gradient(circle at top left, #0f172a 0, #020617 35%, #020617 100%);
+    }
+
+    :root.dark {
+      --bg-soft: #020617;
+      --card: #020617;
+      --border-subtle: #1f2937;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --body-bg-gradient: radial-gradient(circle at top left, #020617 0, #000000 70%);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--body-bg-gradient);
+      min-height: 100vh;
+      color: var(--text-main);
+      font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      transition: background 0.35s ease, color 0.2s ease;
+    }
+
+    body.liturgic-advento,
+    body.liturgic-quaresma {
+      --header-bg: #4b2c6f;
+      --body-bg-gradient: radial-gradient(circle at top left, #3c1f57 0, #0f0a19 70%);
+      transition: all 0.6s ease;
+    }
+    body.liturgic-natal,
+    body.liturgic-pascoa {
+      --header-bg: #92400e;
+      --body-bg-gradient: radial-gradient(circle at top left, #7a3e00 0, #1a0f00 70%);
+      transition: all 0.6s ease;
+    }
+    body.liturgic-tempocomum {
+      --header-bg: #166534;
+      --body-bg-gradient: radial-gradient(circle at top left, #0f3d22 0, #07140c 70%);
+      transition: all 0.6s ease;
+    }
+
+    header {
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 0.9rem 1.4rem;
+      box-shadow: 0 10px 30px rgba(15,23,42,0.6);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      transition: background 0.3s ease;
+    }
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+    }
+    .header-main {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      min-width: 0;
+    }
+    .header-logo {
+      height: 96px;
+      width: auto;
+      border-radius: 10px;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.45));
+      background: rgba(255,255,255,0.04);
+      padding: 5px;
+      object-fit: contain;
+      transition: transform 0.3s ease;
+    }
+    .header-logo:hover {
+      transform: scale(1.05);
+    }
+    .header-text {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      min-width: 0;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.3rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      white-space: nowrap;
+    }
+    header p {
+      margin: 0;
+      font-size: 0.82rem;
+      opacity: 0.96;
+    }
+
+    .liturgical-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.22);
+      padding: 0.2rem 0.6rem;
+      font-size: 0.75rem;
+      align-self: flex-start;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    main {
+      max-width: 1400px;
+      margin: 1.5rem auto 2.5rem;
+      padding: 0 1rem;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 1rem;
+      padding: 1rem 1.25rem 1.25rem;
+      box-shadow:
+        0 22px 45px rgba(15,23,42,0.35),
+        0 0 0 1px rgba(148,163,184,0.18);
+      margin-bottom: 0.7rem;
+      backdrop-filter: blur(12px);
+      transition: background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 0.7rem;
+      flex-wrap: wrap;
+      padding: 0.5rem;
+      border-radius: 0;
+      background: #1f2937;
+      position: sticky;
+      top: 4.2rem;
+      z-index: 10;
+    }
+    .tabs button {
+      border: none;
+      background: transparent;
+      padding: 0.6rem 1rem;
+      border-radius: 0;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, transform 0.1s, box-shadow 0.15s;
+      color: #e2e8f0;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      white-space: nowrap;
+      font-weight: 500;
+    }
+    .tabs button span.dot {
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 0;
+      background: #64748b;
+    }
+    .tabs button.active {
+      background: #0f172a;
+      color: #f9fafb;
+      box-shadow: 0 4px 12px rgba(15,23,42,0.65);
+      transform: translateY(-1px);
+    }
+    .tabs button.active span.dot { background: #22c55e; }
+    .tabs button:hover:not(.active) {
+      transform: translateY(-1px);
+      background: rgba(15,23,42,0.7);
+    }
+
+    .tab { display: none; }
+    .tab.active {
+      display: block;
+      animation: fadeIn 0.18s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to   { opacity: 1; transform: translateY(0);  }
+    }
+
+    label {
+      display: block;
+      font-size: 0.86rem;
+      margin-bottom: 0.25rem;
+      font-weight: 500;
+      color: #111827;
+    }
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    input[type="time"],
+    select,
+    textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0.4rem 0.55rem;
+      border-radius: 0.55rem;
+      border: 1px solid #d0d4da;
+      font-size: 0.9rem;
+      margin-bottom: 0.7rem;
+      font-family: inherit;
+      background: #f9fafb;
+      transition: border-color 0.12s, box-shadow 0.12s, background 0.12s;
+    }
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 1px rgba(37,99,235,0.2);
+      background: #ffffff;
+    }
+    textarea { min-height: 160px; resize: vertical; }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .col {
+      flex: 1 1 220px;
+      min-width: 0;
+    }
+
+    .btn {
+      border: none;
+      padding: 0.5rem 0.9rem;
+      border-radius: 0;
+      background: var(--primary);
+      color: #ffffff;
+      cursor: pointer;
+      font-size: 0.9rem;
+      margin-top: 0.3rem;
+      transition: transform 0.08s, box-shadow 0.12s, background 0.12s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      white-space: nowrap;
+      font-weight: 500;
+    }
+    .btn.secondary {
+      background: #e5e7eb;
+      color: #111827;
+      border: 1px solid #d1d5db;
+    }
+    .btn.small {
+      padding: 0.3rem 0.6rem;
+      font-size: 0.8rem;
+    }
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+    .btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(15,23,42,0.25);
+    }
+    .btn.btn-delete {
+      background: #ef4444;
+      color: white;
+      border: none;
+    }
+    .btn.btn-delete:hover {
+      background: #dc2626;
+      box-shadow: 0 4px 14px rgba(239,68,68,0.4);
+    }
+    .btn-toggle {
+      border-radius: 999px;
+      padding: 0.3rem 0.7rem;
+      font-size: 0.8rem;
+      background: rgba(15,23,42,0.25);
+      color: #e5e7eb;
+    }
+
+    .small { font-size: 0.8rem; color: #6b7280; }
+    .muted { color: #9ca3af; font-size: 0.75rem; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.75rem;
+    }
+    th, td {
+      border-bottom: 1px solid #e5e7eb;
+      padding: 0.4rem 0.4rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #f9fafb;
+      font-weight: 600;
+      font-size: 0.8rem;
+      color: #4b5563;
+    }
+    a {
+      color: #2563eb;
+      text-decoration: none;
+      font-size: 0.8rem;
+    }
+    a:hover { text-decoration: underline; }
+
+    .toast-container {
+      position: fixed;
+      right: 1rem;
+      bottom: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      z-index: 60;
+      pointer-events: none;
+    }
+    .toast {
+      background: #111827;
+      color: #f9fafb;
+      padding: 0.45rem 0.9rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      box-shadow: 0 12px 30px rgba(15,23,42,0.6);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      opacity: 0;
+      transform: translateY(6px);
+      animation: toast-in 0.18s forwards;
+      pointer-events: auto;
+    }
+    .toast--success { background: #16a34a; }
+    .toast--error   { background: #b91c1c; }
+    @keyframes toast-in {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes toast-out {
+      to { opacity: 0; transform: translateY(6px); }
+    }
+
+    #previewContainer {
+      max-width: 21cm;
+      min-height: 6cm;
+      margin: 0.5rem auto 1.5rem auto;
+      padding: 0.7cm 0.7cm 0.7cm 1.2cm;
+      border: 1px dashed var(--border-subtle);
+      border-radius: 0.4rem;
+      background: #ffffff;
+      box-shadow: 0 5px 12px rgba(15,23,42,0.08);
+      column-count: 2;
+      column-gap: 1.5cm;
+      font-size: 0.9rem;
+    }
+    #previewContainer .song-block {
+      break-inside: avoid;
+      margin-bottom: 0.5rem;
+    }
+    #previewContainer h3 {
+      margin-top: 0;
+      text-align: center;
+      font-size: 1rem;
+    }
+
+    
+
+    /* Folheto typography */
+    .leaflet-a4 {
+      font-family: 'Noto Serif', 'Times New Roman', serif;
+    }
+    .leaflet-song-title {
+      font-family: 'Lato', 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .leaflet-note {
+      font-family: 'Lato', 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+/* Folheto */
+    .leaflet-frame {
+      background:white;
+      border-radius:0.75rem;
+      border:1px solid var(--border);
+      padding:0.75rem;
+      max-height:80vh;
+      overflow:auto;
+    }
+    .leaflet-a4 {
+      width:794px;
+      min-height:1123px;
+      margin:0 auto;
+      padding:1.2cm 1cm 1.2cm 1.6cm;
+      box-shadow:0 10px 35px rgba(15,23,42,0.12);
+      position:relative;
+      background:white;
+      color:black;
+    }
+    .leaflet-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.6rem;
+      padding: 0.4rem 0.6rem;
+      border-radius: 0.6rem;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+      gap: 1rem;
+    }
+    .leaflet-header-left img {
+      max-height: 80px;
+      max-width: 150px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+    .leaflet-header-center {
+      flex: 1;
+      text-align: center;
+      min-width: 0;
+    }
+    .leaflet-header-right img {
+      max-height: 80px;
+      max-width: 150px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+    .leaflet-header-center h2 {
+      margin: 0;
+      font-size: 1.35rem;
+      word-wrap: break-word;
+      hyphens: auto;
+    }
+    .leaflet-header-center .meta {
+      font-size:0.8rem;
+      color:#4b5563;
+    }
+    .leaflet-line {
+      height:3px;
+      width:65%;
+      margin:0.35rem auto 0.15rem auto;
+      border-radius:999px;
+      background:#e5e7eb;
+    }
+    .leaflet-note {
+      font-size:0.75rem;
+      color:#6b7280;
+      text-align:center;
+      margin-bottom:0.4rem;
+    }
+    .leaflet-cols {
+      column-count:2;
+      column-gap:1.4rem;
+      font-size:0.85rem;
+    }
+    .leaflet-song {
+      break-inside: avoid;
+      break-inside: avoid-column;
+      page-break-inside: avoid;
+      -webkit-column-break-inside: avoid;
+      display: inline-block;
+      width: 100%;
+      margin-bottom: 0.5rem;
+    }
+    .leaflet-song-title {
+      font-weight: 600;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    .leaflet-song-meta {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-bottom: 0.15rem;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    .leaflet-song-lyrics {
+      margin: 0;
+      white-space: pre-wrap;
+      font-family: inherit;
+      font-size: 0.8rem;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    .leaflet-song-lyrics .chord {
+      color:#b91c1c;
+      font-weight:700;
+    }
+    .leaflet-footer {
+      position:absolute;
+      bottom:0.5cm;
+      left:1.6cm;
+      right:1cm;
+      font-size:0.7rem;
+      color:#9ca3af;
+      display:flex;
+      justify-content:space-between;
+    }
+    
+@media (max-width: 768px) {
+      .header-inner { align-items: flex-start; }
+      header h1, header p { white-space: normal; }
+      .row { flex-direction: column; }
+      #previewContainer { column-count: 1; padding: 0.6cm; }
+      .tabs { 
+        top: 4.4rem; 
+        overflow-x: auto; 
+        gap: 0.3rem;
+        padding: 0.3rem;
+        border-radius: 0;
+      }
+      .tabs button {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.7rem;
+        border-radius: 0;
+        min-width: fit-content;
+      }
+      .tabs button span.dot {
+        width: 0.4rem;
+        height: 0.4rem;
+      }
+      .btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+        width: 100%;
+        justify-content: center;
+      }
+      .btn.small {
+        padding: 0.4rem 0.7rem;
+        font-size: 0.75rem;
+        width: auto;
+      }
+      input, select, textarea {
+        font-size: 16px !important;
+      }
+      .card {
+        padding: 1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .tabs {
+        gap: 0.2rem;
+        padding: 0.2rem;
+      }
+      .tabs button {
+        font-size: 0.7rem;
+        padding: 0.4rem 0.6rem;
+        gap: 0.25rem;
+      }
+      .tabs button span.dot {
+        width: 0.35rem;
+        height: 0.35rem;
+      }
+      .btn {
+        font-size: 0.8rem;
+        padding: 0.55rem 0.9rem;
+      }
+      .btn.small {
+        font-size: 0.7rem;
+        padding: 0.35rem 0.6rem;
+      }
+      header h1 {
+        font-size: 1.3rem;
+      }
+      .card {
+        padding: 0.8rem;
+      }
+    }
+
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 1cm 1cm 1cm 2cm;
+      }
+      body { background: #ffffff !important; }
+      header,
+      .tabs,
+      #tab-programa,
+      #tab-sugestoes,
+      #tab-historico,
+      #tab-catalogo,
+      #tab-partituras,
+      #tab-videos,
+      #tab-ensaios,
+      #tab-folhetos,
+      .toast-container { display: none !important; }
+      #tab-preview,
+      #previewContainer {
+        display: block !important;
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      #previewContainer { column-count: 2; }
+    }
+  
+/* Modais para programa (seleção e edição de letra) */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 80;
+}
+.modal-backdrop[hidden] {
+  display: none;
+}
+.modal {
+  background: #ffffff;
+  color: inherit;
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  max-width: 720px;
+  width: 100%;
+  box-shadow: 0 20px 45px rgba(15,23,42,0.35);
+}
+.modal h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  text-align: left;
+}
+.modal textarea {
+  width: 100%;
+  min-height: 180px;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 0.9rem;
+}
+.modal .modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+.modal small {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+.program-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+}
+.program-buttons .btn.small {
+  padding: 0.15rem 0.4rem;
+  font-size: 0.7rem;
+}
+.song-select-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+.song-select-filters .col {
+  flex: 1 1 160px;
+}
+.song-select-list {
+  max-height: 360px;
+  overflow-y: auto;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 0.5rem;
+}
+.song-select-item {
+  padding: 0.4rem 0;
+  border-bottom: 1px dashed #e5e7eb;
+}
+.song-select-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.2rem;
+}
+.song-select-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.song-select-meta {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-bottom: 0.2rem;
+}
+.song-select-actions .btn.small {
+  margin-right: 0.25rem;
+  margin-bottom: 0.15rem;
+}
+
+
+@page { size: A4 portrait; margin: 2cm 1cm 1cm 2cm; }
+#previewContainer { column-count: 2; column-gap: 1.5cm; }
+
+
+/* Modal centrado */
+.use-modal {
+  position: fixed; inset:0;
+  background: rgba(0,0,0,0.55);
+  display:flex; align-items:center; justify-content:center;
+  z-index:2000;
+}
+.use-modal-box {
+  background: var(--card,#fff);
+  padding:20px; border-radius:12px;
+  min-width:260px; max-width:340px;
+  box-shadow:0 8px 30px rgba(0,0,0,.2);
+  animation: fadeIn .18s ease-out;
+}
+.use-modal-list button{
+  display:block; width:100%; margin:6px 0;
+  padding:8px 12px;
+  border-radius:8px; border:1px solid var(--border-subtle,#ccc);
+  background:var(--bg2,#f5f5f5); cursor:pointer;
+}
+.use-modal-list button:hover{ background:#e0e7ff; }
+@keyframes fadeIn{ from{opacity:0; transform:scale(.95);} to{opacity:1; transform:scale(1);} }
+
+
+/* Botões do catálogo – estilo Material Design */
+#songsTableContainer button {
+  border: none;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: rgba(0,0,0,0.05);
+  cursor: pointer;
+  transition: box-shadow .15s ease, transform .12s ease, background .12s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+#songsTableContainer button:hover {
+  background: rgba(0,0,0,0.08);
+  transform: translateY(-1px);
+}
+
+#songsTableContainer button.primary-action {
+  background: var(--accent, #4f46e5);
+  color: #fff;
+}
+
+#songsTableContainer button.primary-action:hover {
+  box-shadow: 0 3px 10px rgba(79,70,229,0.35);
+}
+
+/* Dashboard cards */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
+  gap: 0.75rem;
+  margin-bottom: 0.8rem;
+}
+.card-grid .dash-card {
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.75rem;
+  background: rgba(255,255,255,0.7);
+  box-shadow: 0 8px 24px rgba(15,23,42,0.04);
+  border: 1px solid rgba(148,163,184,0.35);
+}
+.card-grid .dash-card h3 {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+}
+.card-grid .dash-card p {
+  margin: 0;
+}
+.card-grid .tiny {
+  font-size: 0.75rem;
+}
+.card-grid .dash-actions {
+  display: flex;
+  gap: 0.2rem;
+  flex-wrap: wrap;
+  margin-top: 0.25rem;
+}
+
+/* Pequenos utilitários do gestor de ensaios */
+.rehearsal-song-row {
+  margin-bottom: 0.5rem;
+}
+.tiny-gap .col {
+  padding-right: 0.25rem;
+}
+.tiny-divider {
+  border: 0;
+  border-top: 1px dashed rgba(148,163,184,0.5);
+  margin: 0.5rem 0;
+}
+
+/* Calendário Litúrgico */
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .dashboard-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.liturgical-calendar {
+  background: var(--card);
+  border-radius: 0.5rem;
+  padding: 0.4rem;
+  box-shadow: 0 4px 12px rgba(15,23,42,0.1);
+  max-width: 10cm;
+  width: 10cm;
+  margin: 0 auto;
+  font-size: 0.7rem;
+}
+
+.upcoming-celebrations {
+  background: var(--card);
+  border-radius: 0.5rem;
+  padding: 0.6rem;
+  box-shadow: 0 4px 12px rgba(15,23,42,0.1);
+  height: fit-content;
+  max-height: 100%;
+  overflow-y: auto;
+  font-size: 0.75rem;
+}
+
+.upcoming-celebrations h3 {
+  font-size: 0.8rem;
+  margin: 0 0 0.6rem 0;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.3rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.calendar-header h3 {
+  margin: 0;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.calendar-nav {
+  display: flex;
+  gap: 0.2rem;
+}
+
+.calendar-nav button {
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.3rem;
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.65rem;
+}
+
+.calendar-nav button:hover {
+  background: var(--primary-soft);
+  transform: translateY(-1px);
+}
+
+.calendar-month-year {
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+  color: var(--primary);
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.1rem;
+}
+
+.calendar-day-header {
+  text-align: center;
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 0.2rem;
+  text-transform: uppercase;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.25rem;
+  font-size: 0.65rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  background: var(--bg-soft);
+  border: 1px solid transparent;
+  min-height: 1.2cm;
+}
+
+.calendar-day:hover {
+  background: var(--primary-soft);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.calendar-day.other-month {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.calendar-day.other-month:hover {
+  background: var(--bg-soft);
+  transform: none;
+  box-shadow: none;
+}
+
+.calendar-day.today {
+  background: var(--primary);
+  color: white;
+  font-weight: 700;
+  border-color: var(--primary);
+}
+
+.calendar-day.liturgical-event {
+  background: linear-gradient(135deg, var(--event-color, var(--primary)) 0%, var(--event-color, var(--primary)) 100%);
+  color: white;
+  font-weight: 600;
+  border: 2px solid var(--event-color, var(--primary));
+}
+
+.calendar-day.liturgical-event::after {
+  content: '•';
+  position: absolute;
+  bottom: 2px;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.calendar-day.has-program {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  font-weight: 700;
+  border: 2px solid #059669;
+  position: relative;
+}
+
+.calendar-day.has-program::before {
+  content: '✓';
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.calendar-day.has-program:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+.calendar-day.liturgical-event.has-program {
+  background: linear-gradient(135deg, var(--event-color, var(--primary)) 0%, var(--event-color, var(--primary)) 100%);
+  border: 3px solid var(--event-color, var(--primary));
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px #10b981;
+}
+
+.calendar-day.liturgical-event.has-program::after {
+  content: '✓';
+  bottom: 2px;
+  right: 4px;
+  font-size: 1rem;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.calendar-day.advento { --event-color: #7c3aed; }
+.calendar-day.natal { --event-color: #eab308; }
+.calendar-day.quaresma { --event-color: #7c2d12; }
+.calendar-day.pascoa { --event-color: #fafafa; color: #000; }
+.calendar-day.festa { --event-color: #dc2626; }
+.calendar-day.solenidade { --event-color: #059669; }
+
+.calendar-day-number {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.calendar-day-indicator {
+  font-size: 0.6rem;
+  margin-top: 0.15rem;
+}
+
+.liturgical-events-list {
+  margin-top: 0.5rem;
+  padding-top: 1rem;
+  border-top: 2px solid var(--border-subtle);
+}
+
+.liturgical-events-list h4 {
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+  color: var(--text-main);
+}
+
+.event-item {
+  display: flex;
+  gap: 0.4rem;
+  padding: 0.4rem;
+  margin-bottom: 0.3rem;
+  border-radius: 0.3rem;
+  background: var(--bg-soft);
+  transition: all 0.2s;
+  font-size: 0.7rem;
+}
+
+.event-item:hover {
+  background: var(--primary-soft);
+  transform: translateX(2px);
+}
+
+.event-date {
+  font-weight: 700;
+  font-size: 0.7rem;
+  color: var(--primary);
+  min-width: 40px;
+}
+
+.event-details {
+  flex: 1;
+}
+
+.event-title {
+  font-weight: 600;
+  font-size: 0.7rem;
+  margin-bottom: 0.1rem;
+}
+
+.event-type {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  display: inline-block;
+  padding: 0.1rem 0.3rem;
+  border-radius: 0.2rem;
+  background: rgba(0,0,0,0.05);
+}
+
+.event-type.advento { background: #ede9fe; color: #7c3aed; }
+.event-type.natal { background: #fef3c7; color: #92400e; }
+.event-type.quaresma { background: #fef2f2; color: #7c2d12; }
+.event-type.pascoa { background: #f0fdf4; color: #166534; }
+.event-type.festa { background: #fee2e2; color: #dc2626; }
+.event-type.solenidade { background: #d1fae5; color: #059669; }
+
+/* Modal de Programa do Dia */
+.program-day-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.2s ease-out;
+  padding: 1rem;
+}
+
+.program-day-content {
+  background: var(--card);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  max-width: 600px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 60px rgba(15,23,42,0.6);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.program-day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.8rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--border-subtle);
+}
+
+.program-day-header h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: var(--text-main);
+}
+
+.program-day-date {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.program-day-close {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 0.25rem;
+  line-height: 1;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+}
+
+.program-day-close:hover {
+  background: var(--bg-soft);
+  color: var(--text-main);
+}
+
+.program-day-info {
+  margin-bottom: 0.8rem;
+}
+
+.program-info-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.program-info-label {
+  font-weight: 600;
+  color: var(--text-main);
+  min-width: 100px;
+}
+
+.program-info-value {
+  color: var(--text-muted);
+  flex: 1;
+}
+
+.program-day-parts {
+  margin-top: 0.5rem;
+}
+
+.program-day-parts h4 {
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+  color: var(--text-main);
+}
+
+.program-part-item {
+  background: var(--bg-soft);
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+  border-left: 3px solid var(--primary);
+}
+
+.program-part-label {
+  font-weight: 600;
+  font-size: 0.75rem;
+  color: var(--primary);
+  margin-bottom: 0.25rem;
+}
+
+.program-part-song {
+  font-size: 0.9rem;
+  color: var(--text-main);
+}
+
+.program-day-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  padding-top: 1rem;
+  border-top: 2px solid var(--border-subtle);
+}
+
+.program-day-actions .btn {
+  flex: 1;
+}
+
+.no-program-message {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--text-muted);
+}
+
+.no-program-message i {
+  font-size: 3rem;
+  opacity: 0.3;
+  margin-bottom: 0.7rem;
+  display: block;
+}
+
+.calendar-legend {
+  margin-top: 0.3rem;
+  padding-top: 0.4rem;
+  border-top: 1px solid var(--border-subtle);
+  font-size: 0.65rem;
+}
+
+@media (max-width: 768px) {
+  .calendar-day-header {
+    font-size: 0.65rem;
+    padding: 0.3rem;
+  }
+  
+  .calendar-day {
+    font-size: 0.75rem;
+  }
+  
+  .calendar-nav button {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* Modo impressão do folheto */
+@media print {
+  body {
+    margin: 0;
+    background: #fff;
+  }
+  .no-print, .tabs, header, footer {
+    display: none !important;
+  }
+  #tab-programa {
+    display: block !important;
+  }
+  #previewContainer {
+    box-shadow: none;
+    border: none;
+    padding: 0;
+  }
+  @page {
+    size: A4 portrait;
+    margin-top: var(--print-margin-top, 1.5cm);
+    margin-bottom: var(--print-margin-bottom, 1cm);
+    margin-left: var(--print-margin-left, 1.5cm);
+    margin-right: var(--print-margin-right, 1cm);
+  }
+}
+
+/* Variáveis de margem editáveis */
+:root {
+  --print-margin-top: 1.5cm;
+  --print-margin-bottom: 1cm;
+  --print-margin-left: 1.5cm;
+  --print-margin-right: 1cm;
+}
+
+</style>
+
+<style>
+.btn.btn-xs, .btn-xs {
+  padding: 0.15rem 0.45rem;
+  font-size: 0.75rem;
+  border-radius: 999px;
+}
+
+/* Modal centrado */
+.use-modal {
+  position: fixed; inset:0;
+  background: rgba(0,0,0,0.55);
+  display:flex; align-items:center; justify-content:center;
+  z-index:2000;
+}
+.use-modal-box {
+  background: var(--card,#fff);
+  padding:20px; border-radius:12px;
+  min-width:260px; max-width:340px;
+  box-shadow:0 8px 30px rgba(0,0,0,.2);
+  animation: fadeIn .18s ease-out;
+}
+.use-modal-list button{
+  display:block; width:100%; margin:6px 0;
+  padding:8px 12px;
+  border-radius:8px; border:1px solid var(--border-subtle,#ccc);
+  background:var(--bg2,#f5f5f5); cursor:pointer;
+}
+.use-modal-list button:hover{ background:#e0e7ff; }
+@keyframes fadeIn{ from{opacity:0; transform:scale(.95);} to{opacity:1; transform:scale(1);} }
+
+</style>
+<style>
+#lyricsEditor .ql-editor {
+  min-height:250px;
+  font-size:0.9rem;
+  line-height:1.4;
+}
+#lyricsEditor .ql-editor .chord {
+  color:#b91c1c;
+  font-weight:700;
+}
+.modal-dialog .ql-toolbar {
+  border-radius:8px 8px 0 0;
+}
+.modal-dialog .ql-container {
+  border-radius:0 0 8px 8px;
+}
+
+/* Modal centrado */
+.use-modal {
+  position: fixed; inset:0;
+  background: rgba(0,0,0,0.55);
+  display:flex; align-items:center; justify-content:center;
+  z-index:2000;
+}
+.use-modal-box {
+  background: var(--card,#fff);
+  padding:20px; border-radius:12px;
+  min-width:260px; max-width:340px;
+  box-shadow:0 8px 30px rgba(0,0,0,.2);
+  animation: fadeIn .18s ease-out;
+}
+.use-modal-list button{
+  display:block; width:100%; margin:6px 0;
+  padding:8px 12px;
+  border-radius:8px; border:1px solid var(--border-subtle,#ccc);
+  background:var(--bg2,#f5f5f5); cursor:pointer;
+}
+.use-modal-list button:hover{ background:#e0e7ff; }
+@keyframes fadeIn{ from{opacity:0; transform:scale(.95);} to{opacity:1; transform:scale(1);} }
+
+</style>
+
+
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<style>
+#lyricsModal .modal-backdrop {
+    z-index: 1000 !important;
+}
+#lyricsModal .modal-dialog {
+    z-index: 1001 !important;
+    position: fixed;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+/* Modal centrado */
+.use-modal {
+  position: fixed; inset:0;
+  background: rgba(0,0,0,0.55);
+  display:flex; align-items:center; justify-content:center;
+  z-index:2000;
+}
+.use-modal-box {
+  background: var(--card,#fff);
+  padding:20px; border-radius:12px;
+  min-width:260px; max-width:340px;
+  box-shadow:0 8px 30px rgba(0,0,0,.2);
+  animation: fadeIn .18s ease-out;
+}
+.use-modal-list button{
+  display:block; width:100%; margin:6px 0;
+  padding:8px 12px;
+  border-radius:8px; border:1px solid var(--border-subtle,#ccc);
+  background:var(--bg2,#f5f5f5); cursor:pointer;
+}
+.use-modal-list button:hover{ background:#e0e7ff; }
+@keyframes fadeIn{ from{opacity:0; transform:scale(.95);} to{opacity:1; transform:scale(1);} }
+
+</style>
+
+
+<style>
+.folheto-letra {
+    white-space: pre-line;
+    text-align: left;
+    line-height: 1.45;
+    font-size: 1.05rem;
+}
+
+/* Modal centrado */
+.use-modal {
+  position: fixed; inset:0;
+  background: rgba(0,0,0,0.55);
+  display:flex; align-items:center; justify-content:center;
+  z-index:2000;
+}
+.use-modal-box {
+  background: var(--card,#fff);
+  padding:20px; border-radius:12px;
+  min-width:260px; max-width:340px;
+  box-shadow:0 8px 30px rgba(0,0,0,.2);
+  animation: fadeIn .18s ease-out;
+}
+.use-modal-list button{
+  display:block; width:100%; margin:6px 0;
+  padding:8px 12px;
+  border-radius:8px; border:1px solid var(--border-subtle,#ccc);
+  background:var(--bg2,#f5f5f5); cursor:pointer;
+}
+.use-modal-list button:hover{ background:#e0e7ff; }
+@keyframes fadeIn{ from{opacity:0; transform:scale(.95);} to{opacity:1; transform:scale(1);} }
+
+</style>
+
+
+<style>
+/* Melhorias visuais dos modais principais */
+.modal-backdrop {
+  backdrop-filter: blur(10px) saturate(140%);
+}
+.modal {
+  border-radius: 1rem;
+  padding: 1.25rem 1.6rem;
+  max-width: 760px;
+  box-shadow: 0 24px 60px rgba(15,23,42,0.6);
+  animation: fadeIn 0.2s ease-out;
+  transform-origin: center top;
+}
+:root.dark .modal {
+  background: #020617;
+  box-shadow: 0 24px 60px rgba(15,23,42,0.9);
+}
+.modal h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.modal .modal-actions {
+  gap: 0.6rem;
+}
+</style>
+
+<style>
+/* Estilo litúrgico premium */
+:root {
+  --lit-green: #15803d;
+  --lit-purple: #6d28d9;
+  --lit-red: #b91c1c;
+  --lit-white: #e5e7eb;
+  --lit-gold: #fbbf24;
+}
+
+.badge-usage {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  background: rgba(24, 119, 242, 0.1);
+  border: 1px solid rgba(24, 119, 242, 0.25);
+  color: #1d4ed8;
+  margin-left: 0.35rem;
+  white-space: nowrap;
+}
+
+.song-select-item {
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+.song-select-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(15,23,42,0.18);
+}
+
+button, .btn {
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease, color 0.18s ease;
+}
+button:hover, .btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(15,23,42,0.25);
+}
+button:active, .btn:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 2px 8px rgba(15,23,42,0.3);
+}
+
+/* Modais com entrada/saída suave */
+.modal-backdrop {
+  backdrop-filter: blur(10px) saturate(140%);
+  animation: modalFadeIn 0.18s ease-out;
+}
+.modal-backdrop.modal-closing {
+  animation: modalFadeOut 0.18s ease-in forwards;
+}
+.modal {
+  border-radius: 1rem;
+  box-shadow: 0 24px 60px rgba(15,23,42,0.7);
+  transform-origin: center top;
+  animation: modalContentIn 0.2s ease-out;
+}
+:root.dark .modal {
+  background: #020617;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes modalFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes modalContentIn {
+  from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Tabela do histórico de cânticos */
+#songHistoryTableContainer table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+}
+#songHistoryTableContainer th,
+#songHistoryTableContainer td {
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid rgba(148,163,184,0.4);
+  text-align: left;
+}
+#songHistoryTableContainer th {
+  font-weight: 600;
+  background: rgba(15,23,42,0.03);
+}
+#songHistoryTableContainer tr:hover td {
+  background: rgba(15,23,42,0.03);
+}
+
+</style>
+
+<style>
+/* Tema litúrgico premium – acentos por cor litúrgica */
+:root {
+  --accent: #4b5563;
+  --accent-soft: rgba(75, 85, 99, 0.1);
+}
+
+body.lit-green {
+  --accent: #15803d;
+  --accent-soft: rgba(21, 128, 61, 0.1);
+}
+body.lit-purple {
+  --accent: #6d28d9;
+  --accent-soft: rgba(109, 40, 217, 0.12);
+}
+body.lit-red {
+  --accent: #b91c1c;
+  --accent-soft: rgba(185, 28, 28, 0.12);
+}
+body.lit-white {
+  --accent: #d4d4d8;
+  --accent-soft: rgba(212, 212, 216, 0.15);
+}
+body.lit-gold {
+  --accent: #fbbf24;
+  --accent-soft: rgba(251, 191, 36, 0.12);
+}
+
+.leaflet-header-center h2 {
+  letter-spacing: 0.03em;
+}
+.leaflet-header-center .meta {
+  color: var(--accent);
+}
+
+.badge-usage {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Melhorias mobile/responsivo */
+@media (max-width: 768px) {
+  .tabs {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+  .tabs button {
+    flex: 1 1 auto;
+    min-width: 140px;
+  }
+  .row {
+    flex-direction: column;
+  }
+  .program-grid {
+    grid-template-columns: 1fr !important;
+  }
+  #previewContainer {
+    column-count: 1 !important;
+  }
+  .leaflet-a4 {
+    padding: 1rem;
+  }
+}
+
+/* Pequenos realces litúrgicos nos títulos de secções */
+.program-section-title {
+  border-left: 4px solid var(--accent);
+  padding-left: 0.4rem;
+}
+</style>
+
+<style id="coro-smart-v20">
+.smart-suggestion-row{display:flex;justify-content:space-between;gap:.75rem;align-items:center;padding:.65rem .7rem;margin:.35rem 0;background:var(--card);border:1px solid var(--border-subtle);border-radius:.5rem}.smart-suggestion-row>div{min-width:0}.smart-suggestion-row .small{line-height:1.35}.smart-suggestion-row .btn{flex:0 0 auto}.song-select-meta{line-height:1.35}
+</style>
+<style>
+.assistant-item{display:grid;grid-template-columns:minmax(150px,1fr) minmax(220px,2fr) auto;gap:.7rem;align-items:center;padding:.65rem 0;border-top:1px solid var(--border)}
+.assistant-item:first-child{border-top:0}.assistant-score{font-weight:700}.assistant-reason{font-size:.78rem;color:var(--text-muted)}
+.assistant-empty{padding:.6rem;border-radius:.5rem;background:rgba(220,38,38,.08)}
+@media(max-width:700px){.assistant-item{grid-template-columns:1fr}.assistant-item .btn{width:100%}}
+</style>
+
+<style id="coro-dashboard-v3">
+.dashboard-v3{display:grid;gap:1rem;padding:1rem 0}.dash-top{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.dash-card{background:var(--card);border:1px solid var(--border-subtle);border-radius:1rem;padding:1.15rem;box-shadow:0 8px 25px rgba(15,23,42,.12)}.dash-create{display:flex;align-items:center;gap:1rem;background:linear-gradient(135deg,#eef6ff,#fff)}.dash-plus{width:76px;height:76px;border-radius:50%;display:grid;place-items:center;background:#0b67b2;color:#fff;font-size:3.4rem;line-height:1;flex:0 0 auto}.dash-card h3{margin:.1rem 0 .45rem;font-size:1.05rem}.dash-create h2{margin:0 0 .35rem;font-size:1.35rem}.dash-muted{color:var(--text-muted);font-size:.82rem}.dash-next{display:flex;gap:1rem;align-items:center}.dash-date{min-width:92px;text-align:center;border-right:1px solid var(--border-subtle);padding-right:1rem}.dash-date strong{display:block;font-size:2.1rem;line-height:1}.dash-date small{display:block;text-transform:uppercase}.dash-event-title{font-weight:700;font-size:1.05rem}.dash-event-meta{font-size:.78rem;color:var(--text-muted);margin-top:.2rem}.dash-actions{display:grid;grid-template-columns:repeat(6,1fr);gap:.65rem}.dash-action{border:0;border-radius:.8rem;padding:.8rem .45rem;background:var(--bg-soft);color:var(--text-main);cursor:pointer;font:inherit}.dash-action:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.08)}.dash-action span{display:block;font-size:1.5rem;margin-bottom:.2rem}.dash-action b{font-size:.76rem}.dash-lists{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.dash-list{display:grid;gap:.35rem}.dash-list-row{display:grid;grid-template-columns:70px 1fr auto;gap:.65rem;align-items:center;padding:.55rem 0;border-bottom:1px solid var(--border-subtle)}.dash-list-row:last-child{border-bottom:0}.dash-list-date{font-weight:600}.dash-list-title{font-size:.82rem}.dash-list-sub{font-size:.7rem;color:var(--text-muted)}.dash-view{font-size:.75rem}.dash-quote{padding:1rem 1.25rem;background:linear-gradient(135deg,rgba(11,103,178,.18),rgba(11,103,178,.05));border-radius:1rem;font-family:'Noto Serif',serif;font-style:italic}.dash-quote small{float:right;font-family:Poppins,sans-serif;font-style:normal;color:var(--text-muted)}
+@media(max-width:850px){.dash-top,.dash-lists{grid-template-columns:1fr}.dash-actions{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:520px){.dash-actions{grid-template-columns:repeat(2,1fr)}.dash-create{align-items:flex-start}.dash-plus{width:58px;height:58px;font-size:2.5rem}.dash-date{min-width:70px}.dash-list-row{grid-template-columns:58px 1fr auto}}
+</style>
+<style id="coro-v31-final-ui">
+  .header-logo{background:transparent!important;padding:0!important;filter:drop-shadow(0 3px 8px rgba(0,0,0,.35));}
+  .header-inner{max-width:1400px;margin:0 auto;}
+  main{max-width:1400px;}
+  main>.card:first-child{background:transparent;box-shadow:none;padding:0;margin-bottom:1rem;}
+  .tabs{background:#06284b;border-radius:0 0 .85rem .85rem;padding:.35rem .45rem;gap:.25rem;box-shadow:0 8px 24px rgba(2,8,23,.28);}
+  .tabs button{padding:.72rem .9rem;border-radius:.55rem;}
+  .tabs button.active{background:#1479d1;box-shadow:0 5px 14px rgba(0,0,0,.22);}
+  .dash-card{border-radius:1rem;}
+  .dash-create{min-height:190px;}
+  .dash-create .btn{min-width:250px;font-size:1rem;}
+  .lyrics-auto-status{display:block;margin-top:.3rem;color:#15803d!important;font-weight:600;}
+  .assistant-panel{scroll-margin-top:6rem;}
+  #assistantLiveStatus{color:#15803d;font-weight:600;}
+  #newProgramModal .modal{max-width:620px;}
+  #newProgramModal .btn.secondary{text-align:left;padding:1rem;}
+  @media(max-width:700px){.header-logo{height:72px}.header-inner{gap:.7rem}.dash-create .btn{min-width:0;width:100%}.tabs{overflow-x:auto;flex-wrap:nowrap}.tabs button{flex:0 0 auto}}
+
+    .lyrics-online-box{display:flex;align-items:center;justify-content:space-between;gap:.8rem;flex-wrap:wrap;background:#f8fafc;border:1px solid var(--border-subtle);border-radius:12px;padding:.75rem .9rem;margin:.65rem 0 1rem}.lyrics-online-actions{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}.lyrics-online-mini{margin-left:.45rem;white-space:nowrap}.lyrics-online-mini a{color:var(--primary);text-decoration:none}.lyrics-online-mini a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="header-main">
+      <img class="header-logo" src="logo_light.png" alt="Logotipo do Coro">
+      <div class="header-text">
+        <h1 id="headerTitle">Coro Paroquial São João Batista de Rio Caldo</h1>
+        <p id="headerSubtitle">Ferramenta litúrgica para preparação de cânticos dominicais</p>
+        <div class="liturgical-pill" id="liturgicalInfoPill">
+          <span id="liturgicalIcon">🎵</span>
+          <span id="liturgicalInfoText">Tempo litúrgico não definido</span>
+        </div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button type="button" class="btn-toggle" id="themeToggleBtn">🌙 Modo escuro</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="card">
+    
+    <nav class="tabs">
+      <button type="button" class="active" data-tab="tab-dashboard"><span class="dot"></span> Página inicial</button>
+      <button type="button" data-tab="tab-calendario"><span class="dot"></span> Calendário</button>
+      <button type="button" data-tab="tab-programa"><span class="dot"></span> Programa</button>
+      <button type="button" data-tab="tab-folhetos"><span class="dot"></span> Folhetos</button>
+      <button type="button" data-tab="tab-catalogo"><span class="dot"></span> Catálogo</button>
+      <button type="button" data-tab="tab-partituras"><span class="dot"></span> Partituras</button>
+      <button type="button" data-tab="tab-videos"><span class="dot"></span> Vídeos</button>
+      <button type="button" data-tab="tab-historico"><span class="dot"></span> Histórico</button>
+      <button type="button" data-tab="tab-ensaios"><span class="dot"></span> Ensaios</button>
+    </nav>
+
+
+
+    <section id="tab-dashboard" class="tab active">
+      <div class="dashboard-v3">
+        <div class="dash-top">
+          <div class="dash-card dash-create">
+            <div class="dash-plus">+</div>
+            <div>
+              <h2>Criar novo programa</h2>
+              <div class="dash-muted">Escolha uma data e deixe o assistente preparar a celebração com os cânticos mais adequados.</div>
+              <button type="button" class="btn" id="newProgramBtn" style="margin-top:.7rem;">📅 Novo programa</button>
+            </div>
+          </div>
+          <div class="dash-card">
+            <div style="display:flex;justify-content:space-between;gap:.5rem;align-items:center;">
+              <h3>📅 Próxima celebração</h3><button type="button" class="btn secondary tiny" id="dashboardCalendarBtn">Ver calendário →</button>
+            </div>
+            <div id="dashboardNextEvent" class="dash-next"></div>
+          </div>
+        </div>
+
+        <div class="dash-card">
+          <h3>⚡ Ações rápidas</h3>
+          <div class="dash-actions">
+            <button type="button" class="dash-action" data-dash-tab="tab-programa" id="dashNewProgramAction"><span>📅</span><b>Novo programa</b></button>
+            <button type="button" class="dash-action" data-dash-tab="tab-catalogo"><span>🎵</span><b>Consultar catálogo</b></button>
+            <button type="button" class="dash-action" data-dash-tab="tab-partituras"><span>📄</span><b>Ver partituras</b></button>
+            <button type="button" class="dash-action" data-dash-tab="tab-folhetos"><span>📖</span><b>Folhetos</b></button>
+            <button type="button" class="dash-action" data-dash-tab="tab-historico"><span>◷</span><b>Histórico</b></button>
+            <button type="button" class="dash-action" data-dash-tab="tab-ensaios"><span>👥</span><b>Ensaios</b></button>
+          </div>
+        </div>
+
+        <div class="dash-lists">
+          <div class="dash-card"><div style="display:flex;justify-content:space-between;align-items:center;"><h3>📅 Próximas celebrações</h3><button type="button" class="btn secondary tiny" id="dashboardAllCalendarBtn">Ver todas →</button></div><div id="dashboardUpcoming" class="dash-list"></div></div>
+          <div class="dash-card"><div style="display:flex;justify-content:space-between;align-items:center;"><h3>📄 Programas recentes</h3><button type="button" class="btn secondary tiny" id="dashboardHistoryBtn">Ver todos →</button></div><div id="dashboardRecent" class="dash-list"></div></div>
+        </div>
+
+        <div class="dash-quote">“A música sacra é um dom e um serviço à Igreja.” <small>— Papa Francisco</small></div>
+      </div>
+    </section>
+
+    <section id="tab-calendario" class="tab">
+      <div class="card" style="padding:1rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:.75rem;flex-wrap:wrap;">
+          <div><h2 style="margin:0;">📅 Calendário Litúrgico</h2><p class="small muted" style="margin:.25rem 0 0;">Consulte as celebrações, o tempo litúrgico e os programas já preparados.</p></div>
+          <div class="calendar-nav"><button type="button" id="prevMonth" title="Mês anterior">‹</button><button type="button" id="todayBtn">Hoje</button><button type="button" id="nextMonth" title="Próximo mês">›</button></div>
+        </div>
+        <div class="calendar-month-year" id="calendarMonthYear" style="margin:1rem 0;text-align:center;font-size:1.15rem;font-weight:700;"></div>
+        <div class="calendar-grid" id="calendarGrid">
+          <div class="calendar-day-header">Dom</div><div class="calendar-day-header">Seg</div><div class="calendar-day-header">Ter</div><div class="calendar-day-header">Qua</div><div class="calendar-day-header">Qui</div><div class="calendar-day-header">Sex</div><div class="calendar-day-header">Sáb</div>
+        </div>
+        <div class="calendar-legend" style="margin-top:1rem;"><span class="small muted">💡 Clique numa celebração para abrir o programa dessa data.</span></div>
+      </div>
+    </section>
+
+    <section id="tab-programa" class="tab">
+      <form id="programForm">
+        <h2>Programa litúrgico</h2>
+        <p class="small">Escolhe a data. A aplicação identifica a celebração, tempo litúrgico, ciclo, cor, leituras e Salmo e usa esse contexto para sugerir cânticos do repertório.</p>
+
+        <div class="row">
+          <div class="col">
+            <label for="date">Data</label>
+            <input type="date" id="date" required>
+          </div>
+          <div class="col">
+            <label for="liturgicalTitle">Título litúrgico</label>
+            <input type="text" id="liturgicalTitle" placeholder="ex.: XXXIII Domingo do Tempo Comum — Ano C">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label for="extraTheme">Tema extra / ocasião</label>
+            <input type="text" id="extraTheme" placeholder="ex.: Festa da Padroeira, Profissão de Fé…">
+          </div>
+          <div class="col">
+            <label for="cycleDisplay">Tempo / ciclo (auto)</label>
+            <input type="text" id="cycleDisplay" disabled>
+            <input type="hidden" id="liturgicalColor" value="">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col"><label for="salmistaPrograma">Salmista</label><input type="text" id="salmistaPrograma" placeholder="Nome do salmista"></div>
+          <div class="col"><label for="organistaPrograma">Organista</label><input type="text" id="organistaPrograma" placeholder="Nome do organista"></div>
+        </div>
+
+        <div id="smartLiturgyPanel" style="margin:0.75rem 0;padding:1rem;background:var(--bg-soft);border-left:4px solid var(--primary);border-radius:0.5rem;">
+          <strong>⛪ Contexto litúrgico</strong>
+          <div id="smartLiturgyContent" class="small" style="margin-top:0.35rem;">Escolhe uma data para identificar a celebração.</div>
+        </div>
+
+        <div id="programAssistantPanel" class="assistant-panel" style="margin:1rem 0;padding:1rem;border:1px solid var(--border);border-radius:.75rem;background:var(--bg-soft);">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:.75rem;flex-wrap:wrap;">
+            <div>
+              <strong>🧭 Assistente de preparação do programa</strong>
+              <div class="small muted">Analisa a celebração, o tema, o Salmo e o histórico do coro e propõe uma seleção equilibrada.</div>
+            </div>
+            <div style="display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;">
+              <span class="tiny muted" id="assistantLiveStatus">● Sugestões automáticas</span>
+              <button type="button" class="btn small" id="assistantFillBtn">✨ Preencher programa</button>
+            </div>
+          </div>
+          <div id="assistantSummary" class="small" style="margin-top:.75rem;"></div>
+          <div id="assistantList" style="margin-top:.75rem;"></div>
+        </div>
+
+        <hr>
+
+        <div class="row">
+          <div class="col">
+            <label for="entrada">Entrada</label>
+            <select id="entrada"></select>
+            <div class="program-buttons">
+              <button type="button" class="btn secondary small program-select-btn" data-part-id="entrada">Selecionar</button>
+              <button type="button" class="btn secondary small program-lyrics-btn" data-part-id="entrada">Editar letra</button>
+              <button type="button" class="btn secondary small program-media-btn" data-part-id="entrada">Vídeo/áudio</button>
+            </div>
+          </div>
+          <div class="col">
+            <label for="atoPenitencial">Ato Penitencial</label>
+            <select id="atoPenitencial"></select>
+            <div class="program-buttons">
+              <button type="button" class="btn secondary small program-select-btn" data-part-id="atoPenitencial">Selecionar</button>
+              <button type="button" class="btn secondary small program-lyrics-btn" data-part-id="atoPenitencial">Editar letra</button>
+              <button type="button" class="btn secondary small program-media-btn" data-part-id="atoPenitencial">Vídeo/áudio</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label for="gloria">Glória</label>
+            <select id="gloria"></select>
+            <div class="program-buttons">
+              <button type="button" class="btn secondary small program-select-btn" data-part-id="gloria">Selecionar</button>
+              <button type="button" class="btn secondary small program-lyrics-btn" data-part-id="gloria">Editar letra</button>
+              <button type="button" class="btn secondary small program-media-btn" data-part-id="gloria">Vídeo/áudio</button>
+            </div>
+          </div>
+          <div class="col">
+            <label for="salmo">Salmo Responsorial</label>
+            <select id="salmo"></select>
+            <div class="program-buttons">
+              <button type="button" class="btn secondary small program-select-btn" data-part-id="salmo">Selecionar</button>
+              <button type="button" class="btn secondary small program-lyrics-btn" data-part-id="salmo">Editar letra</button>
+              <button type="button" class="btn secondary small program-media-btn" data-part-id="salmo">Vídeo/áudio</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label for="aclamacao">Aclamação ao Evangelho</label>
+            <select id="aclamacao"></select>
+            <div class="program-buttons">
+              <button type="button" class="btn secondary small program-select-btn" data-part-id="aclamacao">Selecionar</button>
+              <button type="button" class="btn secondary small program-lyrics-btn" data-part-id="aclamacao">Editar letra</button>
+              <button type="button" class="btn secondary small program-media-btn" data-part-id="aclamacao">Vídeo/áudio</button>
+            </div>
+          </div>
+          <div class="col">
+            <label for="ofertorio">Ofertório</label>
+            <select id="ofertorio"></select>
+            <div class="program-buttons">
+              <button type="button" class="btn secondary small program-select-btn" data-part-id="ofertorio">Selecionar</button>
+              <button type="button" class="btn secondary small program-lyrics-btn" data-part-id="ofertorio">Editar letra</button>
+              <button type="button" class="btn secondary small program-media-btn" data-part-id="ofertorio">Vídeo/áudio</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label for="santo">Santo</label>
+            <select id="santo"></select>
+            <div class="program-buttons">
+              <button type="button" class="btn secondary small program-select-btn" data-part-id="santo">Selecionar</button>
+              <button type="button" class="btn secondary small program-lyrics-btn" data-part-id="santo">Editar letra</button>
+              <button type="button" class="btn secondary small program-media-btn" data-part-id="santo">Vídeo/áudio</button>
+            </div>
+          </div>
+          <div class="col">
+            <label for="paiNosso">Pai Nosso</label>
+            <select id="paiNosso"></select>
+            <div class="program-buttons">
+              <button type="button" class="btn secondary small program-select-btn" data-part-id="paiNosso">Selecionar</button>
+              <button type="button" class="btn secondary small program-lyrics-btn" data-part-id="paiNosso">Editar letra</button>
+              <button type="button" class="btn secondary small program-media-btn" data-part-id="paiNosso">Vídeo/áudio</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label for="paz">Paz</label>
+            <select id="paz"></select>
+            <div class="program-buttons">
+              <button type="button" class="btn secondary small program-select-btn" data-part-id="paz">Selecionar</button>
+              <button type="button" class="btn secondary small program-lyrics-btn" data-part-id="paz">Editar letra</button>
+              <button type="button" class="btn secondary small program-media-btn" data-part-id="paz">Vídeo/áudio</button>
+            </div>
+          </div>
+          <div class="col">
+            <label for="cordeiro">Cordeiro de Deus</label>
+            <select id="cordeiro"></select>
+            <div class="program-buttons">
+              <button type="button" class="btn secondary small program-select-btn" data-part-id="cordeiro">Selecionar</button>
+              <button type="button" class="btn secondary small program-lyrics-btn" data-part-id="cordeiro">Editar letra</button>
+              <button type="button" class="btn secondary small program-media-btn" data-part-id="cordeiro">Vídeo/áudio</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label for="comunhao">Comunhão</label>
+            <select id="comunhao"></select>
+            <div class="program-buttons">
+              <button type="button" class="btn secondary small program-select-btn" data-part-id="comunhao">Selecionar</button>
+              <button type="button" class="btn secondary small program-lyrics-btn" data-part-id="comunhao">Editar letra</button>
+              <button type="button" class="btn secondary small program-media-btn" data-part-id="comunhao">Vídeo/áudio</button>
+            </div>
+          </div>
+          <div class="col">
+            <label for="acaoGracas">Ação de Graças</label>
+            <select id="acaoGracas"></select>
+            <div class="program-buttons">
+              <button type="button" class="btn secondary small program-select-btn" data-part-id="acaoGracas">Selecionar</button>
+              <button type="button" class="btn secondary small program-lyrics-btn" data-part-id="acaoGracas">Editar letra</button>
+              <button type="button" class="btn secondary small program-media-btn" data-part-id="acaoGracas">Vídeo/áudio</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label for="final">Final</label>
+            <select id="final"></select>
+            <div class="program-buttons">
+              <button type="button" class="btn secondary small program-select-btn" data-part-id="final">Selecionar</button>
+              <button type="button" class="btn secondary small program-lyrics-btn" data-part-id="final">Editar letra</button>
+              <button type="button" class="btn secondary small program-media-btn" data-part-id="final">Vídeo/áudio</button>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="row" style="align-items:center; margin-top:0.5rem;">
+          <div class="col">
+            <button type="submit" class="btn">Guardar domingo no histórico</button>
+          </div>
+          <div class="col" style="text-align:right;">
+            <button type="button" class="btn secondary" id="assemblySheetBtn" style="margin-left:0.4rem;">Folheto assembleia</button>
+<button type="button" class="btn secondary" id="assemblySheetBtnNoLyrics" style="margin-left:0.4rem;">Folheto (sem letras)</button>
+          </div>
+        </div>
+      
+<div style="margin-top:20px;">
+  <label><strong>Imagem do Domingo / Solenidade:</strong></label><br>
+  <input type="file" id="uploadSundayImage" accept="image/*" style="margin-top: 0.5rem;">
+  <button type="button" class="btn secondary small" id="removeSundayImage" style="margin-left: 0.5rem; display: none;">
+    🗑️ Remover Imagem
+  </button>
+  
+  <!-- Preview da imagem -->
+  <div id="sundayImagePreview" style="margin-top: 1rem; display: none;">
+    <img id="sundayImagePreviewImg" src="" alt="Preview" style="max-width: 300px; max-height: 200px; border-radius: 0.5rem; border: 2px solid var(--border);">
+  </div>
+</div>
+
+<div style="margin-top:20px;">
+  <label><strong>Margens do folheto (mm):</strong></label>
+  <div class="row small" style="margin-top:0.5rem;">
+    <div class="col">
+      <label for="marginTop">Topo</label>
+      <input type="number" id="marginTop" value="10" min="0" max="40" class="small">
+    </div>
+    <div class="col">
+      <label for="marginBottom">Fundo</label>
+      <input type="number" id="marginBottom" value="12" min="0" max="40" class="small">
+    </div>
+    <div class="col">
+      <label for="marginLeft">Esquerda</label>
+      <input type="number" id="marginLeft" value="14" min="0" max="40" class="small">
+    </div>
+    <div class="col">
+      <label for="marginRight">Direita</label>
+      <input type="number" id="marginRight" value="10" min="0" max="40" class="small">
+    </div>
+  </div>
+  <p class="tiny muted">Estas margens são usadas ao imprimir o folheto (A4 retrato).</p>
+</div>
+
+
+</form>
+    </section>
+
+    <!-- Container invisível para geração de folhetos (usado pela funcionalidade de Folhetos Guardados) -->
+    <div id="previewContainer" style="display: none;"></div>
+
+    <section id="tab-folhetos" class="tab">
+      <h2>📋 Folhetos Guardados</h2>
+      <p class="small">Os folhetos ficam guardados apenas neste dispositivo (localStorage).</p>
+      
+      <div class="row" style="margin-bottom: 1rem; align-items: center;">
+        <div class="col">
+          <button type="button" class="btn" id="saveCurrentLeafletBtn">💾 Guardar Folheto Atual</button>
+        </div>
+        <div class="col text-right">
+          <small id="leafletsSummary" class="small muted"></small>
+        </div>
+      </div>
+      
+      <div id="savedLeafletsContainer" class="small muted">
+        Ainda não há folhetos guardados.
+      </div>
+      
+      <div style="margin-top: 1rem;">
+        <button type="button" class="btn btn-delete small" id="clearAllLeafletsBtn">🗑️ Limpar TODOS os Folhetos</button>
+      </div>
+      
+      <!-- Modal de visualização de folheto -->
+      <div id="leafletViewModal" class="modal-backdrop" style="display:none;">
+        <div class="modal" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
+          <h3 id="leafletViewTitle">Folheto</h3>
+          <div id="leafletViewContent" style="background: white; padding: 1rem; border-radius: 0.5rem;">
+          </div>
+          <div style="margin-top: 1rem; display: flex; gap: 0.5rem; justify-content: flex-end;">
+            <button type="button" class="btn secondary" id="leafletViewPrint">🖨️ Imprimir</button>
+            <button type="button" class="btn secondary" id="leafletViewClose">Fechar</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-catalogo" class="tab">
+      <h2>Catálogo de cânticos</h2>
+      <p class="small">
+        O catálogo é carregado automaticamente a partir do Google Sheets.<br>
+        Se necessário, podes carregar também um CSV manual.
+      </p>
+
+      <div class="row align-center small" style="margin-top:0.5rem;margin-bottom:0.5rem;">
+        <div class="col">
+          <button type="button" class="btn secondary tiny" id="refreshCatalogBtn">Atualizar catálogo agora</button>
+        </div>
+        <div class="col">
+          <span id="catalogStatus" class="tiny muted">Catálogo carregado automaticamente ao abrir.</span><div class="tiny muted" style="margin-top:.3rem;">💡 Se o catálogo tiver uma coluna <b>Letra</b>, a letra é associada automaticamente por <b>nome + autor</b>.</div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <label for="filterAuthor">Filtrar por autor</label>
+          <select id="filterAuthor">
+            <option value="">Todos</option>
+          </select>
+        </div>
+        <div class="col">
+          <label for="filterTheme">Filtrar por tema</label>
+          <select id="filterTheme">
+            <option value="">Todos</option>
+          </select>
+        </div>
+        <div class="col">
+          <label for="songSearch">Procurar por título</label>
+          <input type="text" id="songSearch" placeholder="Escreve parte do título…">
+        </div>
+      </div>
+
+      <p class="small" style="margin-top:0;">Carregamento manual (opcional):</p>
+      <input type="file" id="csvFile" accept=".csv">
+      <button type="button" class="btn secondary" id="loadCsvBtn">Carregar CSV manualmente</button>
+      <div id="csvError" class="small" style="color:#b91c1c;display:none;"></div>
+
+      <hr>
+
+      <!-- Secção de Cânticos Personalizados -->
+      <div style="background: var(--bg-soft); padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;">
+        <div class="row align-center">
+          <div class="col">
+            <h3 style="margin: 0;">📝 Cânticos Personalizados</h3>
+            <p class="small muted" style="margin: 0.25rem 0 0 0;">Adiciona cânticos próprios com partituras em PDF ou imagem</p>
+          </div>
+          <div class="col text-right">
+            <button type="button" class="btn" id="addCustomSongBtn">➕ Adicionar Cântico</button>
+          </div>
+        </div>
+        <div id="customSongsContainer" style="margin-top: 1rem;"></div>
+      </div>
+
+      <hr>
+
+      <div id="songsTableContainer" class="small muted">
+        A carregar catálogo do Google Sheets…
+      </div>
+    </section>
+
+    <section id="tab-historico" class="tab">
+      <h2>Histórico de domingos</h2>
+      <p class="small">Os programas guardados ficam apenas neste dispositivo (localStorage).</p>
+      <div id="historyContainer" class="small muted">Ainda não há domingos guardados.</div>
+      
+
+      <div style="margin-top: 1rem;">
+        <button type="button" class="btn btn-delete small" id="clearAllHistoryBtn">🗑️ Limpar TODO o Histórico de Domingos</button>
+      </div>
+
+    </section>
+
+    <section id="tab-ensaios" class="tab">
+      <h2>Ensaios</h2>
+      <form id="rehearsalForm">
+        <p class="small">Gera uma mensagem para enviar por WhatsApp ou Email com o programa do domingo.</p>
+        <div class="row">
+          <div class="col">
+            <label for="rehearsalDate">Data do ensaio</label>
+            <input type="date" id="rehearsalDate">
+          </div>
+          <div class="col">
+            <label for="rehearsalTime">Hora</label>
+            <input type="time" id="rehearsalTime">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <label for="rehearsalPlace">Local</label>
+            <input type="text" id="rehearsalPlace" placeholder="ex.: Igreja Paroquial">
+          </div>
+          <div class="col">
+            <label for="rehearsalProgram">Programa (domingo)</label>
+            <select id="rehearsalProgram">
+              <option value="">— escolher domingo —</option>
+            </select>
+          </div>
+        </div>
+        <label for="rehearsalNotes">Notas para o ensaio</label>
+        <textarea id="rehearsalNotes" placeholder="ex.: Tragam a partitura nova do ofertório."></textarea>
+
+        <div class="row" style="margin-top: 1rem; gap: 0.5rem;">
+          <button type="button" class="btn" id="rehearsalWhatsAppBtn">📱 Enviar WhatsApp</button>
+          <button type="button" class="btn secondary" id="rehearsalEmailBtn">📧 Enviar Email (com partituras)</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="tab-partituras" class="tab">
+      <h2>📁 Partituras</h2>
+      <p class="small">Acesso direto às partituras do coro no Google Drive.</p>
+      
+      <!-- Campo de pesquisa -->
+      <div style="margin-bottom: 1rem;">
+        <label for="partituraSearch">🔍 Pesquisar partitura</label>
+        <input type="text" id="partituraSearch" placeholder="Escreve o nome do cântico ou partitura...">
+        <p class="small muted" style="margin-top: 0.5rem;">A pesquisa funciona dentro de cada pasta do Google Drive abaixo.</p>
+      </div>
+
+      <!-- Pasta 1: Original -->
+      <div style="margin-bottom: 2rem;">
+        <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">📂 Partituras - Pasta Principal</h3>
+        
+        <div style="margin-bottom: 1rem;">
+          <a href="https://drive.google.com/drive/folders/10VhjmmmvGcUzg8gdIT3Rlu5iDTFqlJy8?usp=drive_link" 
+             target="_blank" 
+             class="btn secondary small"
+             style="display: inline-flex; align-items: center; gap: 0.5rem;">
+            🔗 Abrir no Google Drive
+          </a>
+        </div>
+
+        <!-- Google Drive Embed 1 -->
+        <div style="border: 1px solid var(--border-subtle); border-radius: 0.5rem; overflow: hidden; background: white;">
+          <iframe 
+            id="driveFrame1"
+            src="https://drive.google.com/embeddedfolderview?id=10VhjmmmvGcUzg8gdIT3Rlu5iDTFqlJy8#grid" 
+            style="width: 100%; height: 500px; border: none;">
+          </iframe>
+        </div>
+      </div>
+
+      <!-- Pasta 2: Nova -->
+      <div style="margin-bottom: 2rem;">
+        <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">📂 Partituras - Pasta Adicional</h3>
+        
+        <div style="margin-bottom: 1rem;">
+          <a href="https://drive.google.com/drive/folders/10YDH1vUq67KE1Qd3trMukyacLTjwpVis?usp=drive_link" 
+             target="_blank" 
+             class="btn secondary small"
+             style="display: inline-flex; align-items: center; gap: 0.5rem;">
+            🔗 Abrir no Google Drive
+          </a>
+        </div>
+
+        <!-- Google Drive Embed 2 -->
+        <div style="border: 1px solid var(--border-subtle); border-radius: 0.5rem; overflow: hidden; background: white;">
+          <iframe 
+            id="driveFrame2"
+            src="https://drive.google.com/embeddedfolderview?id=10YDH1vUq67KE1Qd3trMukyacLTjwpVis#grid" 
+            style="width: 100%; height: 500px; border: none;">
+          </iframe>
+        </div>
+      </div>
+
+      <div style="margin-top: 1rem;">
+        <details>
+          <summary class="small" style="cursor: pointer; padding: 0.5rem; background: var(--bg-soft); border-radius: 0.5rem;">
+            💡 Como usar as partituras
+          </summary>
+          <div style="padding: 1rem; font-size: 0.9rem;">
+            <ul>
+              <li><strong>Pesquisar:</strong> Usa o campo acima para procurar em ambas as pastas</li>
+              <li><strong>Visualizar:</strong> Clica numa partitura para abrir</li>
+              <li><strong>Download:</strong> Botão de download no topo direito</li>
+              <li><strong>Imprimir:</strong> Menu "Ficheiro" → "Imprimir"</li>
+              <li><strong>Organização:</strong> Partituras organizadas por tempo litúrgico e alfabeticamente</li>
+              <li><strong>Duas pastas:</strong> Temos 2 pastas diferentes com partituras - podes procurar em ambas</li>
+            </ul>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section id="tab-videos" class="tab">
+      <h2>🎥 Vídeos dos Cânticos</h2>
+      <p class="small">Vê e ouve os cânticos do repertório para ensaiar.</p>
+
+      <!-- Filtros -->
+      <div class="row" style="margin-bottom: 1rem;">
+        <div class="col">
+          <label for="videoSearch">Pesquisar cântico</label>
+          <input type="text" id="videoSearch" placeholder="Nome do cântico...">
+        </div>
+        <div class="col">
+          <label for="videoSection">Secção</label>
+          <select id="videoSection">
+            <option value="">Todas</option>
+            <option value="Entrada">Entrada</option>
+            <option value="Glória">Glória</option>
+            <option value="Salmo">Salmo</option>
+            <option value="Aclamação">Aclamação</option>
+            <option value="Ofertório">Ofertório</option>
+            <option value="Santo">Santo</option>
+            <option value="Cordeiro">Cordeiro</option>
+            <option value="Comunhão">Comunhão</option>
+            <option value="Final">Final</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Container de vídeos -->
+      <div id="videosContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem;">
+        <p class="small muted">Seleciona um cântico do catálogo para ver o vídeo...</p>
+      </div>
+
+      <div style="margin-top: 1.5rem; padding: 1rem; background: var(--bg-soft); border-radius: 0.5rem; border-left: 4px solid var(--primary);">
+        <p class="small" style="margin: 0;"><strong>💡 Dica:</strong> Podes adicionar links de vídeo do YouTube no catálogo de cânticos (coluna "Video" do Google Sheets).</p>
+      </div>
+    </section>
+  </div>
+
+<div id="lyricsModal" class="modal" style="display:none;">
+  <div class="modal-backdrop" style="position:fixed;inset:0;background:rgba(0,0,0,0.35);"></div>
+  <div class="modal-dialog" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#ffffff;padding:1rem 1.25rem;border-radius:12px;max-width:600px;width:90%;box-shadow:0 18px 45px rgba(15,23,42,0.25);">
+    <h3 style="margin-top:0;">Letra do cântico</h3>
+    <p id="lyricsModalTitle" class="small muted" style="margin-bottom:0.5rem;"></p>
+    
+<div id="lyricsEditorToolbar">
+  <span class="ql-formats">
+    <button class="ql-bold"></button>
+    <button class="ql-italic"></button>
+    <button class="ql-underline"></button>
+  </span>
+  <span class="ql-formats">
+    <button class="ql-list" value="ordered"></button>
+    <button class="ql-list" value="bullet"></button>
+  </span>
+  <span class="ql-formats">
+    <button class="ql-link"></button>
+    <button class="ql-clean"></button>
+    <button class="ql-header" value="3"></button>
+    <button class="ql-chord">Acorde</button>
+  </span>
+</div>
+<div id="lyricsEditor" style="height:250px;"></div>
+
+    <div style="margin-top:0.75rem; text-align:right; display:flex; gap:0.5rem; justify-content:flex-end;">
+      <button type="button" class="btn secondary" id="lyricsModalCancel">Cancelar</button>
+      <button type="button" class="btn" id="lyricsModalSave">Guardar letra</button>
+    </div>
+  </div>
+</div>
+</main>
+
+<div id="toastContainer" class="toast-container"></div>
+
+
+<!-- Modais do programa: seleção de cântico e edição de letra -->
+<div class="modal-backdrop" id="newProgramModal" hidden aria-hidden="true">
+  <div class="modal" style="max-width:560px;">
+    <div style="display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;">
+      <div>
+        <h3 style="margin:0;">➕ Novo programa</h3>
+        <p class="small muted" style="margin:.35rem 0 0;">O que pretende fazer?</p>
+      </div>
+      <button type="button" class="btn secondary small" id="newProgramCloseBtn" aria-label="Fechar">✕</button>
+    </div>
+    <div style="display:grid;gap:.65rem;margin-top:1rem;">
+      <button type="button" class="btn secondary" id="newProgramExistingBtn" style="text-align:left;">📅 <b>Criar programa para uma celebração existente</b><br><span class="tiny muted">Escolher a data no calendário e preparar o programa.</span></button>
+      <button type="button" class="btn secondary" id="newProgramNextBtn" style="text-align:left;">✨ <b>Criar programa para a próxima celebração</b><br><span class="tiny muted">Usar automaticamente a próxima celebração disponível.</span></button>
+      <button type="button" class="btn secondary" id="newProgramDateBtn" style="text-align:left;">📝 <b>Criar programa para uma nova data</b><br><span class="tiny muted">Escolher manualmente uma data.</span></button>
+      <button type="button" class="btn secondary" id="newProgramDuplicateBtn" style="text-align:left;">📋 <b>Duplicar um programa anterior</b><br><span class="tiny muted">Escolher um programa já guardado como base.</span></button>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-top:1rem;">
+      <button type="button" class="btn secondary" id="newProgramCancelBtn">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="songSelectModal" hidden>
+  <div class="modal">
+    <h3>Selecionar cântico</h3>
+    <p class="small" id="songSelectPartLabel"></p>
+    <div class="song-select-filters">
+      <div class="col">
+        <label for="songSelectSearch">Pesquisar</label>
+        <input type="text" id="songSelectSearch" placeholder="Título, tema, autor…">
+      </div>
+      <div class="col">
+        <label for="songSelectTheme">Tema</label>
+        <select id="songSelectTheme">
+          <option value="">Todos</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="songSelectSuggestions" class="small" style="margin-bottom:0.75rem; display:none;">
+      <p class="small" style="margin-bottom:0.25rem;"><strong>✨ Sugestões para esta parte</strong></p>
+      <div id="songSelectSuggestionsList"></div>
+    </div>
+
+    <div id="songSelectList" class="song-select-list">
+      <p class="small muted">Catálogo a carregar…</p>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn secondary" id="songSelectCloseBtn">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="programLyricsModal" hidden>
+  <div class="modal">
+    <h3 id="programLyricsModalTitle">Editar letra</h3>
+    <p class="small" id="programLyricsModalSong"></p>
+    <div id="programLyricsOnline"></div>
+    <textarea id="programLyricsTextarea" placeholder="Letra a usar neste programa."></textarea>
+    <div class="modal-actions">
+      <button type="button" class="btn secondary" id="programLyricsCancelBtn">Cancelar</button>
+      <button type="button" class="btn" id="programLyricsSaveBtn">Guardar</button>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+
+<div class="modal-backdrop" id="songEditModal" hidden>
+  <div class="modal">
+    <h3>✏️ Editar cântico antes de inserir</h3>
+    <div class="row">
+      <div class="col">
+        <label for="songEditTitle">Título</label>
+        <input type="text" id="songEditTitle" placeholder="Título do cântico">
+      </div>
+      <div class="col">
+        <label for="songEditKey">Tom</label>
+        <input type="text" id="songEditKey" placeholder="Ex.: Ré, Mi♭, etc.">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <label for="songEditLyrics">Letra</label>
+        <textarea id="songEditLyrics" placeholder="Letra a usar neste programa. Pode incluir acordes entre [] se quiser."></textarea>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <label for="songEditChords">Acordes (opcional)</label>
+        <textarea id="songEditChords" placeholder="Sequência de acordes, notas para músicos…"></textarea>
+      </div>
+      <div class="col">
+        <label for="songEditNotes">Notas internas (opcional)</label>
+        <textarea id="songEditNotes" placeholder="Notas internas para o coro ou organista."></textarea>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <label for="songEditPartSelect">Secção do programa</label>
+        <select id="songEditPartSelect"></select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn secondary" id="songEditCancelBtn">Cancelar</button>
+      <button type="button" class="btn" id="songEditSaveInsertBtn">Guardar e inserir</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Histórico de Uso do Cântico -->
+<div id="songUsageModal" class="modal-backdrop" style="display: none;">
+  <div class="modal" style="max-width: 600px;">
+    <h3 id="songUsageModalTitle">Histórico de Utilização</h3>
+    <div id="songUsageModalContent" style="max-height: 400px; overflow-y: auto;">
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn secondary" id="songUsageModalClose">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Adicionar Cântico Personalizado -->
+<div id="customSongModal" class="modal-backdrop" style="display: none;">
+  <div class="modal" style="max-width: 650px;">
+    <h3>➕ Adicionar Cântico Personalizado</h3>
+    <p class="small muted">Cria um cântico com partitura em PDF ou imagem (foto/scan)</p>
+    
+    <form id="customSongForm">
+      <div style="margin-bottom: 1rem;">
+        <label><strong>Título do Cântico *</strong></label>
+        <input type="text" id="customSongTitle" required placeholder="Ex: Ave Maria de Fátima">
+      </div>
+
+      <div style="margin-bottom: 1rem;">
+        <label><strong>Secção Litúrgica</strong></label>
+        <select id="customSongSection">
+          <option value="">Nenhuma</option>
+          <option value="Entrada">Entrada</option>
+          <option value="Glória">Glória</option>
+          <option value="Salmo">Salmo</option>
+          <option value="Aleluia">Aleluia</option>
+          <option value="Ofertório">Ofertório</option>
+          <option value="Santo">Santo</option>
+          <option value="Comunhão">Comunhão</option>
+          <option value="Final">Final</option>
+          <option value="Outro">Outro</option>
+        </select>
+      </div>
+
+      <div style="margin-bottom: 1rem;">
+        <label><strong>Autor</strong></label>
+        <input type="text" id="customSongAuthor" placeholder="Ex: Marco Frisina">
+      </div>
+
+      <div style="margin-bottom: 1rem;">
+        <label><strong>Observações</strong></label>
+        <textarea id="customSongNotes" rows="2" placeholder="Notas sobre o cântico..."></textarea>
+      </div>
+
+      <div style="margin-bottom: 1rem; padding: 1rem; background: #f0f9ff; border-radius: 0.5rem; border-left: 4px solid #0284c7;">
+        <label style="display: block; margin-bottom: 0.5rem;"><strong>📄 Partitura (PDF ou Imagem)</strong></label>
+        
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem;">
+          <button type="button" class="btn secondary small" id="uploadFileBtn">
+            📁 Escolher Ficheiro
+          </button>
+          <button type="button" class="btn secondary small" id="takePictureBtn">
+            📷 Tirar Foto
+          </button>
+        </div>
+
+        <input type="file" id="customSongFile" accept="application/pdf,image/*" style="display: none;">
+        <input type="file" id="customSongCamera" accept="image/*" capture="environment" style="display: none;">
+        
+        <div id="filePreview" style="display: none; margin-top: 0.75rem; padding: 0.75rem; background: white; border-radius: 0.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong id="fileName"></strong>
+              <br>
+              <small class="muted" id="fileSize"></small>
+            </div>
+            <button type="button" class="btn secondary small" id="removeFileBtn">🗑️ Remover</button>
+          </div>
+          <img id="imagePreview" style="max-width: 100%; margin-top: 0.5rem; display: none; border-radius: 0.25rem;">
+        </div>
+
+        <p class="small muted" style="margin-top: 0.5rem; margin-bottom: 0;">
+          💡 Formatos aceites: PDF, JPG, PNG. Máximo 5MB.
+        </p>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn secondary" id="customSongModalClose">Cancelar</button>
+        <button type="submit" class="btn">💾 Guardar Cântico</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal de Visualizar Cântico Personalizado -->
+<div id="viewCustomSongModal" class="modal-backdrop" style="display: none;">
+  <div class="modal" style="max-width: 800px;">
+    <h3 id="viewCustomSongTitle">Cântico Personalizado</h3>
+    
+    <div id="viewCustomSongContent">
+      <div style="margin-bottom: 1rem;">
+        <strong>Secção:</strong> <span id="viewSongSection"></span>
+      </div>
+      <div style="margin-bottom: 1rem;">
+        <strong>Autor:</strong> <span id="viewSongAuthor"></span>
+      </div>
+      <div style="margin-bottom: 1rem;" id="viewSongNotesContainer">
+        <strong>Observações:</strong>
+        <p id="viewSongNotes" style="margin-top: 0.25rem;"></p>
+      </div>
+      
+      <div id="viewSongFileContainer" style="margin-top: 1.5rem;">
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+          <button type="button" class="btn secondary" id="downloadSongFileBtn">
+            ⬇️ Download Partitura
+          </button>
+          <button type="button" class="btn secondary" id="openSongFileBtn">
+            🔍 Abrir em Nova Aba
+          </button>
+        </div>
+        <div id="pdfViewer" style="display: none;">
+          <embed id="pdfEmbed" type="application/pdf" style="width: 100%; height: 500px; border-radius: 0.5rem;">
+        </div>
+        <div id="imageViewer" style="display: none;">
+          <img id="imageView" style="max-width: 100%; border-radius: 0.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button type="button" class="btn secondary" id="viewCustomSongClose">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<script>window.CORO_EMBEDDED_CATALOG=[{"id":"s1","Título":"***","Autor":"","Tema":"cruz; DOMINGO DE RAMOS E DA PAIXÃO DO SENHOR; entrega; Paixão; Ramos; sofrimento","Tempo":"Semana Santa","Observações":"Momento: Ato Penitencial","Video":"","Partitura":"","_uses":1,"_last":"2026-03-29"},{"id":"s2","Título":"******","Autor":"","Tema":"","Tempo":"","Observações":"","Video":"","Partitura":"","_uses":1,"_last":"2026-01-01"},{"id":"s3","Título":"**********","Autor":"","Tema":"conversão; deserto; DOMINGO I DA QUARESMA; misericórdia; pecado; Quaresma","Tempo":"Quaresma","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-02-22"},{"id":"s4","Título":"A bondade do Senhor","Autor":"A. Cartageno","Tema":"Bom Pastor; DOMINGO IV DA PÁSCOA; pastor; rebanho; vocação","Tempo":"Tempo Pascal","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-04-26"},{"id":"s5","Título":"A messe é grande","Autor":"C. Silva","Tema":"alegria; DOMINGO XIV DO TEMPO COMUM; humildade; paz; salvação","Tempo":"Tempo Comum","Observações":"Momento: Final","Video":"","Partitura":"","_uses":1,"_last":"2026-07-05"},{"id":"s6","Título":"A minha alma tem sede de Vós, meu Deus.","Autor":"A. Cartageno","Tema":"cruz; DOMINGO XXII DO TEMPO COMUM; entrega; misericórdia; seguimento","Tempo":"Tempo Comum","Observações":"Momento: Salmo | Salmo: Senhor, pela vossa grande misericórdia, salvai-me","Video":"","Partitura":"","_uses":1,"_last":"2026-08-30"},{"id":"s7","Título":"A quem segue o caminho reto, darei a Salvação de Deus","Autor":"Az. Oliveira","Tema":"compaixão; DOMINGO X DO TEMPO COMUM; misericórdia; vocação","Tempo":"Tempo Comum","Observações":"Momento: Salmo | Salmo: Eu quero misericórdia e não sacrifício","Video":"","Partitura":"","_uses":1,"_last":"2026-06-07"},{"id":"s8","Título":"A semente caiu em boa terra e deu muito fruto.","Autor":"M.Luis","Tema":"amor; DOMINGO XV DO TEMPO COMUM; misericórdia; Palavra; próximo","Tempo":"Tempo Comum","Observações":"Momento: Salmo | Salmo: Procurai o Senhor, enquanto se pode encontrar","Video":"","Partitura":"","_uses":1,"_last":"2026-07-12"},{"id":"s9","Título":"A semente é a palavra de Deus","Autor":"","Tema":"conversão; DOMINGO III DO TEMPO COMUM; luz; missão; Palavra de Deus","Tempo":"Tempo Comum","Observações":"Momento: Final","Video":"","Partitura":"","_uses":1,"_last":"2026-01-25"},{"id":"s10","Título":"A Sto. António elevemos","Autor":"M. Faria","Tema":"compaixão; DOMINGO X DO TEMPO COMUM; misericórdia; vocação","Tempo":"Tempo Comum","Observações":"Momento: Final","Video":"","Partitura":"","_uses":1,"_last":"2026-06-07"},{"id":"s11","Título":"A terra inteira aclame o Senhor","Autor":"M.Luis","Tema":"DOMINGO VI DA PÁSCOA; esperança; Espírito Santo; testemunho","Tempo":"Tempo Pascal","Observações":"Momento: Salmo | Salmo: O Senhor é rei, exulte a terra","Video":"","Partitura":"","_uses":1,"_last":"2026-05-10"},{"id":"s12","Título":"Acabou a missa","Autor":"Az. Oliveira","Tema":"bondade; conversão; DOMINGO XXV DO TEMPO COMUM; generosidade; reino","Tempo":"Tempo Comum","Observações":"Momento: Final","Video":"","Partitura":"","_uses":1,"_last":"2026-09-20"},{"id":"s13","Título":"Aclamai Jesus Cristo","Autor":"F. Silva","Tema":"DOMINGO VII DA PÁSCOA; glória; oração; unidade","Tempo":"Tempo Pascal","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-05-17"},{"id":"s14","Título":"Aclamai o Senhor, porque Ele é bom","Autor":"M.Luis","Tema":"comunidade; DOMINGO II DA PÁSCOA — DA DIVINA MISERICÓRDIA; misericórdia; paz; ressurreição","Tempo":"Tempo Pascal","Observações":"Momento: Salmo | Salmo: Dai graças ao Senhor, porque Ele é bom, porque é eterna a sua misericórdia","Video":"","Partitura":"","_uses":1,"_last":"2026-04-12"},{"id":"s15","Título":"Agnus Dei","Autor":"Henryk Jan Botor","Tema":"compaixão; DOMINGO X DO TEMPO COMUM; misericórdia; vocação","Tempo":"Tempo Comum","Observações":"Momento: Cordeiro de Deus","Video":"","Partitura":"","_uses":3,"_last":"2026-06-24"},{"id":"s16","Título":"Alegra-te Jerusalem","Autor":"J.P.Martins","Tema":"alegria; conversão; cura; DOMINGO IV DA QUARESMA; luz; pastor","Tempo":"Quaresma","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-03-15"},{"id":"s17","Título":"Alegrai-vos mãe de Jesus","Autor":"A. Cartageno","Tema":"caminho; casa do Pai; DOMINGO V DA PÁSCOA; DOMINGO VI DA PÁSCOA; esperança; Espírito Santo; testemunho; verdade; vida","Tempo":"Tempo Pascal","Observações":"Momento: Final","Video":"","Partitura":"","_uses":2,"_last":"2026-05-10"},{"id":"s18","Título":"Alegrem-se os céus e a terra","Autor":"","Tema":"bênção; Maria; Mãe de Deus; paz; SANTA MARIA, MÃE DE DEUS","Tempo":"Tempo do Natal","Observações":"Momento: Final","Video":"","Partitura":"","_uses":1,"_last":"2026-01-01"},{"id":"s19","Título":"Aleluia","Autor":"Az. Oliveira","Tema":"adoração; alegria; aleluia; amor; Assunção; ASSUNÇÃO DA VIRGEM SANTA MARIA; Batismo; BATISMO DO SENHOR; Bem-aventuranças; boas obras; Bom Pastor; bondade; bênção; caminho; casa do Pai; ceifa; chave; compaixão; comunidade; conversão; coragem; coração; Cordeiro de Deus; correção fraterna; cruz; deserto; discipulado; DOMINGO DE PENTECOSTES; DOMINGO DE PÁSCOA DA RESSURREIÇÃO DO SENHOR; DOMINGO I DA QUARESMA; DOMINGO II DA PÁSCOA — DA DIVINA MISERICÓRDIA; DOMINGO II DO TEMPO COMUM; DOMINGO III DA PÁSCOA; DOMINGO III DO TEMPO COMUM; DOMINGO IV DA PÁSCOA; DOMINGO IV DO TEMPO COMUM; DOMINGO V DA PÁSCOA; DOMINGO V DO TEMPO COMUM; DOMINGO VI DA PÁSCOA; DOMINGO VI DO TEMPO COMUM; DOMINGO VII DA PÁSCOA; DOMINGO X DO TEMPO COMUM; DOMINGO XI DO TEMPO COMUM; DOMINGO XII DO TEMPO COMUM; DOMINGO XIII DO TEMPO COMUM; DOMINGO XIV DO TEMPO COMUM; DOMINGO XIX DO TEMPO COMUM; DOMINGO XV DO TEMPO COMUM; DOMINGO XVI DO TEMPO COMUM; DOMINGO XVII DO TEMPO COMUM; DOMINGO XVIII DO TEMPO COMUM; DOMINGO XX DO TEMPO COMUM; DOMINGO XXI DO TEMPO COMUM; DOMINGO XXII DO TEMPO COMUM; DOMINGO XXIII DO TEMPO COMUM; DOMINGO XXV DO TEMPO COMUM; DOMINGO XXVI DO TEMPO COMUM; dons; Emaús; entrega; Epifania; EPIFANIA DO SENHOR; escolha; escuta; esperança; Espírito; Espírito Santo; Filho; Filho amado; fogo; fome; fé; generosidade; glória; humildade; Igreja; justiça; lei; luz; mandamentos; Maria; misericórdia; missão; Mãe de Deus; oração; paciência; Pai; Palavra; Palavra de Deus; pastor; pastores; paz; pecado; Pedro; Pentecostes; perdão; pobreza; povos; providência; próximo; Páscoa; pão; Quaresma; rainha; rebanho; reconciliação; reino; reis; ressurreição; sabedoria; sal; salvação; SANTA MARIA, MÃE DE DEUS; SANTÍSSIMA TRINDADE; seguimento; tesouro; testemunho; Trindade; unidade; universalidade; verdade; vida; vida nova; vigilância; vocação; vontade de Deus; água","Tempo":"Quaresma; Tempo Comum; Tempo do Natal; Tempo Pascal","Observações":"Momento: Aclamação","Video":"","Partitura":"","_uses":42,"_last":"2026-09-27"},{"id":"s20","Título":"Aleluia I","Autor":"Az. Oliveira","Tema":"amor; compaixão; DOMINGO XXIV DO TEMPO COMUM; Espírito; Filho; misericórdia; Pai; perdão; reconciliação; SANTÍSSIMA TRINDADE; Trindade","Tempo":"Tempo Comum","Observações":"Momento: Aclamação","Video":"","Partitura":"","_uses":2,"_last":"2026-09-13"},{"id":"s21","Título":"Anima Christi","Autor":"M. Frisina","Tema":"compaixão; DOMINGO X DO TEMPO COMUM; misericórdia; vocação","Tempo":"Tempo Comum","Observações":"Momento: Ação de Graças","Video":"","Partitura":"","_uses":1,"_last":"2026-06-07"},{"id":"s22","Título":"Anunciai com voz de júbilo","Autor":"Az.Oliveira","Tema":"DOMINGO VI DA PÁSCOA; esperança; Espírito Santo; testemunho","Tempo":"Tempo Pascal","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-05-10"},{"id":"s23","Título":"Anunciaremos teu reino Senhor","Autor":"","Tema":"DOMINGO XVI DO TEMPO COMUM; esperança; misericórdia; paciência; perdão","Tempo":"Tempo Comum","Observações":"Momento: Final","Video":"","Partitura":"","_uses":1,"_last":"2026-07-19"},{"id":"s24","Título":"Ao Senhor do universo","Autor":"F. Silva","Tema":"amor; Espírito; Filho; Pai; SANTÍSSIMA TRINDADE; Trindade","Tempo":"Tempo Comum","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-05-31"},{"id":"s25","Título":"Aos pés da Cruz","Autor":"H. Faria","Tema":"alegria; conversão; cura; DOMINGO IV DA QUARESMA; luz; pastor","Tempo":"Quaresma","Observações":"Momento: Final","Video":"","Partitura":"","_uses":1,"_last":"2026-03-15"},{"id":"s26","Título":"Apareceu no Céu um sinal","Autor":"J. Geada","Tema":"Assunção; ASSUNÇÃO DA VIRGEM SANTA MARIA; glória; Maria; rainha","Tempo":"Tempo Comum","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-08-15"},{"id":"s27","Título":"Apareceu um homem","Autor":"A. Cartageno","Tema":"","Tempo":"","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-06-24"},{"id":"s28","Título":"Apresentamos Senhor","Autor":"H. Faria","Tema":"amor; DOMINGO XV DO TEMPO COMUM; misericórdia; Palavra; próximo","Tempo":"Tempo Comum","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-07-12"},{"id":"s29","Título":"Apresentamos Senhor os frutos","Autor":"H. Faria","Tema":"alegria; DOMINGO XIV DO TEMPO COMUM; humildade; paz; salvação","Tempo":"Tempo Comum","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-07-05"},{"id":"s30","Título":"Aproxima a tua mão","Autor":"F. santos","Tema":"comunidade; DOMINGO II DA PÁSCOA — DA DIVINA MISERICÓRDIA; misericórdia; paz; ressurreição","Tempo":"Tempo Pascal","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-04-12"},{"id":"s31","Título":"Ave de Fátima","Autor":"","Tema":"amor; Espírito; Filho; Pai; SANTÍSSIMA TRINDADE; Trindade","Tempo":"Tempo Comum","Observações":"Momento: Final","Video":"","Partitura":"","_uses":1,"_last":"2026-05-31"},{"id":"s32","Título":"Avé Maria","Autor":"M. Silva","Tema":"amor; Espírito; Filho; Pai; SANTÍSSIMA TRINDADE; Trindade","Tempo":"Tempo Comum","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-05-31"},{"id":"s33","Título":"Bebei se tendes sede","Autor":"C. Silva","Tema":"conversão; DOMINGO III DA QUARESMA; escuta; misericórdia; sede; água","Tempo":"Quaresma","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-03-08"},{"id":"s34","Título":"Bem-aventurados os pobres em espírito","Autor":"Az. Oliveira","Tema":"Bem-aventuranças; DOMINGO IV DO TEMPO COMUM; justiça; pobreza; reino","Tempo":"Tempo Comum","Observações":"Momento: Salmo | Salmo: Bem-aventurados os pobres em espírito","Video":"","Partitura":"","_uses":1,"_last":"2026-02-01"},{"id":"s35","Título":"Bendita Seja a Paixão","Autor":"M. Faria","Tema":"cruz; DOMINGO DE RAMOS E DA PAIXÃO DO SENHOR; entrega; Paixão; Ramos; sofrimento","Tempo":"Semana Santa","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-03-29"},{"id":"s36","Título":"Bendito o que Deus nos envia","Autor":"P.Alaio","Tema":"","Tempo":"","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-06-24"},{"id":"s37","Título":"Bendito seja deus nosso pai","Autor":"Az. Oliveira","Tema":"Bem-aventuranças; DOMINGO IV DO TEMPO COMUM; justiça; pobreza; reino","Tempo":"Tempo Comum","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-02-01"},{"id":"s38","Título":"Bendito, bendito o que vem Glória honra e louvor","Autor":"M.Luis F. Santos","Tema":"cruz; DOMINGO DE RAMOS E DA PAIXÃO DO SENHOR; entrega; Paixão; Ramos; sofrimento","Tempo":"Semana Santa","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-03-29"},{"id":"s39","Título":"Bendiz minha alma o Senhor","Autor":"M. Carneiro","Tema":"DOMINGO XVII DO TEMPO COMUM; reino; sabedoria; tesouro; vontade de Deus","Tempo":"Tempo Comum","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-07-26"},{"id":"s40","Título":"Bendizemos o teu nome","Autor":"","Tema":"amor; Espírito; Filho; Pai; SANTÍSSIMA TRINDADE; Trindade","Tempo":"Tempo Comum","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-05-31"},{"id":"s41","Título":"Brilhe a vossa luz diante dos homens","Autor":"M. Simões","Tema":"boas obras; DOMINGO V DO TEMPO COMUM; luz; sal; testemunho","Tempo":"Tempo Comum","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-02-08"},{"id":"s42","Título":"Caminhamos para o vosso altar","Autor":"M. Luis","Tema":"DOMINGO XVI DO TEMPO COMUM; esperança; misericórdia; paciência; perdão","Tempo":"Tempo Comum","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-07-19"},{"id":"s43","Título":"Cantai ao Senhor","Autor":"F. Santos","Tema":"conversão; DOMINGO III DO TEMPO COMUM; luz; missão; Palavra de Deus","Tempo":"Tempo Comum","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-01-25"},{"id":"s44","Título":"Cantai ao Senhor um cântico novo","Autor":"F. Silva","Tema":"alegria; DOMINGO XIV DO TEMPO COMUM; humildade; paz; salvação","Tempo":"Tempo Comum","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-07-05"},{"id":"s45","Título":"Cantai ao Senhor um cântico novo I","Autor":"F. Silva","Tema":"caminho; casa do Pai; DOMINGO V DA PÁSCOA; verdade; vida","Tempo":"Tempo Pascal","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-05-03"},{"id":"s46","Título":"Cantai comigo","Autor":"H. Faria","Tema":"compaixão; DOMINGO XVIII DO TEMPO COMUM; fome; providência; pão","Tempo":"Tempo Comum","Observações":"Momento: Final","Video":"","Partitura":"","_uses":1,"_last":"2026-08-02"},{"id":"s47","Título":"Cantarei eternamente as misericórdias do Senhor.","Autor":"M. Luis","Tema":"DOMINGO XIII DO TEMPO COMUM; entrega; missão; seguimento; vocação","Tempo":"Tempo Comum","Observações":"Momento: Salmo | Salmo: Senhor, sois a minha herança","Video":"","Partitura":"","_uses":1,"_last":"2026-06-28"},{"id":"s48","Título":"Com hinos preces e cantos","Autor":"A. Cartageno","Tema":"DOMINGO XVII DO TEMPO COMUM; reino; sabedoria; tesouro; vontade de Deus","Tempo":"Tempo Comum","Observações":"Momento: Final","Video":"","Partitura":"","_uses":1,"_last":"2026-07-26"},{"id":"s49","Título":"Como o veado em busca das aguas","Autor":"B Salgado","Tema":"comunidade; correção fraterna; DOMINGO XXIII DO TEMPO COMUM; escuta; reconciliação","Tempo":"Tempo Comum","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-09-06"},{"id":"s50","Título":"Confesso o meu pecado","Autor":"J. Santos","Tema":"conversão; DOMINGO III DA QUARESMA; escuta; misericórdia; sede; água","Tempo":"Quaresma","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-03-08"},{"id":"s51","Título":"Cordeiro de Deus","Autor":"Az. Oliveira","Tema":"adoração; alegria; amor; Bem-aventuranças; boas obras; Bom Pastor; bondade; bênção; caminho; casa do Pai; ceifa; chave; compaixão; comunidade; conversão; coragem; coração; correção fraterna; cruz; cura; deserto; discipulado; DOMINGO DE PENTECOSTES; DOMINGO DE RAMOS E DA PAIXÃO DO SENHOR; DOMINGO I DA QUARESMA; DOMINGO II DA PÁSCOA — DA DIVINA MISERICÓRDIA; DOMINGO II DA QUARESMA; DOMINGO III DA PÁSCOA; DOMINGO III DA QUARESMA; DOMINGO III DO TEMPO COMUM; DOMINGO IV DA PÁSCOA; DOMINGO IV DA QUARESMA; DOMINGO IV DO TEMPO COMUM; DOMINGO V DA PÁSCOA; DOMINGO V DA QUARESMA; DOMINGO V DO TEMPO COMUM; DOMINGO VI DA PÁSCOA; DOMINGO VII DA PÁSCOA; DOMINGO XI DO TEMPO COMUM; DOMINGO XII DO TEMPO COMUM; DOMINGO XIII DO TEMPO COMUM; DOMINGO XIV DO TEMPO COMUM; DOMINGO XIX DO TEMPO COMUM; DOMINGO XV DO TEMPO COMUM; DOMINGO XVI DO TEMPO COMUM; DOMINGO XVII DO TEMPO COMUM; DOMINGO XVIII DO TEMPO COMUM; DOMINGO XX DO TEMPO COMUM; DOMINGO XXI DO TEMPO COMUM; DOMINGO XXII DO TEMPO COMUM; DOMINGO XXIII DO TEMPO COMUM; DOMINGO XXIV DO TEMPO COMUM; DOMINGO XXV DO TEMPO COMUM; DOMINGO XXVI DO TEMPO COMUM; dons; Emaús; entrega; Epifania; EPIFANIA DO SENHOR; escuta; esperança; Espírito; Espírito Santo; Filho; fogo; fome; fé; generosidade; glória; humildade; Igreja; justiça; luz; Maria; misericórdia; missão; Mãe de Deus; oração; paciência; Pai; Paixão; Palavra; Palavra de Deus; pastor; pastores; paz; pecado; Pedro; Pentecostes; perdão; pobreza; povos; providência; próximo; pão; Quaresma; Ramos; rebanho; reconciliação; reino; reis; ressurreição; sabedoria; sal; salvação; SANTA MARIA, MÃE DE DEUS; SANTÍSSIMA TRINDADE; sede; seguimento; sofrimento; tesouro; testemunho; transfiguração; Trindade; unidade; universalidade; verdade; vida; vigilância; vocação; vontade de Deus; água","Tempo":"Quaresma; Semana Santa; Tempo Comum; Tempo do Natal; Tempo Pascal","Observações":"Momento: Cordeiro de Deus","Video":"","Partitura":"","_uses":44,"_last":"2026-09-27"},{"id":"s52","Título":"Cordeiro de Deus II","Autor":"F. Silva","Tema":"Assunção; ASSUNÇÃO DA VIRGEM SANTA MARIA; glória; Maria; rainha","Tempo":"Tempo Comum","Observações":"Momento: Cordeiro de Deus","Video":"","Partitura":"","_uses":1,"_last":"2026-08-15"},{"id":"s53","Título":"Cordeiro de Deus V","Autor":"M. Simões","Tema":"alegria; aleluia; amor; DOMINGO DE PÁSCOA DA RESSURREIÇÃO DO SENHOR; Espírito; Filho; Pai; Páscoa; ressurreição; SANTÍSSIMA TRINDADE; Trindade; vida nova","Tempo":"Tempo Comum; Tempo Pascal","Observações":"Momento: Cordeiro de Deus","Video":"","Partitura":"","_uses":2,"_last":"2026-05-31"},{"id":"s54","Título":"Cremos em Vós ó Deus","Autor":"L. Mason","Tema":"DOMINGO XIX DO TEMPO COMUM; esperança; fé; vigilância","Tempo":"Tempo Comum","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-08-09"},{"id":"s55","Título":"Cristo Jesus Tu me chamaste","Autor":"H. Faria","Tema":"conversão; deserto; DOMINGO I DA QUARESMA; misericórdia; pecado; Quaresma","Tempo":"Quaresma","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-02-22"},{"id":"s56","Título":"Cristo nasceu: Vinde adoremos","Autor":"C. Silva","Tema":"adoração; Epifania; EPIFANIA DO SENHOR; luz; povos; reis","Tempo":"Tempo do Natal","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-01-04"},{"id":"s57","Título":"Cristo nosso cordeiro Pascal","Autor":"C. Silva","Tema":"alegria; aleluia; DOMINGO DE PÁSCOA DA RESSURREIÇÃO DO SENHOR; Páscoa; ressurreição; vida nova","Tempo":"Tempo Pascal","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-04-05"},{"id":"s58","Título":"Cristo ressuscitou","Autor":"C. Gabarain","Tema":"caminho; coração; DOMINGO III DA PÁSCOA; Emaús; esperança","Tempo":"Tempo Pascal","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-04-19"},{"id":"s59","Título":"Deixamos aqui Senhor","Autor":"A. Cartageno","Tema":"","Tempo":"","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-06-24"},{"id":"s60","Título":"Deixamos aqui Senhor Pai santo","Autor":"A. Cartageno","Tema":"compaixão; DOMINGO X DO TEMPO COMUM; misericórdia; vocação","Tempo":"Tempo Comum","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-06-07"},{"id":"s61","Título":"Desde toda a eternidade","Autor":"M. Carneiro","Tema":"Assunção; ASSUNÇÃO DA VIRGEM SANTA MARIA; glória; Maria; rainha","Tempo":"Tempo Comum","Observações":"Momento: Final","Video":"","Partitura":"","_uses":1,"_last":"2026-08-15"},{"id":"s62","Título":"Deus tenha compaixão de nós","Autor":"M.Luis","Tema":"bênção; Maria; Mãe de Deus; paz; SANTA MARIA, MÃE DE DEUS","Tempo":"Tempo do Natal","Observações":"Momento: Salmo | Salmo: Deus tenha compaixão de nós","Video":"","Partitura":"","_uses":1,"_last":"2026-01-01"},{"id":"s63","Título":"Deus vinde em meu auxilio","Autor":"F. Silva","Tema":"DOMINGO V DA QUARESMA; esperança; misericórdia; ressurreição; vida","Tempo":"Quaresma","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-03-22"},{"id":"s64","Título":"Deus vinde em meu auxilo","Autor":"F. Silva","Tema":"compaixão; DOMINGO XVIII DO TEMPO COMUM; fome; providência; pão","Tempo":"Tempo Comum","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-08-02"},{"id":"s65","Título":"Deus vive na sua morada santa","Autor":"F. Santos","Tema":"coragem; cruz; discipulado; DOMINGO XII DO TEMPO COMUM; fé","Tempo":"Tempo Comum","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-06-21"},{"id":"s66","Título":"Deus é amor","Autor":"M.Luis","Tema":"compaixão; DOMINGO VI DO TEMPO COMUM; DOMINGO X DO TEMPO COMUM; escolha; lei; mandamentos; misericórdia; vida; vocação","Tempo":"Tempo Comum","Observações":"Momento: Comunhão | Momento: Fim da Benção","Video":"","Partitura":"","_uses":2,"_last":"2026-06-07"},{"id":"s67","Título":"Deus é pai Deus é amor","Autor":"F. silva","Tema":"compaixão; comunidade; correção fraterna; DOMINGO XXIII DO TEMPO COMUM; DOMINGO XXIV DO TEMPO COMUM; escuta; misericórdia; perdão; reconciliação","Tempo":"Tempo Comum","Observações":"Momento: Final","Video":"","Partitura":"","_uses":2,"_last":"2026-09-13"},{"id":"s68","Título":"Digno de louvor e de glória","Autor":"M.Luis","Tema":"amor; Espírito; Filho; Pai; SANTÍSSIMA TRINDADE; Trindade","Tempo":"Tempo Comum","Observações":"Momento: Salmo | Salmo: Bendito seja Deus, Pai, Filho e Espírito Santo","Video":"","Partitura":"","_uses":1,"_last":"2026-05-31"},{"id":"s69","Título":"Ditoso o que anda na lei do Senhor.","Autor":"M.Luis","Tema":"DOMINGO VI DO TEMPO COMUM; escolha; lei; mandamentos; vida","Tempo":"Tempo Comum","Observações":"Momento: Salmo | Salmo: Ditoso o que anda na lei do Senhor","Video":"","Partitura":"","_uses":1,"_last":"2026-02-15"},{"id":"s70","Título":"Dou-vos um mandamento novo","Autor":"J.P. Martins","Tema":"compaixão; DOMINGO XXIV DO TEMPO COMUM; misericórdia; perdão; reconciliação","Tempo":"Tempo Comum","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-09-13"},{"id":"s71","Título":"Eis o dia que o Senhor fez","Autor":"B. Ferreira","Tema":"alegria; aleluia; DOMINGO DE PÁSCOA DA RESSURREIÇÃO DO SENHOR; Páscoa; ressurreição; vida nova","Tempo":"Tempo Pascal","Observações":"Momento: Salmo | Salmo: Este é o dia que o Senhor fez: exultemos e cantemos de alegria","Video":"","Partitura":"","_uses":1,"_last":"2026-04-05"},{"id":"s72","Título":"Eis os homens santos","Autor":"Az. Oliveira","Tema":"DOMINGO XVII DO TEMPO COMUM; reino; sabedoria; tesouro; vontade de Deus","Tempo":"Tempo Comum","Observações":"Momento: Ofertório | Momento: Saída procissão","Video":"","Partitura":"","_uses":2,"_last":"2026-07-26"},{"id":"s73","Título":"Em vós senhor está a fonte da vida","Autor":"Az. Oliveira","Tema":"alegria; conversão; cura; DOMINGO IV DA QUARESMA; luz; pastor","Tempo":"Quaresma","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-03-15"},{"id":"s74","Título":"Ergue-se Deus o Senhor","Autor":"M.Luis","Tema":"DOMINGO VII DA PÁSCOA; glória; oração; unidade","Tempo":"Tempo Pascal","Observações":"Momento: Salmo | Salmo: O Senhor é rei, exulte a terra","Video":"","Partitura":"","_uses":1,"_last":"2026-05-17"},{"id":"s75","Título":"Escuta e inclina-te","Autor":"Az. Oliveira","Tema":"amor; Espírito; Filho; Pai; SANTÍSSIMA TRINDADE; Trindade","Tempo":"Tempo Comum","Observações":"Momento: Salmo | Salmo: Bendito seja Deus, Pai, Filho e Espírito Santo","Video":"","Partitura":"","_uses":1,"_last":"2026-05-31"},{"id":"s76","Título":"Esperamos, Senhor, na vossa misericórdia.","Autor":"M.Luis","Tema":"caminho; casa do Pai; DOMINGO II DA QUARESMA; DOMINGO V DA PÁSCOA; esperança; glória; Quaresma; transfiguração; verdade; vida","Tempo":"Quaresma; Tempo Pascal","Observações":"Momento: Salmo | Salmo: A bondade do Senhor encheu a terra | Salmo: Esperamos, Senhor, na vossa misericórdia","Video":"","Partitura":"","_uses":2,"_last":"2026-05-03"},{"id":"s77","Título":"Este é o meu Filho","Autor":"M. Carneiro","Tema":"DOMINGO II DA QUARESMA; esperança; glória; Quaresma; transfiguração","Tempo":"Quaresma","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-03-01"},{"id":"s78","Título":"Eu darei ao meu povo a salvação","Autor":"A. Cartageno","Tema":"bondade; conversão; DOMINGO XXV DO TEMPO COMUM; generosidade; reino","Tempo":"Tempo Comum","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-09-20"},{"id":"s79","Título":"Eu estou sempre convosco","Autor":"C. Silva","Tema":"DOMINGO VII DA PÁSCOA; glória; oração; unidade","Tempo":"Tempo Pascal","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-05-17"},{"id":"s80","Título":"Eu estou à porta e chamo","Autor":"F. Silva","Tema":"DOMINGO XVI DO TEMPO COMUM; esperança; misericórdia; paciência; perdão","Tempo":"Tempo Comum","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-07-19"},{"id":"s81","Título":"Eu sou a verdadeira vide","Autor":"C. Silva","Tema":"caminho; casa do Pai; DOMINGO V DA PÁSCOA; verdade; vida","Tempo":"Tempo Pascal","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-05-03"},{"id":"s82","Título":"Eu sou o pão da vida","Autor":"B. Sousa","Tema":"compaixão; DOMINGO XVIII DO TEMPO COMUM; fome; providência; pão","Tempo":"Tempo Comum","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-08-02"},{"id":"s83","Título":"Eu Sou o Pão vivo","Autor":"C. Silva","Tema":"alegria; DOMINGO XIV DO TEMPO COMUM; DOMINGO XX DO TEMPO COMUM; fé; humildade; misericórdia; paz; salvação; universalidade","Tempo":"Tempo Comum","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":2,"_last":"2026-08-16"},{"id":"s84","Título":"Eu venho, Senhor, à vossa presença","Autor":"A. Cartageno","Tema":"amor; DOMINGO XV DO TEMPO COMUM; misericórdia; Palavra; próximo","Tempo":"Tempo Comum","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-07-12"},{"id":"s85","Título":"Eu Vos dou graças, Senhor","Autor":"F. Santos","Tema":"","Tempo":"","Observações":"Momento: Salmo","Video":"","Partitura":"","_uses":1,"_last":"2026-06-24"},{"id":"s86","Título":"Exultai de alegria, cantai hinos","Autor":"F. Silva","Tema":"comunidade; DOMINGO II DA PÁSCOA — DA DIVINA MISERICÓRDIA; misericórdia; paz; ressurreição","Tempo":"Tempo Pascal","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-04-12"},{"id":"s87","Título":"Ficai conosco Senhor","Autor":"M. Borda","Tema":"caminho; coração; DOMINGO III DA PÁSCOA; Emaús; esperança","Tempo":"Tempo Pascal","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-04-19"},{"id":"s88","Título":"Glória","Autor":"A. Cartageno","Tema":"Bem-aventuranças; bênção; compaixão; DOMINGO IV DO TEMPO COMUM; DOMINGO X DO TEMPO COMUM; justiça; Maria; misericórdia; Mãe de Deus; paz; pobreza; reino; SANTA MARIA, MÃE DE DEUS; vocação","Tempo":"Tempo Comum; Tempo do Natal","Observações":"Momento: Glória","Video":"","Partitura":"","_uses":4,"_last":"2026-06-24"},{"id":"s89","Título":"Glória a Deus","Autor":"A. Cartageno","Tema":"alegria; aleluia; DOMINGO DE PÁSCOA DA RESSURREIÇÃO DO SENHOR; Páscoa; ressurreição; vida nova","Tempo":"Tempo Pascal","Observações":"Momento: Glória","Video":"","Partitura":"","_uses":2,"_last":"2026-06-24"},{"id":"s90","Título":"Glória a vós Cristo","Autor":"F. Santos","Tema":"conversão; deserto; DOMINGO I DA QUARESMA; misericórdia; pecado; Quaresma","Tempo":"Quaresma","Observações":"Momento: Aclamação","Video":"","Partitura":"","_uses":1,"_last":"2026-02-22"},{"id":"s91","Título":"Glória a Vós, Cristo","Autor":"F. Santos","Tema":"cruz; DOMINGO DE RAMOS E DA PAIXÃO DO SENHOR; entrega; Paixão; Ramos; sofrimento","Tempo":"Semana Santa","Observações":"Momento: Aclamação","Video":"","Partitura":"","_uses":1,"_last":"2026-03-29"},{"id":"s92","Título":"Hino das JMJ 2023","Autor":"","Tema":"","Tempo":"","Observações":"Momento: Final","Video":"","Partitura":"","_uses":1,"_last":"2026-06-24"},{"id":"s93","Título":"Hino do Jubileu e Cantem cantem os anjos","Autor":"","Tema":"adoração; Epifania; EPIFANIA DO SENHOR; luz; povos; reis","Tempo":"Tempo do Natal","Observações":"Momento: Final","Video":"","Partitura":"","_uses":1,"_last":"2026-01-04"},{"id":"s94","Título":"Hoje se escutardes a voz do Senhor","Autor":"M.Luis","Tema":"comunidade; conversão; correção fraterna; DOMINGO III DA QUARESMA; DOMINGO XXIII DO TEMPO COMUM; escuta; misericórdia; reconciliação; sede; água","Tempo":"Quaresma; Tempo Comum","Observações":"Momento: Salmo | Salmo: Hoje se escutardes a voz do Senhor | Salmo: Se hoje ouvirdes a voz do Senhor","Video":"","Partitura":"","_uses":2,"_last":"2026-09-06"},{"id":"s95","Título":"Homens da Galileia","Autor":"M.Luis","Tema":"DOMINGO VII DA PÁSCOA; glória; oração; unidade","Tempo":"Tempo Pascal","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-05-17"},{"id":"s96","Título":"Hossana tu reinarás","Autor":"","Tema":"DOMINGO V DA QUARESMA; esperança; misericórdia; ressurreição; vida","Tempo":"Quaresma","Observações":"Momento: Final","Video":"","Partitura":"","_uses":1,"_last":"2026-03-22"},{"id":"s97","Título":"Ide por todo o mundo","Autor":"M.Faria","Tema":"ceifa; conversão; DOMINGO XI DO TEMPO COMUM; DOMINGO XXVI DO TEMPO COMUM; humildade; justiça; misericórdia; missão; pastores; rebanho","Tempo":"Tempo Comum","Observações":"Momento: Final","Video":"","Partitura":"","_uses":2,"_last":"2026-09-27"},{"id":"s98","Título":"Ide por todo o mundo e proclami","Autor":"J.Santos","Tema":"DOMINGO VII DA PÁSCOA; glória; oração; unidade","Tempo":"Tempo Pascal","Observações":"Momento: Final","Video":"","Partitura":"","_uses":1,"_last":"2026-05-17"},{"id":"s99","Título":"Ide por todo o mundo proclamai","Autor":"J.Santos","Tema":"DOMINGO DE PENTECOSTES; dons; Espírito Santo; fogo; missão; Pentecostes","Tempo":"Tempo Pascal","Observações":"Momento: Final","Video":"","Partitura":"","_uses":1,"_last":"2026-05-24"},{"id":"s100","Título":"Inclinai o vosso ouvido","Autor":"G. Gomes","Tema":"chave; comunidade; DOMINGO XXI DO TEMPO COMUM; fé; Igreja; Pedro","Tempo":"Tempo Comum","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-08-23"},{"id":"s101","Título":"Irei mais além","Autor":"H. Faria","Tema":"chave; comunidade; DOMINGO XXI DO TEMPO COMUM; fé; Igreja; Pedro","Tempo":"Tempo Comum","Observações":"Momento: Final","Video":"","Partitura":"","_uses":1,"_last":"2026-08-23"},{"id":"s102","Título":"Irmãos, convertei o vosso coração","Autor":"J. P. Lecót","Tema":"conversão; deserto; DOMINGO I DA QUARESMA; DOMINGO III DA QUARESMA; escuta; misericórdia; pecado; Quaresma; sede; água","Tempo":"Quaresma","Observações":"Momento: Final","Video":"","Partitura":"","_uses":2,"_last":"2026-03-08"},{"id":"s103","Título":"Jesus Cristo, ontem e hoje","Autor":"A. Cartageno","Tema":"bênção; Maria; Mãe de Deus; paz; SANTA MARIA, MÃE DE DEUS","Tempo":"Tempo do Natal","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-01-01"},{"id":"s104","Título":"Jesus tomou consigo","Autor":"C. Silva","Tema":"DOMINGO II DA QUARESMA; esperança; glória; Quaresma; transfiguração","Tempo":"Quaresma","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-03-01"},{"id":"s105","Título":"Junto do Senhor a misericórdia","Autor":"M.Luis","Tema":"DOMINGO V DA QUARESMA; esperança; misericórdia; ressurreição; vida","Tempo":"Quaresma","Observações":"Momento: Salmo | Salmo: Junto do Senhor a misericórdia","Video":"","Partitura":"","_uses":1,"_last":"2026-03-22"},{"id":"s106","Título":"Já luz se levantou","Autor":"A. Cartageno","Tema":"alegria; aleluia; DOMINGO DE PÁSCOA DA RESSURREIÇÃO DO SENHOR; Páscoa; ressurreição; vida nova","Tempo":"Tempo Pascal","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-04-05"},{"id":"s107","Título":"Kyrie","Autor":"M. Carneiro","Tema":"amor; caminho; coração; DOMINGO III DA PÁSCOA; DOMINGO VI DA PÁSCOA; DOMINGO VI DO TEMPO COMUM; DOMINGO XV DO TEMPO COMUM; Emaús; escolha; esperança; Espírito; Espírito Santo; Filho; lei; mandamentos; misericórdia; Pai; Palavra; próximo; SANTÍSSIMA TRINDADE; testemunho; Trindade; vida","Tempo":"Tempo Comum; Tempo Pascal","Observações":"Momento: Ato Penitencial","Video":"","Partitura":"","_uses":5,"_last":"2026-07-12"},{"id":"s108","Título":"Kyrie eleison","Autor":"M.Simões","Tema":"DOMINGO V DA QUARESMA; esperança; misericórdia; ressurreição; vida","Tempo":"Quaresma","Observações":"Momento: Ato Penitencial","Video":"","Partitura":"","_uses":1,"_last":"2026-03-22"},{"id":"s109","Título":"Laudate Dominum","Autor":"Taize","Tema":"","Tempo":"","Observações":"Momento: Ação de Graças","Video":"","Partitura":"","_uses":1,"_last":"2026-06-24"},{"id":"s110","Título":"Lembrai-Vos, Senhor, da vossa misericórdia","Autor":"M. Luis","Tema":"conversão; DOMINGO XXVI DO TEMPO COMUM; humildade; justiça; misericórdia","Tempo":"Tempo Comum","Observações":"Momento: Salmo | Salmo: Lembrai-Vos, Senhor, da vossa misericórdia","Video":"","Partitura":"","_uses":1,"_last":"2026-09-27"},{"id":"s111","Título":"Levamos para o vosso altar","Autor":"","Tema":"DOMINGO XVII DO TEMPO COMUM; reino; sabedoria; tesouro; vontade de Deus","Tempo":"Tempo Comum","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-07-26"},{"id":"s112","Título":"Louvado sejais, Senhor, pelos povos de toda a terra.","Autor":"M. Luis","Tema":"DOMINGO XX DO TEMPO COMUM; fé; misericórdia; universalidade","Tempo":"Tempo Comum","Observações":"Momento: Salmo | Salmo: Deus, vinde em meu auxílio","Video":"","Partitura":"","_uses":1,"_last":"2026-08-16"},{"id":"s113","Título":"Louvai louvai o Senhor","Autor":"F. Silva","Tema":"DOMINGO XIII DO TEMPO COMUM; entrega; missão; seguimento; vocação","Tempo":"Tempo Comum","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-06-28"},{"id":"s114","Título":"Louvarei para sempre o vosso nome, Senhor, meu Deus e meu Rei.","Autor":"M. Luis","Tema":"alegria; DOMINGO XIV DO TEMPO COMUM; humildade; paz; salvação","Tempo":"Tempo Comum","Observações":"Momento: Salmo | Salmo: Eu Vos louvarei, Senhor, porque me salvastes","Video":"","Partitura":"","_uses":1,"_last":"2026-07-05"},{"id":"s115","Título":"Louvor a vós","Autor":"F. Santos","Tema":"DOMINGO II DA QUARESMA; esperança; glória; Quaresma; transfiguração","Tempo":"Quaresma","Observações":"Momento: Aclamação","Video":"","Partitura":"","_uses":2,"_last":"2026-03-15"},{"id":"s116","Título":"Louvor a Vós, Rei da eterna Glória","Autor":"M.Luis","Tema":"conversão; DOMINGO III DA QUARESMA; DOMINGO V DA QUARESMA; escuta; esperança; misericórdia; ressurreição; sede; vida; água","Tempo":"Quaresma","Observações":"Momento: Aclamação","Video":"","Partitura":"","_uses":2,"_last":"2026-03-22"},{"id":"s117","Título":"Luz terna suave","Autor":"B. Ferreira","Tema":"DOMINGO V DA QUARESMA; esperança; misericórdia; ressurreição; vida","Tempo":"Quaresma","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-03-22"},{"id":"s118","Título":"Mandai, Senhor, o vosso Espírito","Autor":"M. Luis","Tema":"DOMINGO DE PENTECOSTES; dons; Espírito Santo; fogo; missão; Pentecostes","Tempo":"Tempo Pascal","Observações":"Momento: Salmo | Salmo: Enviai, Senhor, o vosso Espírito e renovai a face da terra","Video":"","Partitura":"","_uses":1,"_last":"2026-05-24"},{"id":"s119","Título":"Maria, és a árvore da vida","Autor":"F. Santos","Tema":"Assunção; ASSUNÇÃO DA VIRGEM SANTA MARIA; glória; Maria; rainha","Tempo":"Tempo Comum","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-08-15"},{"id":"s120","Título":"Meu Deus na simplicidade","Autor":"Az. Oliveira","Tema":"coragem; cruz; discipulado; DOMINGO XII DO TEMPO COMUM; fé","Tempo":"Tempo Comum","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":2,"_last":"2026-08-23"},{"id":"s121","Título":"Meu Deus, meu Deus, porque me abandonastes?","Autor":"Az. Oliveira","Tema":"cruz; DOMINGO DE RAMOS E DA PAIXÃO DO SENHOR; entrega; Paixão; Ramos; sofrimento","Tempo":"Semana Santa","Observações":"Momento: Salmo | Salmo: Meu Deus, meu Deus, porque me abandonastes?","Video":"","Partitura":"","_uses":1,"_last":"2026-03-29"},{"id":"s122","Título":"Meu Deus, na simplicidade","Autor":"Az. Oliveira","Tema":"Bem-aventuranças; DOMINGO IV DO TEMPO COMUM; justiça; pobreza; reino","Tempo":"Tempo Comum","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-02-01"},{"id":"s123","Título":"Meu Senhor eu vos amo","Autor":"A. Cartageno","Tema":"cruz; DOMINGO XXII DO TEMPO COMUM; entrega; misericórdia; seguimento","Tempo":"Tempo Comum","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-08-30"},{"id":"s124","Título":"Minha Senhora e minha mãe","Autor":"H. Faria","Tema":"caminho; casa do Pai; DOMINGO V DA PÁSCOA; verdade; vida","Tempo":"Tempo Pascal","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-05-03"},{"id":"s125","Título":"Mostrai-me, Senhor, o caminho da vida","Autor":"M.Luis","Tema":"caminho; coração; DOMINGO III DA PÁSCOA; Emaús; esperança","Tempo":"Tempo Pascal","Observações":"Momento: Salmo | Salmo: Mostrai-nos, Senhor, o vosso amor e dai-nos a vossa salvação","Video":"","Partitura":"","_uses":1,"_last":"2026-04-19"},{"id":"s126","Título":"Mostrai-nos o vosso amor","Autor":"M.Luis","Tema":"DOMINGO XIX DO TEMPO COMUM; esperança; fé; vigilância","Tempo":"Tempo Comum","Observações":"Momento: Salmo | Salmo: Felizes os que esperam no Senhor","Video":"","Partitura":"","_uses":1,"_last":"2026-08-09"},{"id":"s127","Título":"Na hóstia sobre a patena","Autor":"B. Salgado","Tema":"DOMINGO XIII DO TEMPO COMUM; entrega; missão; seguimento; vocação","Tempo":"Tempo Comum","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-06-28"},{"id":"s128","Título":"Na sua dor","Autor":"A. Cartageno","Tema":"comunidade; DOMINGO II DA PÁSCOA — DA DIVINA MISERICÓRDIA; misericórdia; paz; ressurreição","Tempo":"Tempo Pascal","Observações":"Momento: Final","Video":"","Partitura":"","_uses":2,"_last":"2026-04-19"},{"id":"s129","Título":"Nem só de pão vive o homem","Autor":"F. Santos","Tema":"conversão; deserto; DOMINGO I DA QUARESMA; misericórdia; pecado; Quaresma","Tempo":"Quaresma","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-02-22"},{"id":"s130","Título":"Nossa Senhora de Fátima","Autor":"A. Cartageno","Tema":"amor; Espírito; Filho; Pai; SANTÍSSIMA TRINDADE; Trindade","Tempo":"Tempo Comum","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-05-31"},{"id":"s131","Título":"Não foste vós que me escolheste","Autor":"Az. Oliveira","Tema":"ceifa; DOMINGO XI DO TEMPO COMUM; missão; pastores; rebanho","Tempo":"Tempo Comum","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-06-14"},{"id":"s132","Título":"Não fostes vós que me escolheste","Autor":"Az. Oliveira","Tema":"chave; comunidade; conversão; DOMINGO III DO TEMPO COMUM; DOMINGO XXI DO TEMPO COMUM; fé; Igreja; luz; missão; Palavra de Deus; Pedro","Tempo":"Tempo Comum","Observações":"Momento: Comunhão | Momento: Ofertório","Video":"","Partitura":"","_uses":2,"_last":"2026-08-23"},{"id":"s133","Título":"Não me abandoneis, Senhor","Autor":"Az. Oliveira","Tema":"ceifa; DOMINGO XI DO TEMPO COMUM; missão; pastores; rebanho","Tempo":"Tempo Comum","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-06-14"},{"id":"s134","Título":"Não vou só","Autor":"M. Carneiro","Tema":"coragem; cruz; discipulado; DOMINGO XII DO TEMPO COMUM; fé","Tempo":"Tempo Comum","Observações":"Momento: Final","Video":"","Partitura":"","_uses":1,"_last":"2026-06-21"},{"id":"s135","Título":"Nós somos as pedras vivas","Autor":"F. Santos","Tema":"DOMINGO XIX DO TEMPO COMUM; esperança; fé; vigilância","Tempo":"Tempo Comum","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-08-09"},{"id":"s136","Título":"Nós somos o povo de Deus, as ovelhas do seu rebanho.","Autor":"M.Luis","Tema":"ceifa; DOMINGO XI DO TEMPO COMUM; missão; pastores; rebanho","Tempo":"Tempo Comum","Observações":"Momento: Salmo | Salmo: Nós somos o povo de Deus, somos as ovelhas do seu rebanho","Video":"","Partitura":"","_uses":1,"_last":"2026-06-14"},{"id":"s137","Título":"Nós Vos saudamos, ó Mãe Santa","Autor":"F. Santos","Tema":"bênção; Maria; Mãe de Deus; paz; SANTA MARIA, MÃE DE DEUS","Tempo":"Tempo do Natal","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-01-01"},{"id":"s138","Título":"O Cordeiro de Deus é o nosso pastor","Autor":"Az. Oliveira","Tema":"bondade; conversão; DOMINGO XXV DO TEMPO COMUM; generosidade; reino","Tempo":"Tempo Comum","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-09-20"},{"id":"s139","Título":"O Corpo de Jesus é alimento","Autor":"A. Cartageno","Tema":"coragem; cruz; discipulado; DOMINGO XII DO TEMPO COMUM; fé","Tempo":"Tempo Comum","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":2,"_last":"2026-06-24"},{"id":"s140","Título":"O Espirito de Deus repousou sobre mim","Autor":"Az. Oliveira","Tema":"DOMINGO DE PENTECOSTES; dons; Espírito Santo; fogo; missão; Pentecostes","Tempo":"Tempo Pascal","Observações":"Momento: Confirmação | Momento: Ofertório","Video":"","Partitura":"","_uses":2,"_last":"2026-06-24"},{"id":"s141","Título":"O Espírito do Senhor","Autor":"M.Luis","Tema":"DOMINGO DE PENTECOSTES; dons; Espírito Santo; fogo; missão; Pentecostes","Tempo":"Tempo Pascal","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-05-24"},{"id":"s142","Título":"O Hino da Alegria","Autor":"M. Faria","Tema":"comunidade; DOMINGO II DA PÁSCOA — DA DIVINA MISERICÓRDIA; misericórdia; paz; ressurreição","Tempo":"Tempo Pascal","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-04-12"},{"id":"s143","Título":"O pão da vida eterna prometida","Autor":"B. Salgado","Tema":"bênção; Maria; Mãe de Deus; paz; SANTA MARIA, MÃE DE DEUS","Tempo":"Tempo do Natal","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-01-01"},{"id":"s144","Título":"O Santissima","Autor":"M. Faria","Tema":"Assunção; ASSUNÇÃO DA VIRGEM SANTA MARIA; glória; Maria; rainha","Tempo":"Tempo Comum","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-08-15"},{"id":"s145","Título":"O Senhor abençoará o seu povo","Autor":"","Tema":"Batismo; BATISMO DO SENHOR; Espírito; Filho amado; água","Tempo":"Tempo do Natal","Observações":"Momento: Salmo | Salmo: O Senhor abençoará o seu povo","Video":"","Partitura":"","_uses":1,"_last":"2026-01-11"},{"id":"s146","Título":"O Senhor deu-lhes o pão do Céu","Autor":"M. Luis","Tema":"DOMINGO VI DO TEMPO COMUM; escolha; lei; mandamentos; vida","Tempo":"Tempo Comum","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-02-15"},{"id":"s147","Título":"O Senhor está perto de quantos O invocam.","Autor":"M.Luis","Tema":"bondade; conversão; DOMINGO XXV DO TEMPO COMUM; generosidade; reino","Tempo":"Tempo Comum","Observações":"Momento: Salmo | Salmo: O Senhor está perto de quantos O invocam","Video":"","Partitura":"","_uses":1,"_last":"2026-09-20"},{"id":"s148","Título":"O Senhor ressuscitou verdadeiramente","Autor":"A. Cartageno","Tema":"alegria; aleluia; DOMINGO DE PÁSCOA DA RESSURREIÇÃO DO SENHOR; Páscoa; ressurreição; vida nova","Tempo":"Tempo Pascal","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-04-05"},{"id":"s149","Título":"O Senhor ungiu os meus olhos","Autor":"M.Geada","Tema":"alegria; conversão; cura; DOMINGO IV DA QUARESMA; luz; pastor","Tempo":"Quaresma","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-03-15"},{"id":"s150","Título":"O Senhor é clemente e compassivo","Autor":"M.Luis","Tema":"compaixão; DOMINGO XXIV DO TEMPO COMUM; misericórdia; perdão; reconciliação","Tempo":"Tempo Comum","Observações":"Momento: Salmo | Salmo: O Senhor é clemente e compassivo, paciente e cheio de bondade","Video":"","Partitura":"","_uses":1,"_last":"2026-09-13"},{"id":"s151","Título":"O Senhor é meu pastor","Autor":"M.Luis","Tema":"alegria; conversão; cura; DOMINGO IV DA QUARESMA; luz; pastor","Tempo":"Quaresma","Observações":"Momento: Salmo | Salmo: O Senhor é meu pastor","Video":"","Partitura":"","_uses":1,"_last":"2026-03-15"},{"id":"s152","Título":"O Senhor é meu pastor nada me falta","Autor":"F. Santos","Tema":"Bom Pastor; DOMINGO IV DA PÁSCOA; pastor; rebanho; vocação","Tempo":"Tempo Pascal","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-04-26"},{"id":"s153","Título":"O Senhor é meu pastor nada me faltará.","Autor":"M. Luis","Tema":"Bom Pastor; DOMINGO IV DA PÁSCOA; pastor; rebanho; vocação","Tempo":"Tempo Pascal","Observações":"Momento: Salmo | Salmo: O Senhor é meu pastor: nada me faltará","Video":"","Partitura":"","_uses":1,"_last":"2026-04-26"},{"id":"s154","Título":"Olhai para mim, Senhor","Autor":"A. Cartageno","Tema":"conversão; DOMINGO III DA QUARESMA; escuta; misericórdia; sede; água","Tempo":"Quaresma","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-03-08"},{"id":"s155","Título":"Onde há caridade verdadeira","Autor":"C. silva","Tema":"conversão; DOMINGO VI DO TEMPO COMUM; DOMINGO XXVI DO TEMPO COMUM; escolha; humildade; justiça; lei; mandamentos; misericórdia; vida","Tempo":"Tempo Comum","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":2,"_last":"2026-09-27"},{"id":"s156","Título":"Onde se reunem dois ou tres","Autor":"az oliveira","Tema":"comunidade; correção fraterna; DOMINGO XXIII DO TEMPO COMUM; escuta; reconciliação","Tempo":"Tempo Comum","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-09-06"},{"id":"s157","Título":"Os discipulos reconheceram","Autor":"F. Silva","Tema":"caminho; coração; DOMINGO III DA PÁSCOA; Emaús; esperança","Tempo":"Tempo Pascal","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-04-19"},{"id":"s158","Título":"Os povos proclamam","Autor":"M. Simões","Tema":"compaixão; DOMINGO X DO TEMPO COMUM; misericórdia; vocação","Tempo":"Tempo Comum","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-06-07"},{"id":"s159","Título":"Pai Nosso","Autor":"Melodia oficial","Tema":"","Tempo":"","Observações":"Momento: Pai Nosso","Video":"","Partitura":"","_uses":1,"_last":"2026-06-24"},{"id":"s160","Título":"Pai se este cálice","Autor":"F. Santos","Tema":"cruz; DOMINGO DE RAMOS E DA PAIXÃO DO SENHOR; entrega; Paixão; Ramos; sofrimento","Tempo":"Semana Santa","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-03-29"},{"id":"s161","Título":"Pai, Filho, Espírito Santo","Autor":"A. Cartageno","Tema":"amor; Espírito; Filho; Pai; SANTÍSSIMA TRINDADE; Trindade","Tempo":"Tempo Comum","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-05-31"},{"id":"s162","Título":"Para o homem recto nascerá uma luz no meio das trevas.","Autor":"M.Luis","Tema":"boas obras; DOMINGO V DO TEMPO COMUM; luz; sal; testemunho","Tempo":"Tempo Comum","Observações":"Momento: Salmo | Salmo: Para o homem recto nascerá uma luz no meio das trevas","Video":"","Partitura":"","_uses":1,"_last":"2026-02-08"},{"id":"s163","Título":"Pecámos, Senhor: tende piedade de nós.","Autor":"M. Luis","Tema":"conversão; deserto; DOMINGO I DA QUARESMA; misericórdia; pecado; Quaresma","Tempo":"Quaresma","Observações":"Momento: Salmo | Salmo: Pecámos, Senhor: tende piedade de nós","Video":"","Partitura":"","_uses":1,"_last":"2026-02-22"},{"id":"s164","Título":"Pela vossa grande misericórdia","Autor":"M.Luis","Tema":"coragem; cruz; discipulado; DOMINGO XII DO TEMPO COMUM; fé","Tempo":"Tempo Comum","Observações":"Momento: Salmo | Salmo: Tende compaixão de mim, Senhor, porque sou um pobre pecador","Video":"","Partitura":"","_uses":2,"_last":"2026-06-24"},{"id":"s165","Título":"Pobres e fracos que somos","Autor":"A. Cartageno","Tema":"DOMINGO XVI DO TEMPO COMUM; esperança; misericórdia; paciência; perdão","Tempo":"Tempo Comum","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-07-19"},{"id":"s166","Título":"Por Cristo e em Cristo","Autor":"M. Faria","Tema":"amor; Espírito; Filho; Pai; SANTÍSSIMA TRINDADE; Trindade","Tempo":"Tempo Comum","Observações":"Momento: Final","Video":"","Partitura":"","_uses":1,"_last":"2026-05-31"},{"id":"s167","Título":"Por vossa misericórdia","Autor":"M.Luis","Tema":"chave; comunidade; DOMINGO XXI DO TEMPO COMUM; fé; Igreja; Pedro","Tempo":"Tempo Comum","Observações":"Momento: Salmo | Salmo: Senhor, é eterna a vossa misericórdia","Video":"","Partitura":"","_uses":1,"_last":"2026-08-23"},{"id":"s168","Título":"Porque somos filhos de Deus","Autor":"A. Cartageno","Tema":"amor; Espírito; Filho; Pai; SANTÍSSIMA TRINDADE; Trindade","Tempo":"Tempo Comum","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-05-31"},{"id":"s169","Título":"Povo teu somos","Autor":"","Tema":"amor; DOMINGO VI DO TEMPO COMUM; DOMINGO XV DO TEMPO COMUM; escolha; lei; mandamentos; misericórdia; Palavra; próximo; vida","Tempo":"Tempo Comum","Observações":"Momento: Final","Video":"","Partitura":"","_uses":2,"_last":"2026-07-12"},{"id":"s170","Título":"Povo teu somos ó Senhor","Autor":"","Tema":"DOMINGO XIII DO TEMPO COMUM; entrega; missão; seguimento; vocação","Tempo":"Tempo Comum","Observações":"Momento: Final","Video":"","Partitura":"","_uses":1,"_last":"2026-06-28"},{"id":"s171","Título":"Povo teu somos, ó Senhor","Autor":"","Tema":"DOMINGO XX DO TEMPO COMUM; fé; misericórdia; universalidade","Tempo":"Tempo Comum","Observações":"Momento: Final","Video":"","Partitura":"","_uses":1,"_last":"2026-08-16"},{"id":"s172","Título":"Preparais a mesa para mim","Autor":"C. Silva","Tema":"Cordeiro de Deus; DOMINGO II DO TEMPO COMUM; testemunho; vocação","Tempo":"Tempo Comum","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-01-18"},{"id":"s173","Título":"Procurai a face do Senhor","Autor":"M. Carneiro","Tema":"DOMINGO II DA QUARESMA; esperança; glória; Quaresma; transfiguração","Tempo":"Quaresma","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-03-01"},{"id":"s174","Título":"Quanto amo, Senhor, a vossa lei!","Autor":"F. Santos","Tema":"DOMINGO XVII DO TEMPO COMUM; reino; sabedoria; tesouro; vontade de Deus","Tempo":"Tempo Comum","Observações":"Momento: Salmo | Salmo: Quanto amo, Senhor, a vossa lei","Video":"","Partitura":"","_uses":1,"_last":"2026-07-26"},{"id":"s175","Título":"Quem comer deste pão","Autor":"C. Silva","Tema":"amor; DOMINGO XV DO TEMPO COMUM; misericórdia; Palavra; próximo","Tempo":"Tempo Comum","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-07-12"},{"id":"s176","Título":"Quero amar-Te meu Jesus","Autor":"H. Faria","Tema":"","Tempo":"","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-06-24"},{"id":"s177","Título":"Quero cantar o vosso nome","Autor":"A. Cartageno","Tema":"boas obras; DOMINGO V DO TEMPO COMUM; luz; sal; testemunho","Tempo":"Tempo Comum","Observações":"Momento: Final","Video":"","Partitura":"","_uses":1,"_last":"2026-02-08"},{"id":"s178","Título":"Ressuscitou o Bom Pastor","Autor":"M. Luis","Tema":"Bom Pastor; DOMINGO IV DA PÁSCOA; pastor; rebanho; vocação","Tempo":"Tempo Pascal","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-04-26"},{"id":"s179","Título":"S. João precussor","Autor":"A. Costa Gomes","Tema":"","Tempo":"","Observações":"Momento: Final","Video":"","Partitura":"","_uses":1,"_last":"2026-06-24"},{"id":"s180","Título":"Salvai-nos, Senhor, nosso Deus","Autor":"Az. Oliveira","Tema":"Bem-aventuranças; DOMINGO IV DO TEMPO COMUM; justiça; pobreza; reino","Tempo":"Tempo Comum","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-02-01"},{"id":"s181","Título":"Salvé ó Cruz","Autor":"M.Faria","Tema":"cruz; DOMINGO DE RAMOS E DA PAIXÃO DO SENHOR; entrega; Paixão; Ramos; sofrimento","Tempo":"Semana Santa","Observações":"Momento: Final","Video":"","Partitura":"","_uses":1,"_last":"2026-03-29"},{"id":"s182","Título":"Sanctus","Autor":"H. Botor","Tema":"","Tempo":"","Observações":"Momento: Santo","Video":"","Partitura":"","_uses":1,"_last":"2026-06-24"},{"id":"s183","Título":"Santo","Autor":"Az. Oliveira","Tema":"adoração; alegria; aleluia; amor; Assunção; ASSUNÇÃO DA VIRGEM SANTA MARIA; Batismo; BATISMO DO SENHOR; Bem-aventuranças; boas obras; Bom Pastor; bondade; bênção; caminho; casa do Pai; ceifa; chave; compaixão; comunidade; conversão; coragem; coração; Cordeiro de Deus; correção fraterna; cruz; cura; deserto; discipulado; DOMINGO DE PENTECOSTES; DOMINGO DE PÁSCOA DA RESSURREIÇÃO DO SENHOR; DOMINGO DE RAMOS E DA PAIXÃO DO SENHOR; DOMINGO I DA QUARESMA; DOMINGO II DA PÁSCOA — DA DIVINA MISERICÓRDIA; DOMINGO II DA QUARESMA; DOMINGO II DO TEMPO COMUM; DOMINGO III DA PÁSCOA; DOMINGO III DO TEMPO COMUM; DOMINGO IV DA PÁSCOA; DOMINGO IV DA QUARESMA; DOMINGO IV DO TEMPO COMUM; DOMINGO V DA PÁSCOA; DOMINGO V DA QUARESMA; DOMINGO V DO TEMPO COMUM; DOMINGO VI DA PÁSCOA; DOMINGO VI DO TEMPO COMUM; DOMINGO X DO TEMPO COMUM; DOMINGO XI DO TEMPO COMUM; DOMINGO XII DO TEMPO COMUM; DOMINGO XIII DO TEMPO COMUM; DOMINGO XIV DO TEMPO COMUM; DOMINGO XIX DO TEMPO COMUM; DOMINGO XV DO TEMPO COMUM; DOMINGO XVI DO TEMPO COMUM; DOMINGO XVII DO TEMPO COMUM; DOMINGO XVIII DO TEMPO COMUM; DOMINGO XX DO TEMPO COMUM; DOMINGO XXI DO TEMPO COMUM; DOMINGO XXII DO TEMPO COMUM; DOMINGO XXIII DO TEMPO COMUM; DOMINGO XXV DO TEMPO COMUM; DOMINGO XXVI DO TEMPO COMUM; dons; Emaús; entrega; Epifania; EPIFANIA DO SENHOR; escolha; escuta; esperança; Espírito; Espírito Santo; Filho; Filho amado; fogo; fome; fé; generosidade; glória; humildade; Igreja; justiça; lei; luz; mandamentos; Maria; misericórdia; missão; Mãe de Deus; paciência; Pai; Paixão; Palavra; Palavra de Deus; pastor; pastores; paz; pecado; Pedro; Pentecostes; perdão; pobreza; povos; providência; próximo; Páscoa; pão; Quaresma; rainha; Ramos; rebanho; reconciliação; reino; reis; ressurreição; sabedoria; sal; salvação; SANTA MARIA, MÃE DE DEUS; SANTÍSSIMA TRINDADE; seguimento; sofrimento; tesouro; testemunho; transfiguração; Trindade; universalidade; verdade; vida; vida nova; vigilância; vocação; vontade de Deus; água","Tempo":"Quaresma; Semana Santa; Tempo Comum; Tempo do Natal; Tempo Pascal","Observações":"Momento: Santo","Video":"","Partitura":"","_uses":46,"_last":"2026-09-27"},{"id":"s184","Título":"Santo I","Autor":"A. Cartageno","Tema":"conversão; DOMINGO III DA QUARESMA; escuta; misericórdia; sede; água","Tempo":"Quaresma","Observações":"Momento: Santo","Video":"","Partitura":"","_uses":1,"_last":"2026-03-08"},{"id":"s185","Título":"Santo II","Autor":"F. Silva","Tema":"compaixão; DOMINGO VII DA PÁSCOA; DOMINGO XXIV DO TEMPO COMUM; glória; misericórdia; oração; perdão; reconciliação; unidade","Tempo":"Tempo Comum; Tempo Pascal","Observações":"Momento: Santo","Video":"","Partitura":"","_uses":2,"_last":"2026-09-13"},{"id":"s186","Título":"Se alguem quiser seguir-me","Autor":"C. Siva","Tema":"DOMINGO XIII DO TEMPO COMUM; entrega; missão; seguimento; vocação","Tempo":"Tempo Comum","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-06-28"},{"id":"s187","Título":"Se alguém quiser seguir-me","Autor":"C. Silva","Tema":"cruz; DOMINGO XXII DO TEMPO COMUM; entrega; misericórdia; seguimento","Tempo":"Tempo Comum","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-08-30"},{"id":"s188","Título":"Se muito pesa irmãos a vossa cruz","Autor":"Manuel Faria","Tema":"DOMINGO V DA QUARESMA; esperança; misericórdia; ressurreição; vida","Tempo":"Quaresma","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-03-22"},{"id":"s189","Título":"Se vos amardes uns aos outros","Autor":"F. Silva","Tema":"compaixão; DOMINGO VI DA PÁSCOA; DOMINGO XXIV DO TEMPO COMUM; esperança; Espírito Santo; misericórdia; perdão; reconciliação; testemunho","Tempo":"Tempo Comum; Tempo Pascal","Observações":"Momento: Comunhão | Momento: Ofertório","Video":"","Partitura":"","_uses":2,"_last":"2026-09-13"},{"id":"s190","Título":"Sede a rocha do meu refúgio","Autor":"M.Simões","Tema":"DOMINGO VI DO TEMPO COMUM; escolha; lei; mandamentos; vida","Tempo":"Tempo Comum","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-02-15"},{"id":"s191","Título":"Senhor eu creio que sois Cristo","Autor":"F. Silva","Tema":"DOMINGO XIX DO TEMPO COMUM; esperança; fé; vigilância","Tempo":"Tempo Comum","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-08-09"},{"id":"s192","Título":"Senhor fazei de mim um instrumento","Autor":"F. Silva","Tema":"bondade; conversão; DOMINGO XXV DO TEMPO COMUM; generosidade; reino","Tempo":"Tempo Comum","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-09-20"},{"id":"s193","Título":"Senhor misericórdia","Autor":"A. Cartageno","Tema":"conversão; deserto; DOMINGO I DA QUARESMA; DOMINGO II DA QUARESMA; DOMINGO XIII DO TEMPO COMUM; entrega; esperança; glória; misericórdia; missão; pecado; Quaresma; seguimento; transfiguração; vocação","Tempo":"Quaresma; Tempo Comum","Observações":"Momento: Ato Penitencial","Video":"","Partitura":"","_uses":3,"_last":"2026-06-28"},{"id":"s194","Título":"Senhor nós vos oferecemos","Autor":"B. Salgado","Tema":"DOMINGO XX DO TEMPO COMUM; fé; misericórdia; universalidade","Tempo":"Tempo Comum","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-08-16"},{"id":"s195","Título":"Senhor tende piedade","Autor":"Az. Oliveira","Tema":"alegria; amor; Bem-aventuranças; Bom Pastor; ceifa; chave; compaixão; comunidade; conversão; cruz; cura; DOMINGO DE PENTECOSTES; DOMINGO IV DA PÁSCOA; DOMINGO IV DA QUARESMA; DOMINGO IV DO TEMPO COMUM; DOMINGO X DO TEMPO COMUM; DOMINGO XI DO TEMPO COMUM; DOMINGO XIV DO TEMPO COMUM; DOMINGO XIX DO TEMPO COMUM; DOMINGO XVII DO TEMPO COMUM; DOMINGO XVIII DO TEMPO COMUM; DOMINGO XXI DO TEMPO COMUM; DOMINGO XXII DO TEMPO COMUM; DOMINGO XXIV DO TEMPO COMUM; DOMINGO XXVI DO TEMPO COMUM; dons; entrega; esperança; Espírito; Espírito Santo; Filho; fogo; fome; fé; humildade; Igreja; justiça; luz; misericórdia; missão; Pai; pastor; pastores; paz; Pedro; Pentecostes; perdão; pobreza; providência; pão; rebanho; reconciliação; reino; sabedoria; salvação; SANTÍSSIMA TRINDADE; seguimento; tesouro; Trindade; vigilância; vocação; vontade de Deus","Tempo":"Quaresma; Tempo Comum; Tempo Pascal","Observações":"Momento: Ato Penitencial","Video":"","Partitura":"","_uses":20,"_last":"2026-09-27"},{"id":"s196","Título":"Senhor tende piedade de nós","Autor":"C. Silva","Tema":"Assunção; ASSUNÇÃO DA VIRGEM SANTA MARIA; bondade; caminho; casa do Pai; comunidade; conversão; coragem; correção fraterna; cruz; discipulado; DOMINGO II DA PÁSCOA — DA DIVINA MISERICÓRDIA; DOMINGO III DA QUARESMA; DOMINGO V DA PÁSCOA; DOMINGO VII DA PÁSCOA; DOMINGO XII DO TEMPO COMUM; DOMINGO XVI DO TEMPO COMUM; DOMINGO XXIII DO TEMPO COMUM; DOMINGO XXV DO TEMPO COMUM; escuta; esperança; fé; generosidade; glória; Maria; misericórdia; oração; paciência; paz; perdão; rainha; reconciliação; reino; ressurreição; sede; unidade; verdade; vida; água","Tempo":"Quaresma; Tempo Comum; Tempo Pascal","Observações":"Momento: Ato Penitencial","Video":"","Partitura":"","_uses":9,"_last":"2026-09-20"},{"id":"s197","Título":"Senhor tende piedade somos o teu povo","Autor":"J. Santos","Tema":"DOMINGO XX DO TEMPO COMUM; fé; misericórdia; universalidade","Tempo":"Tempo Comum","Observações":"Momento: Ato Penitencial","Video":"","Partitura":"","_uses":1,"_last":"2026-08-16"},{"id":"s198","Título":"Senhor tende piedadede nós","Autor":"J.Santos","Tema":"adoração; boas obras; DOMINGO V DO TEMPO COMUM; Epifania; EPIFANIA DO SENHOR; luz; povos; reis; sal; testemunho","Tempo":"Tempo Comum; Tempo do Natal","Observações":"Momento: Ato Penitencial","Video":"","Partitura":"","_uses":2,"_last":"2026-02-08"},{"id":"s199","Título":"Senhor trazei-mos a paz","Autor":"Az. Oliveira","Tema":"DOMINGO XIX DO TEMPO COMUM; esperança; fé; vigilância","Tempo":"Tempo Comum","Observações":"Momento: Final","Video":"","Partitura":"","_uses":1,"_last":"2026-08-09"},{"id":"s200","Título":"Senhor trazei-nos a paz","Autor":"Az. Oliveira","Tema":"Bem-aventuranças; compaixão; DOMINGO IV DO TEMPO COMUM; DOMINGO XXIV DO TEMPO COMUM; justiça; misericórdia; perdão; pobreza; reconciliação; reino","Tempo":"Tempo Comum","Observações":"Momento: Entrada | Momento: Final","Video":"","Partitura":"","_uses":2,"_last":"2026-09-13"},{"id":"s201","Título":"Senhor tu és a luz","Autor":"Az. Oliveira","Tema":"boas obras; DOMINGO V DO TEMPO COMUM; luz; sal; testemunho","Tempo":"Tempo Comum","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-02-08"},{"id":"s202","Título":"Senhor, quem entrará no santuário","Autor":"I. Larrañaga","Tema":"DOMINGO XX DO TEMPO COMUM; fé; misericórdia; universalidade","Tempo":"Tempo Comum","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-08-16"},{"id":"s203","Título":"Senhor, sois um Deus clemente e compassivo.","Autor":"M.Luis","Tema":"DOMINGO XVI DO TEMPO COMUM; esperança; misericórdia; paciência; perdão","Tempo":"Tempo Comum","Observações":"Momento: Salmo | Salmo: Vós, Senhor, sois clemente e compassivo","Video":"","Partitura":"","_uses":1,"_last":"2026-07-19"},{"id":"s204","Título":"Senhora do manto lindo","Autor":"H. Faria","Tema":"amor; Espírito; Filho; Pai; SANTÍSSIMA TRINDADE; Trindade","Tempo":"Tempo Comum","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-05-31"},{"id":"s205","Título":"Senhora um dia desceste","Autor":"","Tema":"amor; Espírito; Filho; Pai; SANTÍSSIMA TRINDADE; Trindade","Tempo":"Tempo Comum","Observações":"Momento: Final","Video":"","Partitura":"","_uses":1,"_last":"2026-05-31"},{"id":"s206","Título":"Senhora, nós vos louvamos","Autor":"M.Faria","Tema":"amor; Espírito; Filho; Pai; SANTÍSSIMA TRINDADE; Trindade","Tempo":"Tempo Comum","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-05-31"},{"id":"s207","Título":"Toda a terra vos adore","Autor":"C. Silva","Tema":"Cordeiro de Deus; DOMINGO II DO TEMPO COMUM; testemunho; vocação","Tempo":"Tempo Comum","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-01-18"},{"id":"s208","Título":"Tomai e recebei","Autor":"H. Faria","Tema":"compaixão; DOMINGO XVIII DO TEMPO COMUM; fome; providência; pão","Tempo":"Tempo Comum","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-08-02"},{"id":"s209","Título":"Tu que nas margens do lago","Autor":"","Tema":"conversão; DOMINGO III DO TEMPO COMUM; luz; missão; Palavra de Deus","Tempo":"Tempo Comum","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-01-25"},{"id":"s210","Título":"Tu és o sol","Autor":"","Tema":"amor; Espírito; Filho; Pai; SANTÍSSIMA TRINDADE; Trindade","Tempo":"Tempo Comum","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-05-31"},{"id":"s211","Título":"Uns Magos vindos do além","Autor":"F. Silva","Tema":"adoração; Epifania; EPIFANIA DO SENHOR; luz; povos; reis","Tempo":"Tempo do Natal","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-01-04"},{"id":"s212","Título":"Vencida foi a morte","Autor":"J.S. Bach","Tema":"Bom Pastor; DOMINGO IV DA PÁSCOA; pastor; rebanho; vocação","Tempo":"Tempo Pascal","Observações":"Momento: Final","Video":"","Partitura":"","_uses":1,"_last":"2026-04-26"},{"id":"s213","Título":"Vimos trazer Senhor","Autor":"M. Faria","Tema":"cruz; DOMINGO XXII DO TEMPO COMUM; entrega; misericórdia; seguimento","Tempo":"Tempo Comum","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-08-30"},{"id":"s214","Título":"Vimos trazer senhor ao vosso altar","Autor":"M. Faria","Tema":"ceifa; DOMINGO XI DO TEMPO COMUM; missão; pastores; rebanho","Tempo":"Tempo Comum","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-06-14"},{"id":"s215","Título":"Vinde espirito divino","Autor":"M. Borda","Tema":"DOMINGO DE PENTECOSTES; dons; Espírito Santo; fogo; missão; Pentecostes","Tempo":"Tempo Pascal","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":1,"_last":"2026-05-24"},{"id":"s216","Título":"Vinde prostremo-nos em terra","Autor":"Az. Oliveira","Tema":"boas obras; DOMINGO V DO TEMPO COMUM; luz; sal; testemunho","Tempo":"Tempo Comum","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-02-08"},{"id":"s217","Título":"Vinde á presnça de Deus","Autor":"M. Carneiro","Tema":"DOMINGO XVII DO TEMPO COMUM; reino; sabedoria; tesouro; vontade de Deus","Tempo":"Tempo Comum","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-07-26"},{"id":"s218","Título":"Vinde, ó santo Espírito","Autor":"M.Faria","Tema":"DOMINGO DE PENTECOSTES; dons; Espírito Santo; fogo; missão; Pentecostes","Tempo":"Tempo Pascal","Observações":"Momento: Sequência","Video":"","Partitura":"","_uses":1,"_last":"2026-05-24"},{"id":"s219","Título":"Virão adorar-Vos, Senhor, todos os povos da terra.","Autor":"M.Luis","Tema":"adoração; Epifania; EPIFANIA DO SENHOR; luz; povos; reis","Tempo":"Tempo do Natal","Observações":"Momento: Salmo | Salmo: Virão adorar-Vos, Senhor, todos os povos da terra","Video":"","Partitura":"","_uses":1,"_last":"2026-01-04"},{"id":"s220","Título":"Vós abris Senhor a Vossa mão","Autor":"M.Luis","Tema":"compaixão; DOMINGO XVIII DO TEMPO COMUM; fome; providência; pão","Tempo":"Tempo Comum","Observações":"Momento: Salmo | Salmo: Vós abris, Senhor, a vossa mão e saciais a nossa fome","Video":"","Partitura":"","_uses":1,"_last":"2026-08-02"},{"id":"s221","Título":"Vós que fostes batizados","Autor":"F. Santos","Tema":"","Tempo":"","Observações":"Momento: Aspersão","Video":"","Partitura":"","_uses":1,"_last":"2026-06-24"},{"id":"s222","Título":"Vós sereis meus amigos","Autor":"M.Luis","Tema":"conversão; DOMINGO VI DA PÁSCOA; DOMINGO XXVI DO TEMPO COMUM; esperança; Espírito Santo; humildade; justiça; misericórdia; testemunho","Tempo":"Tempo Comum; Tempo Pascal","Observações":"Momento: Comunhão","Video":"","Partitura":"","_uses":2,"_last":"2026-09-27"},{"id":"s223","Título":"Vós sois justo senhor","Autor":"S. Pinto","Tema":"comunidade; correção fraterna; DOMINGO XXIII DO TEMPO COMUM; escuta; reconciliação","Tempo":"Tempo Comum","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-09-06"},{"id":"s224","Título":"Vós sois justos Senhor","Autor":"G. Gomes","Tema":"conversão; DOMINGO XXVI DO TEMPO COMUM; humildade; justiça; misericórdia","Tempo":"Tempo Comum","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-09-27"},{"id":"s225","Título":"À vossa direita, Senhor","Autor":"J. Geada","Tema":"Assunção; ASSUNÇÃO DA VIRGEM SANTA MARIA; glória; Maria; rainha","Tempo":"Tempo Comum","Observações":"Momento: Salmo | Salmo: À vossa direita, Senhor, está a rainha, ornada de ouro de Ofir","Video":"","Partitura":"","_uses":1,"_last":"2026-08-15"},{"id":"s226","Título":"Águas das fontes dos rios e dos mares","Autor":"A. Cartageno","Tema":"Batismo; BATISMO DO SENHOR; Espírito; Filho amado; água","Tempo":"Tempo do Natal","Observações":"Momento: Entrada","Video":"","Partitura":"","_uses":1,"_last":"2026-01-11"},{"id":"s227","Título":"É preciso renascer","Autor":"J.P.Martins","Tema":"DOMINGO II DA QUARESMA; esperança; glória; Quaresma; transfiguração","Tempo":"Quaresma","Observações":"Momento: Final","Video":"","Partitura":"","_uses":1,"_last":"2026-03-01"},{"id":"s228","Título":"Ó luz de Deus","Autor":"","Tema":"adoração; Epifania; EPIFANIA DO SENHOR; luz; povos; reis","Tempo":"Tempo do Natal","Observações":"Momento: Ofertório","Video":"","Partitura":"","_uses":1,"_last":"2026-01-04"},{"id":"s229","Título":"Ó Páscoa gloriosa","Autor":"F. Santos","Tema":"alegria; aleluia; DOMINGO DE PÁSCOA DA RESSURREIÇÃO DO SENHOR; Páscoa; ressurreição; vida nova","Tempo":"Tempo Pascal","Observações":"Momento: Final","Video":"","Partitura":"","_uses":1,"_last":"2026-04-05"}];window.CORO_EMBEDDED_HISTORY=[{"date":"2026-01-01","title":"SANTA MARIA, MÃE DE DEUS","color":"Branco","season":"Tempo do Natal","cycle":"A","extraTheme":"Maria, Mãe de Deus, bênção, paz","salmista":"Rosalina","organista":"","program":{"entrada":"Nós Vos saudamos, ó Mãe Santa","gloria":"Glória","salmo":"Deus tenha compaixão de nós","aclamacao":"Aleluia","ofertorio":"O pão da vida eterna prometida","santo":"Santo","cordeiro":"Cordeiro de Deus","comunhao":"Jesus Cristo, ontem e hoje","final":"Alegrem-se os céus e a terra"}},{"date":"2026-01-04","title":"EPIFANIA DO SENHOR","color":"Branco","season":"Tempo do Natal","cycle":"A","extraTheme":"Epifania, adoração, povos, luz, reis","salmista":"Mariana","organista":"","program":{"entrada":"Cristo nasceu: Vinde adoremos","atoPenitencial":"Senhor tende piedadede nós","salmo":"Virão adorar-Vos, Senhor, todos os povos da terra.","aclamacao":"Aleluia","ofertorio":"Ó luz de Deus","santo":"Santo","cordeiro":"Cordeiro de Deus","comunhao":"Uns Magos vindos do além","final":"Hino do Jubileu e Cantem cantem os anjos"}},{"date":"2026-01-11","title":"Batismo do Senhor","color":"Branco","season":"Tempo do Natal","cycle":"A","extraTheme":"Batismo, água, Espírito, Filho amado","salmista":"Leninha","organista":"","program":{"entrada":"Águas das fontes dos rios e dos mares","salmo":"O Senhor abençoará o seu povo","aclamacao":"Aleluia","santo":"Santo","cordeiro":"Cordeiro de deus"}},{"date":"2026-01-18","title":"DOMINGO II DO TEMPO COMUM","color":"Verde","season":"Tempo Comum","cycle":"A","extraTheme":"Cordeiro de Deus, testemunho, vocação","salmista":"Rosalina","organista":"","program":{"entrada":"Toda a terra vos adore","aclamacao":"Aleluia","santo":"Santo","cordeiro":"Cordeiro de deus","comunhao":"Preparais a mesa para mim"}},{"date":"2026-01-25","title":"DOMINGO III DO TEMPO COMUM ou Domingo da Palavra de Deus","color":"Verde","season":"Tempo Comum","cycle":"A","extraTheme":"Palavra de Deus, conversão, luz, missão","salmista":"Mariana","organista":"","program":{"entrada":"Cantai ao Senhor","aclamacao":"Aleluia","ofertorio":"Não fostes vós que me escolheste","santo":"Santo","cordeiro":"Cordeiro de Deus","comunhao":"Tu que nas margens do lago","final":"A semente é a palavra de Deus"}},{"date":"2026-02-01","title":"DOMINGO IV DO TEMPO COMUM","color":"Verde","season":"Tempo Comum","cycle":"A","extraTheme":"Bem-aventuranças, pobreza, justiça, reino","salmista":"Mariana","organista":"","program":{"entrada":"Salvai-nos, Senhor, nosso Deus","atoPenitencial":"Senhor tende piedade","gloria":"Glória","salmo":"Bem-aventurados os pobres em espírito","aclamacao":"Aleluia","ofertorio":"Meu Deus, na simplicidade","santo":"Santo","cordeiro":"Cordeiro de Deus","comunhao":"Bendito seja deus nosso pai","final":"Senhor trazei-nos a paz"}},{"date":"2026-02-08","title":"DOMINGO V DO TEMPO COMUM","color":"Verde","season":"Tempo Comum","cycle":"A","extraTheme":"luz, testemunho, sal, boas obras","salmista":"Rosalina","organista":"","program":{"entrada":"Vinde prostremo-nos em terra","atoPenitencial":"Senhor tende piedadede nós","salmo":"Para o homem recto nascerá uma luz no meio das trevas.","aclamacao":"Aleluia","ofertorio":"Senhor tu és a luz","santo":"Santo","cordeiro":"Cordeiro de Deus","comunhao":"Brilhe a vossa luz diante dos homens","final":"Quero cantar o vosso nome"}},{"date":"2026-02-15","title":"DOMINGO VI DO TEMPO COMUM","color":"Verde","season":"Tempo Comum","cycle":"A","extraTheme":"lei, mandamentos, vida, escolha","salmista":"Leninha","organista":"","program":{"entrada":"Sede a rocha do meu refúgio","atoPenitencial":"Kyrie","salmo":"Ditoso o que anda na lei do Senhor.","aclamacao":"Aleluia","ofertorio":"Onde há caridade verdadeira","santo":"Santo","cordeiro":"Cordeiro de deus","comunhao":"O Senhor deu-lhes o pão do Céu","final":"Povo teu somos"}},{"date":"2026-02-22","title":"DOMINGO I DA QUARESMA","color":"Roxo","season":"Quaresma","cycle":"A","extraTheme":"Quaresma, conversão, pecado, misericórdia, deserto","salmista":"Mariana","organista":"","program":{"entrada":"Cristo Jesus Tu me chamaste","atoPenitencial":"Senhor misericórdia","salmo":"Pecámos, Senhor: tende piedade de nós.","aclamacao":"Aleluia","ofertorio":"**********","santo":"Santo","cordeiro":"Cordeiro de Deus","comunhao":"Nem só de pão vive o homem","final":"Irmãos, convertei o vosso coração"}},{"date":"2026-03-01","title":"DOMINGO II DA QUARESMA","color":"Roxo","season":"Quaresma","cycle":"A","extraTheme":"Quaresma, transfiguração, glória, esperança","salmista":"Rosalina","organista":"","program":{"entrada":"Procurai a face do Senhor","atoPenitencial":"Senhor misericórdia","salmo":"Esperamos, Senhor, na vossa misericórdia.","aclamacao":"Louvor a vós","ofertorio":"Jesus tomou consigo","santo":"Santo","cordeiro":"Cordeiro de Deus","comunhao":"Este é o meu Filho","final":"É preciso renascer"}},{"date":"2026-03-08","title":"DOMINGO III DA QUARESMA","color":"Roxo","season":"Quaresma","cycle":"A","extraTheme":"água, sede, conversão, escuta, misericórdia","salmista":"Leninha","organista":"","program":{"entrada":"Olhai para mim, Senhor","atoPenitencial":"Senhor tende piedade de nós","salmo":"Hoje se escutardes a voz do Senhor","aclamacao":"Louvor a Vós, Rei da eterna Glória","ofertorio":"Confesso o meu pecado","santo":"Santo I","cordeiro":"Cordeiro de Deus","comunhao":"Bebei se tendes sede","final":"Irmãos, convertei o vosso coração"}},{"date":"2026-03-15","title":"DOMINGO IV DA QUARESMA","color":"Rosa/Roxo","season":"Quaresma","cycle":"A","extraTheme":"luz, cura, pastor, alegria, conversão","salmista":"Mariana","organista":"","program":{"entrada":"Alegra-te Jerusalem","atoPenitencial":"Senhor tende piedade","salmo":"O Senhor é meu pastor","aclamacao":"Louvor a Vós","ofertorio":"Em vós senhor está a fonte da vida","santo":"Santo","cordeiro":"Cordeiro de Deus","comunhao":"O Senhor ungiu os meus olhos","final":"Aos pés da Cruz"}},{"date":"2026-03-22","title":"DOMINGO V DA QUARESMA","color":"Roxo","season":"Quaresma","cycle":"A","extraTheme":"vida, ressurreição, misericórdia, esperança","salmista":"Rosalina","organista":"","program":{"entrada":"Deus vinde em meu auxilio","atoPenitencial":"Kyrie eleison","salmo":"Junto do Senhor a misericórdia","aclamacao":"Louvor a Vós, Rei da eterna Glória","ofertorio":"Luz terna suave","santo":"Santo","cordeiro":"Cordeiro de Deus","comunhao":"Se muito pesa irmãos a vossa cruz","final":"Hossana tu reinarás"}},{"date":"2026-03-29","title":"DOMINGO DE RAMOS NA PAIXÃO DO SENHOR","color":"Vermelho","season":"Semana Santa","cycle":"A","extraTheme":"Ramos, Paixão, cruz, entrega, sofrimento","salmista":"Mariana","organista":"","program":{"entrada":"Bendito, bendito o que vem Glória honra e louvor","atoPenitencial":"***","salmo":"Meu Deus, meu Deus, porque me abandonastes?","aclamacao":"Glória a Vós, Cristo","ofertorio":"Bendita Seja a Paixão","santo":"Santo","cordeiro":"Cordeiro de Deus","comunhao":"Pai se este cálice","final":"Salvé ó Cruz"}},{"date":"2026-04-05","title":"DOMINGO DE PÁSCOA DA RESSURREIÇÃO DO SENHOR","color":"Branco","season":"Tempo Pascal","cycle":"A","extraTheme":"Páscoa, ressurreição, vida nova, alegria, aleluia","salmista":"2 vozes","organista":"Paulo","program":{"entrada":"O Senhor ressuscitou verdadeiramente","gloria":"Glória a Deus","salmo":"Eis o dia que o Senhor fez","aclamacao":"Aleluia","ofertorio":"Já luz se levantou","santo":"Santo","cordeiro":"Cordeiro de Deus V","comunhao":"Cristo nosso cordeiro Pascal","final":"Ó Páscoa gloriosa"}},{"date":"2026-04-12","title":"DOMINGO II DA PÁSCOA ou da Divina Misericórdia","color":"Branco","season":"Tempo Pascal","cycle":"A","extraTheme":"misericórdia, paz, ressurreição, comunidade","salmista":"Rosalina","organista":"Paulo","program":{"entrada":"Exultai de alegria, cantai hinos","atoPenitencial":"Senhor tende piedade de nós","salmo":"Aclamai o Senhor, porque Ele é bom","aclamacao":"Aleluia","ofertorio":"O Hino da Alegria","santo":"Santo","cordeiro":"Cordeiro de Deus","comunhao":"Aproxima a tua mão","final":"Na sua dor"}},{"date":"2026-04-19","title":"DOMINGO III DA PÁSCOA","color":"Branco","season":"Tempo Pascal","cycle":"A","extraTheme":"caminho, Emaús, esperança, coração","salmista":"Mariana","organista":"Leninha","program":{"entrada":"Cristo ressuscitou","atoPenitencial":"Kyrie","salmo":"Mostrai-me, Senhor, o caminho da vida","aclamacao":"Aleluia","ofertorio":"Ficai conosco Senhor","santo":"Santo","cordeiro":"Cordeiro de Deus","comunhao":"Os discipulos reconheceram","final":"Na Sua dor"}},{"date":"2026-04-26","title":"DOMINGO IV DA PÁSCOA","color":"Branco","season":"Tempo Pascal","cycle":"A","extraTheme":"Bom Pastor, vocação, pastor, rebanho","salmista":"Dina","organista":"Carmo","program":{"entrada":"A bondade do Senhor","atoPenitencial":"Senhor tende piedade","salmo":"O Senhor é meu pastor nada me faltará.","aclamacao":"Aleluia","ofertorio":"O Senhor é meu pastor nada me falta","santo":"Santo","cordeiro":"Cordeiro de Deus","comunhao":"Ressuscitou o Bom Pastor","final":"Vencida foi a morte"}},{"date":"2026-05-03","title":"DOMINGO V DA PÁSCOA Dia da Mãe","color":"Branco","season":"Tempo Pascal","cycle":"A","extraTheme":"caminho, verdade, vida, casa do Pai","salmista":"Rosalina","organista":"Leninha","program":{"entrada":"Cantai ao Senhor um cântico novo I","atoPenitencial":"Senhor tende piedade de nós","salmo":"Esperamos, Senhor, na vossa misericórdia.","aclamacao":"Aleluia","ofertorio":"Minha Senhora e minha mãe","santo":"Santo","cordeiro":"Cordeiro de Deus","comunhao":"Eu sou a verdadeira vide","final":"Alegrai-vos mãe de Jesus"}},{"date":"2026-05-10","title":"DOMINGO VI DA PÁSCOA","color":"Branco","season":"Tempo Pascal","cycle":"A","extraTheme":"Espírito Santo, esperança, testemunho","salmista":"Carmo","organista":"Paulo","program":{"entrada":"Anunciai com voz de júbilo","atoPenitencial":"Kyrie","salmo":"A terra inteira aclame o Senhor","aclamacao":"Aleluia","ofertorio":"Se vos amardes uns aos outros","santo":"Santo","cordeiro":"Cordeiro de Deus","comunhao":"Vós sereis meus amigos","final":"Alegrai-vos mãe de Jesus"}},{"date":"2026-05-17","title":"DOMINGO VII DA PÁSCOA ASCENSÃO DO SENHOR","color":"Branco","season":"Tempo Pascal","cycle":"A","extraTheme":"oração, glória, unidade","salmista":"Dina","organista":"Leninha","program":{"entrada":"Homens da Galileia","atoPenitencial":"Senhor tende piedade de nós","salmo":"Ergue-se Deus o Senhor","aclamacao":"Aleluia","ofertorio":"Aclamai Jesus Cristo","santo":"Santo II","cordeiro":"Cordeiro de Deus","comunhao":"Eu estou sempre convosco","final":"Ide por todo o mundo e proclami"}},{"date":"2026-05-24","title":"DOMINGO DE PENTECOSTES","color":"Vermelho","season":"Tempo Pascal","cycle":"A","extraTheme":"Pentecostes, Espírito Santo, fogo, dons, missão","salmista":"Leninha","organista":"Paulo","program":{"entrada":"O Espírito do Senhor","atoPenitencial":"Senhor tende piedade","salmo":"Mandai, Senhor, o vosso Espírito","aclamacao":"Aleluia","ofertorio":"O Espirito de Deus repousou sobre mim","santo":"Santo","cordeiro":"Cordeiro de Deus","comunhao":"Vinde espirito divino","final":"Ide por todo o mundo proclamai"}},{"date":"2026-05-31","title":"DOMINGO IX DO TEMPO COMUM SANTÍSSIMA TRINDADE","color":"Branco","season":"Tempo Comum","cycle":"A","extraTheme":"Trindade, Pai, Filho, Espírito, amor","salmista":"Rosalina","organista":"Carmo","program":{"entrada":"Bendizemos o teu nome","atoPenitencial":"Kyrie","salmo":"Escuta e inclina-te","aclamacao":"Aleluia","ofertorio":"Avé Maria","santo":"Santo","cordeiro":"Cordeiro de Deus","comunhao":"Tu és o sol","final":"Senhora um dia desceste"}},{"date":"2026-06-07","title":"DOMINGO X DO TEMPO COMUM","color":"Verde","season":"Tempo Comum","cycle":"A","extraTheme":"misericórdia, vocação, compaixão","salmista":"Mariana","organista":"","program":{"entrada":"Os povos proclamam","atoPenitencial":"Senhor tende piedade","gloria":"Glória","salmo":"A quem segue o caminho reto, darei a Salvação de Deus","aclamacao":"Aleluia","ofertorio":"Deixamos aqui Senhor Pai santo","santo":"Santo","cordeiro":"Agnus Dei","comunhao":"Deus é amor","acaoGracas":"Anima Christi","final":"A Sto. António elevemos"}},{"date":"2026-06-14","title":"DOMINGO XI DO TEMPO COMUM","color":"Verde","season":"Tempo Comum","cycle":"A","extraTheme":"rebanho, missão, ceifa, pastores","salmista":"Rosalina","organista":"","program":{"entrada":"Não me abandoneis, Senhor","atoPenitencial":"Senhor tende piedade","salmo":"Nós somos o povo de Deus, as ovelhas do seu rebanho.","aclamacao":"Aleluia","ofertorio":"Vimos trazer senhor ao vosso altar","santo":"Santo","cordeiro":"Cordeiro de Deus","comunhao":"Não foste vós que me escolheste","final":"Ide por todo o mundo"}},{"date":"2026-06-21","title":"DOMINGO XII DO TEMPO COMUM","color":"Verde","season":"Tempo Comum","cycle":"A","extraTheme":"fé, cruz, discipulado, coragem","salmista":"Mariana","organista":"","program":{"entrada":"Deus vive na sua morada santa","atoPenitencial":"Senhor tende piedade de nós","salmo":"Pela vossa grande misericórdia","aclamacao":"Aleluia","ofertorio":"Meu Deus na simplicidade","santo":"Santo","cordeiro":"Cordeiro de Deus","comunhao":"O Corpo de Jesus é alimento","final":"Não vou só"}},{"date":"2026-06-28","title":"DOMINGO XIII DO TEMPO COMUM","color":"Verde","season":"Tempo Comum","cycle":"A","extraTheme":"seguimento, entrega, vocação, missão","salmista":"Dina","organista":"","program":{"entrada":"Louvai louvai o Senhor","atoPenitencial":"Senhor misericórdia","salmo":"Cantarei eternamente as misericórdias do Senhor.","aclamacao":"Aleluia","ofertorio":"Na hóstia sobre a patena","santo":"Santo","cordeiro":"Cordeiro de Deus","comunhao":"Se alguem quiser seguir-me","final":"Povo teu somos ó Senhor"}},{"date":"2026-06-24","title":"NASCIMENTO DE SÃO JOÃO BATISTA – SOLENIDADE","color":"","season":"","cycle":"A","extraTheme":"","salmista":"Mariana","organista":"","program":{"entrada":"Bendito o que Deus nos envia","atoPenitencial":"Senhor tende piedade","gloria":"Glória","salmo":"Pela vossa grande misericórdia","aclamacao":"Aleluia","ofertorio":"Deixamos aqui Senhor","santo":"Sanctus","cordeiro":"Agnus Dei","comunhao":"O Corpo de Jesus é alimento","final":"Hino das JMJ 2023","acaoGracas":"Laudate Dominum"}},{"date":"2026-07-05","title":"DOMINGO XIV DO TEMPO COMUM","color":"Verde","season":"Tempo Comum","cycle":"A","extraTheme":"alegria, paz, humildade, salvação","salmista":"Rosalina","organista":"","program":{"entrada":"Cantai ao Senhor um cântico novo","atoPenitencial":"Senhor tende piedade","salmo":"Louvarei para sempre o vosso nome, Senhor, meu Deus e meu Rei.","aclamacao":"Aleluia","ofertorio":"Apresentamos Senhor os frutos","santo":"Santo","cordeiro":"Cordeiro de Deus","comunhao":"Eu Sou o Pão vivo","final":"A messe é grande"}},{"date":"2026-07-12","title":"DOMINGO XV DO TEMPO COMUM","color":"Verde","season":"Tempo Comum","cycle":"A","extraTheme":"próximo, misericórdia, amor, Palavra","salmista":"Mariana","organista":"","program":{"entrada":"Eu venho, Senhor, à vossa presença","atoPenitencial":"Kyrie","salmo":"A semente caiu em boa terra e deu muito fruto.","aclamacao":"Aleluia","ofertorio":"Apresentamos Senhor","santo":"Santo","cordeiro":"Cordeiro de Deus","comunhao":"Quem comer deste pão","final":"Povo teu somos"}},{"date":"2026-07-19","title":"DOMINGO XVI DO TEMPO COMUM","color":"Verde","season":"Tempo Comum","cycle":"A","extraTheme":"paciência, misericórdia, perdão, esperança","salmista":"Rosalina","organista":"","program":{"entrada":"Caminhamos para o vosso altar","atoPenitencial":"Senhor tende piedade de nós","salmo":"Senhor, sois um Deus clemente e compassivo.","aclamacao":"Aleluia","ofertorio":"Pobres e fracos que somos","santo":"Santo","cordeiro":"Cordeiro de Deus","comunhao":"Eu estou à porta e chamo","final":"Anunciaremos teu reino Senhor"}},{"date":"2026-07-26","title":"DOMINGO XVII DO TEMPO COMUM","color":"Verde","season":"Tempo Comum","cycle":"A","extraTheme":"sabedoria, reino, tesouro, vontade de Deus","salmista":"Mariana","organista":"","program":{"entrada":"Vinde á presnça de Deus","atoPenitencial":"Senhor tende piedade","salmo":"Quanto amo, Senhor, a vossa lei!","aclamacao":"Aleluia","ofertorio":"Levamos para o vosso altar","santo":"Santo","cordeiro":"Cordeiro de Deus","comunhao":"Bendiz minha alma o Senhor","final":"Com hinos preces e cantos"}},{"date":"2026-08-02","title":"DOMINGO XVIII DO TEMPO COMUM","color":"Verde","season":"Tempo Comum","cycle":"A","extraTheme":"pão, fome, compaixão, providência","salmista":"Rosalina","organista":"","program":{"entrada":"Deus vinde em meu auxilo","atoPenitencial":"Senhor tende piedade","salmo":"Vós abris Senhor a Vossa mão","aclamacao":"Aleluia","ofertorio":"Tomai e recebei","santo":"Santo","cordeiro":"Cordeiro de Deus","comunhao":"Eu sou o pão da vida","final":"Cantai comigo"}},{"date":"2026-08-09","title":"DOMINGO XIX DO TEMPO COMUM","color":"Verde","season":"Tempo Comum","cycle":"A","extraTheme":"fé, vigilância, esperança","salmista":"Rosalina","organista":"","program":{"entrada":"Nós somos as pedras vivas","atoPenitencial":"Senhor tende piedade","salmo":"Mostrai-nos o vosso amor","aclamacao":"Aleluia","ofertorio":"Cremos em Vós ó Deus","santo":"Santo","cordeiro":"Cordeiro de Deus","comunhao":"Senhor eu creio que sois Cristo","final":"Senhor trazei-mos a paz"}},{"date":"2026-08-15","title":"ASSUNÇÃO DA VIRGEM SANTA MARIA – SOLENIDADE","color":"Branco","season":"Tempo Comum","cycle":"A","extraTheme":"Maria, Assunção, rainha, glória","salmista":"Mariana","organista":"","program":{"entrada":"Apareceu no Céu um sinal","atoPenitencial":"Senhor tende piedade de nós","salmo":"À vossa direita, Senhor","aclamacao":"Aleluia","ofertorio":"O Santissima","santo":"Santo","cordeiro":"Cordeiro de Deus II","comunhao":"Maria, és a árvore da vida","final":"Desde toda a eternidade"}},{"date":"2026-08-16","title":"DOMINGO XX DO TEMPO COMUM","color":"Verde","season":"Tempo Comum","cycle":"A","extraTheme":"fé, universalidade, misericórdia","salmista":"Rosalina","organista":"","program":{"entrada":"Senhor, quem entrará no santuário","atoPenitencial":"Senhor tende piedade somos o teu povo","salmo":"Louvado sejais, Senhor, pelos povos de toda a terra.","aclamacao":"Aleluia","ofertorio":"Senhor nós vos oferecemos","santo":"Santo","cordeiro":"Cordeiro de Deus","comunhao":"Eu Sou o Pão vivo","final":"Povo teu somos, ó Senhor"}},{"date":"2026-08-23","title":"DOMINGO XXI DO TEMPO COMUM","color":"Verde","season":"Tempo Comum","cycle":"A","extraTheme":"Igreja, Pedro, fé, chave, comunidade","salmista":"Mariana","organista":"","program":{"entrada":"Inclinai o vosso ouvido","atoPenitencial":"Senhor tende piedade","salmo":"Por vossa misericórdia","aclamacao":"Aleluia","ofertorio":"Meu Deus na Simplicidade","santo":"Santo","cordeiro":"Cordeiro de Deus","comunhao":"Não fostes vós que me escolheste","final":"Irei mais além"}},{"date":"2026-08-30","title":"DOMINGO XXII DO TEMPO COMUM","color":"Verde","season":"Tempo Comum","cycle":"A","extraTheme":"cruz, entrega, seguimento, misericórdia","salmista":"Mariana","organista":"","program":{"entrada":"Meu Senhor eu vos amo","atoPenitencial":"Senhor tende piedade","salmo":"A minha alma tem sede de Vós, meu Deus.","aclamacao":"Aleluia","ofertorio":"Vimos trazer Senhor","santo":"Santo","cordeiro":"Cordeiro de Deus","comunhao":"Se alguém quiser seguir-me"}},{"date":"2026-09-06","title":"DOMINGO XXIII DO TEMPO COMUM","color":"Verde","season":"Tempo Comum","cycle":"A","extraTheme":"escuta, correção fraterna, comunidade, reconciliação","salmista":"Rosalina","organista":"","program":{"entrada":"Vós sois justo senhor","atoPenitencial":"Senhor tende piedade de nós","salmo":"Hoje se escutardes a voz do Senhor","aclamacao":"Aleluia","ofertorio":"Onde se reunem dois ou tres","santo":"Santo","cordeiro":"Cordeiro de Deus","comunhao":"Como o veado em busca das aguas","final":"Deus é pai Deus é amor"}},{"date":"2026-09-13","title":"DOMINGO XXIV DO TEMPO COMUM","color":"Verde","season":"Tempo Comum","cycle":"A","extraTheme":"perdão, misericórdia, compaixão, reconciliação","salmista":"Mariana","organista":"","program":{"entrada":"Senhor trazei-nos a paz","atoPenitencial":"Senhor tende piedade","salmo":"O Senhor é clemente e compassivo","aclamacao":"Aleluia I","ofertorio":"Dou-vos um mandamento novo","santo":"Santo II","cordeiro":"Cordeiro de Deus","comunhao":"Se vos amardes uns aos outros","final":"Deus é pai Deus é amor"}},{"date":"2026-09-20","title":"DOMINGO XXV DO TEMPO COMUM","color":"Verde","season":"Tempo Comum","cycle":"A","extraTheme":"bondade, generosidade, conversão, reino","salmista":"Rosalina","organista":"","program":{"entrada":"Eu darei ao meu povo a salvação","atoPenitencial":"Senhor tende piedade de nós","salmo":"O Senhor está perto de quantos O invocam.","aclamacao":"Aleluia","ofertorio":"Senhor fazei de mim um instrumento","santo":"Santo","cordeiro":"Cordeiro de Deus","comunhao":"O Cordeiro de Deus é o nosso pastor","final":"Acabou a missa"}},{"date":"2026-09-27","title":"DOMINGO XXVI DO TEMPO COMUM","color":"Verde","season":"Tempo Comum","cycle":"A","extraTheme":"conversão, justiça, humildade, misericórdia","salmista":"Mariana","organista":"","program":{"entrada":"Vós sois justos Senhor","atoPenitencial":"Senhor tende piedade","salmo":"Lembrai-Vos, Senhor, da vossa misericórdia","aclamacao":"Aleluia","ofertorio":"Onde há caridade verdadeira","santo":"Santo","cordeiro":"Cordeiro de Deus","comunhao":"Vós sereis meus amigos","final":"Ide por todo o mundo"}}];window.CORO_LIT2026={
+"2026-01-01":{name:"SANTA MARIA, MÃE DE DEUS",time:"Tempo do Natal",color:"Branco",year:"A",type:"Solenidade",psalm:"Deus tenha compaixão de nós",theme:"Maria, Mãe de Deus, bênção, paz"},
+"2026-01-04":{name:"EPIFANIA DO SENHOR",time:"Tempo do Natal",color:"Branco",year:"A",type:"Solenidade",psalm:"Virão adorar-Vos, Senhor, todos os povos da terra",theme:"Epifania, adoração, povos, luz, reis"},
+"2026-01-11":{name:"BATISMO DO SENHOR",time:"Tempo do Natal",color:"Branco",year:"A",type:"Festa",psalm:"O Senhor abençoará o seu povo",theme:"Batismo, água, Espírito, Filho amado"},
+"2026-01-18":{name:"DOMINGO II DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"Toda a terra vos adore",theme:"Cordeiro de Deus, testemunho, vocação"},
+"2026-01-25":{name:"DOMINGO III DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"O Senhor é a minha luz e a minha salvação",theme:"Palavra de Deus, conversão, luz, missão"},
+"2026-02-01":{name:"DOMINGO IV DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"Bem-aventurados os pobres em espírito",theme:"Bem-aventuranças, pobreza, justiça, reino"},
+"2026-02-08":{name:"DOMINGO V DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"Para o homem recto nascerá uma luz no meio das trevas",theme:"luz, testemunho, sal, boas obras"},
+"2026-02-15":{name:"DOMINGO VI DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"Ditoso o que anda na lei do Senhor",theme:"lei, mandamentos, vida, escolha"},
+"2026-02-22":{name:"DOMINGO I DA QUARESMA",time:"Quaresma",color:"Roxo",year:"A",type:"Domingo",psalm:"Pecámos, Senhor: tende piedade de nós",theme:"Quaresma, conversão, pecado, misericórdia, deserto"},
+"2026-03-01":{name:"DOMINGO II DA QUARESMA",time:"Quaresma",color:"Roxo",year:"A",type:"Domingo",psalm:"Esperamos, Senhor, na vossa misericórdia",theme:"Quaresma, transfiguração, glória, esperança"},
+"2026-03-08":{name:"DOMINGO III DA QUARESMA",time:"Quaresma",color:"Roxo",year:"A",type:"Domingo",psalm:"Hoje se escutardes a voz do Senhor",theme:"água, sede, conversão, escuta, misericórdia"},
+"2026-03-15":{name:"DOMINGO IV DA QUARESMA",time:"Quaresma",color:"Rosa/Roxo",year:"A",type:"Domingo",psalm:"O Senhor é meu pastor",theme:"luz, cura, pastor, alegria, conversão"},
+"2026-03-22":{name:"DOMINGO V DA QUARESMA",time:"Quaresma",color:"Roxo",year:"A",type:"Domingo",psalm:"Junto do Senhor a misericórdia",theme:"vida, ressurreição, misericórdia, esperança"},
+"2026-03-29":{name:"DOMINGO DE RAMOS E DA PAIXÃO DO SENHOR",time:"Semana Santa",color:"Vermelho",year:"A",type:"Domingo",psalm:"Meu Deus, meu Deus, porque me abandonastes?",theme:"Ramos, Paixão, cruz, entrega, sofrimento"},
+"2026-04-02":{name:"QUINTA-FEIRA SANTA — CEIA DO SENHOR",time:"Tríduo Pascal",color:"Branco",year:"A",type:"Solenidade",psalm:"O cálice de bênção é comunhão do sangue de Cristo",theme:"Eucaristia, serviço, amor, lava-pés, sacerdócio"},
+"2026-04-03":{name:"SEXTA-FEIRA DA PAIXÃO DO SENHOR",time:"Tríduo Pascal",color:"Vermelho",year:"A",type:"Celebração",psalm:"Pai, em vossas mãos entrego o meu espírito",theme:"Paixão, cruz, sofrimento, entrega"},
+"2026-04-04":{name:"VIGÍLIA PASCAL",time:"Tríduo Pascal",color:"Branco",year:"A",type:"Solenidade",psalm:"Enviai, Senhor, o vosso Espírito e renovai a face da terra",theme:"ressurreição, luz, batismo, vida nova, aleluia"},
+"2026-04-05":{name:"DOMINGO DE PÁSCOA DA RESSURREIÇÃO DO SENHOR",time:"Tempo Pascal",color:"Branco",year:"A",type:"Solenidade",psalm:"Este é o dia que o Senhor fez: exultemos e cantemos de alegria",theme:"Páscoa, ressurreição, vida nova, alegria, aleluia"},
+"2026-04-12":{name:"DOMINGO II DA PÁSCOA — DA DIVINA MISERICÓRDIA",time:"Tempo Pascal",color:"Branco",year:"A",type:"Domingo",psalm:"Dai graças ao Senhor, porque Ele é bom, porque é eterna a sua misericórdia",theme:"misericórdia, paz, ressurreição, comunidade"},
+"2026-04-19":{name:"DOMINGO III DA PÁSCOA",time:"Tempo Pascal",color:"Branco",year:"A",type:"Domingo",psalm:"Mostrai-nos, Senhor, o vosso amor e dai-nos a vossa salvação",theme:"caminho, Emaús, esperança, coração"},
+"2026-04-26":{name:"DOMINGO IV DA PÁSCOA",time:"Tempo Pascal",color:"Branco",year:"A",type:"Domingo",psalm:"O Senhor é meu pastor: nada me faltará",theme:"Bom Pastor, vocação, pastor, rebanho"},
+"2026-05-03":{name:"DOMINGO V DA PÁSCOA",time:"Tempo Pascal",color:"Branco",year:"A",type:"Domingo",psalm:"A bondade do Senhor encheu a terra",theme:"caminho, verdade, vida, casa do Pai"},
+"2026-05-10":{name:"DOMINGO VI DA PÁSCOA",time:"Tempo Pascal",color:"Branco",year:"A",type:"Domingo",psalm:"O Senhor é rei, exulte a terra",theme:"Espírito Santo, esperança, testemunho"},
+"2026-05-14":{name:"ASCENSÃO DO SENHOR",time:"Tempo Pascal",color:"Branco",year:"A",type:"Solenidade",psalm:"Deus sobe entre aclamações",theme:"Ascensão, missão, céu, glória"},
+"2026-05-17":{name:"DOMINGO VII DA PÁSCOA",time:"Tempo Pascal",color:"Branco",year:"A",type:"Domingo",psalm:"O Senhor é rei, exulte a terra",theme:"oração, glória, unidade"},
+"2026-05-24":{name:"DOMINGO DE PENTECOSTES",time:"Tempo Pascal",color:"Vermelho",year:"A",type:"Solenidade",psalm:"Enviai, Senhor, o vosso Espírito e renovai a face da terra",theme:"Pentecostes, Espírito Santo, fogo, dons, missão"},
+"2026-05-31":{name:"SANTÍSSIMA TRINDADE",time:"Tempo Comum",color:"Branco",year:"A",type:"Solenidade",psalm:"Bendito seja Deus, Pai, Filho e Espírito Santo",theme:"Trindade, Pai, Filho, Espírito, amor"},
+"2026-06-04":{name:"SANTÍSSIMO CORPO E SANGUE DE CRISTO",time:"Tempo Comum",color:"Branco",year:"A",type:"Solenidade",psalm:"Jerusalém, louva o teu Senhor",theme:"Eucaristia, Corpo de Cristo, pão, cálice, comunhão"},
+"2026-06-07":{name:"DOMINGO X DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"Eu quero misericórdia e não sacrifício",theme:"misericórdia, vocação, compaixão"},
+"2026-06-14":{name:"DOMINGO XI DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"Nós somos o povo de Deus, somos as ovelhas do seu rebanho",theme:"rebanho, missão, ceifa, pastores"},
+"2026-06-21":{name:"DOMINGO XII DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"Tende compaixão de mim, Senhor, porque sou um pobre pecador",theme:"fé, cruz, discipulado, coragem"},
+"2026-06-28":{name:"DOMINGO XIII DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"Senhor, sois a minha herança",theme:"seguimento, entrega, vocação, missão"},
+"2026-07-05":{name:"DOMINGO XIV DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"Eu Vos louvarei, Senhor, porque me salvastes",theme:"alegria, paz, humildade, salvação"},
+"2026-07-12":{name:"DOMINGO XV DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"Procurai o Senhor, enquanto se pode encontrar",theme:"próximo, misericórdia, amor, Palavra"},
+"2026-07-19":{name:"DOMINGO XVI DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"Vós, Senhor, sois clemente e compassivo",theme:"paciência, misericórdia, perdão, esperança"},
+"2026-07-26":{name:"DOMINGO XVII DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"Quanto amo, Senhor, a vossa lei",theme:"sabedoria, reino, tesouro, vontade de Deus"},
+"2026-08-02":{name:"DOMINGO XVIII DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"Vós abris, Senhor, a vossa mão e saciais a nossa fome",theme:"pão, fome, compaixão, providência"},
+"2026-08-09":{name:"DOMINGO XIX DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"Felizes os que esperam no Senhor",theme:"fé, vigilância, esperança"},
+"2026-08-15":{name:"ASSUNÇÃO DA VIRGEM SANTA MARIA",time:"Tempo Comum",color:"Branco",year:"A",type:"Solenidade",psalm:"À vossa direita, Senhor, está a rainha, ornada de ouro de Ofir",theme:"Maria, Assunção, rainha, glória"},
+"2026-08-16":{name:"DOMINGO XX DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"Deus, vinde em meu auxílio",theme:"fé, universalidade, misericórdia"},
+"2026-08-23":{name:"DOMINGO XXI DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"Senhor, é eterna a vossa misericórdia",theme:"Igreja, Pedro, fé, chave, comunidade"},
+"2026-08-30":{name:"DOMINGO XXII DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"Senhor, pela vossa grande misericórdia, salvai-me",theme:"cruz, entrega, seguimento, misericórdia"},
+"2026-09-06":{name:"DOMINGO XXIII DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"Se hoje ouvirdes a voz do Senhor",theme:"escuta, correção fraterna, comunidade, reconciliação"},
+"2026-09-13":{name:"DOMINGO XXIV DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"O Senhor é clemente e compassivo, paciente e cheio de bondade",theme:"perdão, misericórdia, compaixão, reconciliação"},
+"2026-09-20":{name:"DOMINGO XXV DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"O Senhor está perto de quantos O invocam",theme:"bondade, generosidade, conversão, reino"},
+"2026-09-27":{name:"DOMINGO XXVI DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"Lembrai-Vos, Senhor, da vossa misericórdia",theme:"conversão, justiça, humildade, misericórdia"},
+"2026-10-04":{name:"DOMINGO XXVII DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"A vinha do Senhor é a casa de Israel",theme:"vinha, frutos, povo de Deus, fidelidade"},
+"2026-10-11":{name:"DOMINGO XXVIII DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"Habitarei para sempre na casa do Senhor",theme:"banquete, alegria, salvação, casa do Senhor"},
+"2026-10-18":{name:"DOMINGO XXIX DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"A Deus pertence a terra e tudo o que ela contém",theme:"missão, César, justiça, Deus"},
+"2026-10-25":{name:"DOMINGO XXX DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"Eu Vos amo, Senhor, minha força",theme:"amor a Deus, amor ao próximo, mandamento"},
+"2026-11-01":{name:"TODOS OS SANTOS",time:"Tempo Comum",color:"Branco",year:"A",type:"Solenidade",psalm:"Esta é a geração dos que procuram o Senhor",theme:"santos, bem-aventuranças, céu, santidade"},
+"2026-11-02":{name:"COMEMORAÇÃO DE TODOS OS FIÉIS DEFUNTOS",time:"Tempo Comum",color:"Roxo",year:"A",type:"Comemoração",psalm:"O Senhor é minha luz e salvação",theme:"defuntos, esperança, ressurreição, vida eterna"},
+"2026-11-08":{name:"DOMINGO XXXII DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"A minha alma tem sede de Vós, Senhor, meu Deus",theme:"vigilância, sabedoria, espera, encontro"},
+"2026-11-15":{name:"DOMINGO XXXIII DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"Feliz o homem que teme o Senhor",theme:"talentos, fidelidade, trabalho, vigilância"},
+"2026-11-22":{name:"NOSSO SENHOR JESUS CRISTO, REI DO UNIVERSO",time:"Tempo Comum",color:"Branco",year:"A",type:"Solenidade",psalm:"O Senhor é meu pastor: nada me faltará",theme:"Cristo Rei, reino, pastor, misericórdia"},
+"2026-11-29":{name:"DOMINGO I DO ADVENTO",time:"Advento",color:"Roxo",year:"A",type:"Domingo",psalm:"Vamos com alegria para a casa do Senhor",theme:"Advento, espera, vigilância, vinda do Senhor"},
+"2026-12-06":{name:"DOMINGO II DO ADVENTO",time:"Advento",color:"Roxo",year:"A",type:"Domingo",psalm:"Nos seus dias florescerá a justiça e a paz para sempre",theme:"Advento, paz, justiça, conversão"},
+"2026-12-08":{name:"IMACULADA CONCEIÇÃO DA VIRGEM SANTA MARIA",time:"Advento",color:"Branco",year:"A",type:"Solenidade",psalm:"Cantai ao Senhor um cântico novo",theme:"Maria, Imaculada Conceição, graça, alegria"},
+"2026-12-13":{name:"DOMINGO III DO ADVENTO — GAUDETE",time:"Advento",color:"Rosa/Roxo",year:"A",type:"Domingo",psalm:"Vinde, Senhor, e salvai-nos",theme:"Advento, alegria, esperança, Messias"},
+"2026-12-20":{name:"DOMINGO IV DO ADVENTO",time:"Advento",color:"Roxo",year:"A",type:"Domingo",psalm:"O Senhor há de entrar: é Ele o Rei glorioso",theme:"Advento, Maria, José, Emanuel, encarnação"},
+"2026-12-25":{name:"NATAL DO SENHOR",time:"Tempo do Natal",color:"Branco",year:"A",type:"Solenidade",psalm:"Hoje nasceu o nosso Salvador: Jesus Cristo, Senhor",theme:"Natal, nascimento, encarnação, alegria, luz"},
+"2026-12-27":{name:"SAGRADA FAMÍLIA DE JESUS, MARIA E JOSÉ",time:"Tempo do Natal",color:"Branco",year:"A",type:"Festa",psalm:"Felizes os que temem o Senhor e andam nos seus caminhos",theme:"família, Jesus, Maria, José, amor"}
+};</script>
+<script src="scripts/scripts.js"></script>
+
+<!-- Modal para visualização do folheto da assembleia -->
+<div id="leafletModalBackdrop" class="modal-backdrop" hidden>
+  <div class="modal" style="max-width: 900px;">
+    <div class="modal-header">
+      <h3>Folheto da assembleia</h3>
+    </div>
+    <div class="modal-body">
+      <div id="leafletModalContent" style="background: #f9fafb; padding: 0.5rem; border-radius: 0.5rem; overflow:auto;">
+        <!-- Conteúdo do folheto será injetado aqui -->
+      </div>
+      <p class="tiny muted" style="margin-top:0.5rem;">
+        Pré-visualização em formato A4. As margens e o conteúdo serão impressos tal como aparecem aqui.
+      </p>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn secondary" id="leafletModalCloseBtn">Fechar</button>
+      <button type="button" class="btn primary" id="leafletModalPrintBtn">Imprimir / PDF</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- v0.8 Modal de pesquisa de letra -->
+<div id="lyricsSearchBackdrop" class="modal-backdrop" hidden>
+  <div class="modal" style="max-width:600px">
+    <div class="modal-header">
+      <h3 id="lyricsSearchTitle">Procurar letra</h3>
+    </div>
+    <div class="modal-body">
+      <div id="lyricsSearchList"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn secondary" id="lyricsSearchCloseBtn">Fechar</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

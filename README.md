@@ -1,1 +1,51 @@
-# cororc
+# Coro Litúrgico 2.1 — revisão completa
+
+Versão revista a partir da 2.0.
+
+## Correções principais
+- Corrigido o botão de modo claro/escuro.
+- Corrigido o guardar do programa: o formulário já não recarrega a página e grava corretamente no histórico.
+- Corrigido o carregamento de programas a partir do histórico/calendário.
+- Corrigida a imagem do domingo (upload, pré-visualização e remoção).
+- Corrigida a cor litúrgica no modelo interno do programa.
+- Corrigida a normalização de “Acto/Ato Penitencial”, “Acção/Ação de Graças” e variantes de “piedade”.
+- Corrigida a comparação inteligente dos tempos litúrgicos.
+- Melhorada a correspondência do Salmo responsorial, privilegiando o refrão oficial quando disponível.
+- Corrigido o Salmo de 06/09/2026 para “Não fecheis os vossos corações”, conforme o Secretariado Nacional de Liturgia.
+- Evitadas duplicações no histórico de utilização dos cânticos quando um domingo é gravado novamente.
+- As sugestões deixam de excluir o cântico que está atualmente selecionado na própria secção; continuam a evitar duplicações noutras secções do mesmo programa.
+- Ativados os botões de atualização/importação CSV do catálogo.
+- Parser CSV melhorado para campos com vírgulas e aspas.
+- Ativados os botões de editar letra e vídeo/áudio das secções do programa.
+- Ativados os folhetos “assembleia” e “sem letras”.
+- Ativada a área de ensaios com geração de mensagem para WhatsApp e email.
+- Ativadas as ações de limpar histórico e limpar folhetos.
+- Ativada pesquisa local de partituras associadas ao catálogo.
+- Melhorada a área de cânticos personalizados.
+
+## Dados
+- 229 cânticos no catálogo integrado.
+- 42 programas históricos de 2026.
+- Dados históricos preservados.
+- As referências litúrgicas verificadas incluídas na aplicação permanecem limitadas às datas documentadas no projeto; o restante calendário deve ser tratado como dados de trabalho até revisão integral.
+
+## Google Drive
+A aplicação mantém os acessos às pastas do Google Drive, mas não pressupõe sincronização automática da pasta. A integração direta deverá ser acrescentada quando houver uma ligação autorizada ao Drive.
+
+
+## Evolução 3.2
+- Layout da página inicial aproximado ao novo desenho aprovado.
+- Logotipo claro e transparente para o cabeçalho azul.
+- Botão Novo programa abre uma janela com 4 opções.
+- Sugestões do programa atualizam automaticamente ao mudar data, catálogo ou cânticos.
+- Catálogo pode atualizar em segundo plano sem recarregar a página.
+- Seleção no calendário abre programas existentes ou cria um novo para a celebração.
+- Associação de letras por título + autor, com prioridade para a letra existente no catálogo.
+
+## Evolução 3.3 — Letras online
+- Integrada a pesquisa de letras online através do Laudate / canticos.pt.
+- A pesquisa é feita por título + autor, com preferência por uma coluna `LaudateURL`/`CanticosURL` caso exista no catálogo.
+- No editor de letra passou a existir uma área “Fonte online” com acesso direto à página encontrada.
+- Cada cântico selecionado no programa mostra também um atalho `🌐 Procurar no Laudate`.
+- O catálogo apresenta uma coluna própria para a fonte online da letra.
+- As letras não são copiadas automaticamente do site externo para a base local; quando a letra for fornecida/importada pelo coro, continua a poder ser guardada localmente e usada nos folhetos.

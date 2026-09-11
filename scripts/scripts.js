@@ -1,1 +1,1713 @@
+// ============================================
+// 🎵 GESTÃO LITÚRGICA - CORO PAROQUIAL
+// Versão 15.0 - JavaScript Completo
+// ============================================
 
+// ============================================
+// CONFIGURAÇÃO GLOBAL
+// ============================================
+
+const PROGRAM_PARTS = [
+  {id:'entrada', label:'Entrada'},
+  {id:'atoPenitencial', label:'Ato Penitencial'},
+  {id:'gloria', label:'Glória'},
+  {id:'salmo', label:'Salmo Responsorial'},
+  {id:'aclamacao', label:'Aclamação ao Evangelho'},
+  {id:'ofertorio', label:'Ofertório'},
+  {id:'santo', label:'Santo'},
+  {id:'paiNosso', label:'Pai Nosso'},
+  {id:'paz', label:'Paz'},
+  {id:'cordeiro', label:'Cordeiro de Deus'},
+  {id:'comunhao', label:'Comunhão'},
+  {id:'acaoGracas', label:'Ação de Graças'},
+  {id:'final', label:'Final'}
+];
+
+window.PROGRAM_PARTS = PROGRAM_PARTS;
+
+let songs = [];
+let history = [];
+let savedLeaflets = [];
+let customSongs = [];
+let songUsageHistory = [];
+let partLyricsOverrides = {};
+
+// ============================================
+// SISTEMA DE TABS
+// ============================================
+
+function initTabs() {
+  const tabButtons = document.querySelectorAll('.tabs button[data-tab]');
+  const tabContents = document.querySelectorAll('section.tab');
+  
+  tabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const targetTab = button.getAttribute('data-tab');
+      
+      // Remove active de todos
+      tabButtons.forEach(btn => btn.classList.remove('active'));
+      tabContents.forEach(content => content.classList.remove('active'));
+      
+      // Adiciona active ao clicado
+      button.classList.add('active');
+      const targetContent = document.getElementById(targetTab);
+      if (targetContent) {
+        targetContent.classList.add('active');
+      }
+      
+      // Salva tab ativa
+      localStorage.setItem('coroActiveTab', targetTab);
+      
+      // Atualiza conteúdo se necessário
+      if (targetTab === 'tab-catalogo') {
+        renderSongsTable();
+      } else if (targetTab === 'tab-historico') {
+        renderHistory();
+      } else if (targetTab === 'tab-folhetos') {
+        renderSavedLeaflets();
+      } else if (targetTab === 'tab-dashboard') {
+        updateDashboard();
+        renderCalendar();
+      }
+    });
+  });
+  
+  // Restaura última tab ativa
+  const lastTab = localStorage.getItem('coroActiveTab') || 'tab-dashboard';
+  const lastButton = document.querySelector(`button[data-tab="${lastTab}"]`);
+  if (lastButton) {
+    lastButton.click();
+  } else {
+    // Se não encontrar, ativa a primeira
+    if (tabButtons.length > 0) {
+      tabButtons[0].click();
+    }
+  }
+}
+
+// ============================================
+// TEMA ESCURO/CLARO
+// ============================================
+
+function initTheme() {
+  const toggleBtn = document.getElementById('themeToggleBtn');
+  if (!toggleBtn) return;
+  
+  const savedTheme = localStorage.getItem('coroTheme') || 'dark';
+  document.documentElement.className = savedTheme;
+  updateThemeIcon(savedTheme);
+  
+  toggleBtn.addEventListener('click', () => {
+    const currentTheme = document.documentElement.className || 'dark';
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    document.documentElement.className = newTheme;
+    localStorage.setItem('coroTheme', newTheme);
+    updateThemeIcon(newTheme);
+  });
+}
+
+function updateThemeIcon(theme) {
+  const btn = document.getElementById('themeToggleBtn');
+  if (!btn) return;
+  btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+}
+
+// ============================================
+// CALENDÁRIO LITÚRGICO
+// ============================================
+
+const LITURGICAL_CALENDAR = {"2026-01-01":{"title":"SANTA MARIA, MÃE DE DEUS","color":"Branco","season":"natal","year":"A","type":"Solenidade","psalm":"Deus tenha compaixão de nós","theme":"Maria, Mãe de Deus, bênção, paz"},"2026-01-04":{"title":"EPIFANIA DO SENHOR","color":"Branco","season":"natal","year":"A","type":"Solenidade","psalm":"Virão adorar-Vos, Senhor, todos os povos da terra","theme":"Epifania, adoração, povos, luz, reis"},"2026-01-11":{"title":"BATISMO DO SENHOR","color":"Branco","season":"natal","year":"A","type":"Festa","psalm":"O Senhor abençoará o seu povo","theme":"Batismo, água, Espírito, Filho amado"},"2026-01-18":{"title":"DOMINGO II DO TEMPO COMUM","color":"Verde","season":"tempocomum","year":"A","type":"Domingo","psalm":"Toda a terra vos adore","theme":"Cordeiro de Deus, testemunho, vocação"},"2026-01-25":{"title":"DOMINGO III DO TEMPO COMUM","color":"Verde","season":"tempocomum","year":"A","type":"Domingo","psalm":"O Senhor é a minha luz e a minha salvação","theme":"Palavra de Deus, conversão, luz, missão"},"2026-02-01":{"title":"DOMINGO IV DO TEMPO COMUM","color":"Verde","season":"tempocomum","year":"A","type":"Domingo","psalm":"Bem-aventurados os pobres em espírito","theme":"Bem-aventuranças, pobreza, justiça, reino"},"2026-02-08":{"title":"DOMINGO V DO TEMPO COMUM","color":"Verde","season":"tempocomum","year":"A","type":"Domingo","psalm":"Para o homem recto nascerá uma luz no meio das trevas","theme":"luz, testemunho, sal, boas obras"},"2026-02-15":{"title":"DOMINGO VI DO TEMPO COMUM","color":"Verde","season":"tempocomum","year":"A","type":"Domingo","psalm":"Ditoso o que anda na lei do Senhor","theme":"lei, mandamentos, vida, escolha"},"2026-02-22":{"title":"DOMINGO I DA QUARESMA","color":"Roxo","season":"quaresma","year":"A","type":"Domingo","psalm":"Pecámos, Senhor: tende piedade de nós","theme":"Quaresma, conversão, pecado, misericórdia, deserto"},"2026-03-01":{"title":"DOMINGO II DA QUARESMA","color":"Roxo","season":"quaresma","year":"A","type":"Domingo","psalm":"Esperamos, Senhor, na vossa misericórdia","theme":"Quaresma, transfiguração, glória, esperança"},"2026-03-08":{"title":"DOMINGO III DA QUARESMA","color":"Roxo","season":"quaresma","year":"A","type":"Domingo","psalm":"Hoje se escutardes a voz do Senhor","theme":"água, sede, conversão, escuta, misericórdia"},"2026-03-15":{"title":"DOMINGO IV DA QUARESMA","color":"Rosa/Roxo","season":"quaresma","year":"A","type":"Domingo","psalm":"O Senhor é meu pastor","theme":"luz, cura, pastor, alegria, conversão"},"2026-03-22":{"title":"DOMINGO V DA QUARESMA","color":"Roxo","season":"quaresma","year":"A","type":"Domingo","psalm":"Junto do Senhor a misericórdia","theme":"vida, ressurreição, misericórdia, esperança"},"2026-03-29":{"title":"DOMINGO DE RAMOS E DA PAIXÃO DO SENHOR","color":"Vermelho","season":"quaresma","year":"A","type":"Domingo","psalm":"Meu Deus, meu Deus, porque me abandonastes?","theme":"Ramos, Paixão, cruz, entrega, sofrimento"},"2026-04-02":{"title":"QUINTA-FEIRA SANTA — CEIA DO SENHOR","color":"Branco","season":"pascoa","year":"A","type":"Solenidade","psalm":"O cálice de bênção é comunhão do sangue de Cristo","theme":"Eucaristia, serviço, amor, lava-pés, sacerdócio"},"2026-04-03":{"title":"SEXTA-FEIRA DA PAIXÃO DO SENHOR","color":"Vermelho","season":"pascoa","year":"A","type":"Celebração","psalm":"Pai, em vossas mãos entrego o meu espírito","theme":"Paixão, cruz, sofrimento, entrega"},"2026-04-04":{"title":"VIGÍLIA PASCAL","color":"Branco","season":"pascoa","year":"A","type":"Solenidade","psalm":"Enviai, Senhor, o vosso Espírito e renovai a face da terra","theme":"ressurreição, luz, batismo, vida nova, aleluia"},"2026-04-05":{"title":"DOMINGO DE PÁSCOA DA RESSURREIÇÃO DO SENHOR","color":"Branco","season":"pascoa","year":"A","type":"Solenidade","psalm":"Este é o dia que o Senhor fez: exultemos e cantemos de alegria","theme":"Páscoa, ressurreição, vida nova, alegria, aleluia"},"2026-04-12":{"title":"DOMINGO II DA PÁSCOA — DA DIVINA MISERICÓRDIA","color":"Branco","season":"pascoa","year":"A","type":"Domingo","psalm":"Dai graças ao Senhor, porque Ele é bom, porque é eterna a sua misericórdia","theme":"misericórdia, paz, ressurreição, comunidade"},"2026-04-19":{"title":"DOMINGO III DA PÁSCOA","color":"Branco","season":"pascoa","year":"A","type":"Domingo","psalm":"Mostrai-nos, Senhor, o vosso amor e dai-nos a vossa salvação","theme":"caminho, Emaús, esperança, coração"},"2026-04-26":{"title":"DOMINGO IV DA PÁSCOA","color":"Branco","season":"pascoa","year":"A","type":"Domingo","psalm":"O Senhor é meu pastor: nada me faltará","theme":"Bom Pastor, vocação, pastor, rebanho"},"2026-05-03":{"title":"DOMINGO V DA PÁSCOA","color":"Branco","season":"pascoa","year":"A","type":"Domingo","psalm":"A bondade do Senhor encheu a terra","theme":"caminho, verdade, vida, casa do Pai"},"2026-05-10":{"title":"DOMINGO VI DA PÁSCOA","color":"Branco","season":"pascoa","year":"A","type":"Domingo","psalm":"O Senhor é rei, exulte a terra","theme":"Espírito Santo, esperança, testemunho"},"2026-05-14":{"title":"ASCENSÃO DO SENHOR","color":"Branco","season":"pascoa","year":"A","type":"Solenidade","psalm":"Deus sobe entre aclamações","theme":"Ascensão, missão, céu, glória"},"2026-05-17":{"title":"DOMINGO VII DA PÁSCOA","color":"Branco","season":"pascoa","year":"A","type":"Domingo","psalm":"O Senhor é rei, exulte a terra","theme":"oração, glória, unidade"},"2026-05-24":{"title":"DOMINGO DE PENTECOSTES","color":"Vermelho","season":"pascoa","year":"A","type":"Solenidade","psalm":"Enviai, Senhor, o vosso Espírito e renovai a face da terra","theme":"Pentecostes, Espírito Santo, fogo, dons, missão"},"2026-05-31":{"title":"SANTÍSSIMA TRINDADE","color":"Branco","season":"tempocomum","year":"A","type":"Solenidade","psalm":"Bendito seja Deus, Pai, Filho e Espírito Santo","theme":"Trindade, Pai, Filho, Espírito, amor"},"2026-06-04":{"title":"SANTÍSSIMO CORPO E SANGUE DE CRISTO","color":"Branco","season":"tempocomum","year":"A","type":"Solenidade","psalm":"Jerusalém, louva o teu Senhor","theme":"Eucaristia, Corpo de Cristo, pão, cálice, comunhão"},"2026-06-07":{"title":"DOMINGO X DO TEMPO COMUM","color":"Verde","season":"tempocomum","year":"A","type":"Domingo","psalm":"Eu quero misericórdia e não sacrifício","theme":"misericórdia, vocação, compaixão"},"2026-06-14":{"title":"DOMINGO XI DO TEMPO COMUM","color":"Verde","season":"tempocomum","year":"A","type":"Domingo","psalm":"Nós somos o povo de Deus, somos as ovelhas do seu rebanho","theme":"rebanho, missão, ceifa, pastores"},"2026-06-21":{"title":"DOMINGO XII DO TEMPO COMUM","color":"Verde","season":"tempocomum","year":"A","type":"Domingo","psalm":"Tende compaixão de mim, Senhor, porque sou um pobre pecador","theme":"fé, cruz, discipulado, coragem"},"2026-06-28":{"title":"DOMINGO XIII DO TEMPO COMUM","color":"Verde","season":"tempocomum","year":"A","type":"Domingo","psalm":"Senhor, sois a minha herança","theme":"seguimento, entrega, vocação, missão"},"2026-07-05":{"title":"DOMINGO XIV DO TEMPO COMUM","color":"Verde","season":"tempocomum","year":"A","type":"Domingo","psalm":"Eu Vos louvarei, Senhor, porque me salvastes","theme":"alegria, paz, humildade, salvação"},"2026-07-12":{"title":"DOMINGO XV DO TEMPO COMUM","color":"Verde","season":"tempocomum","year":"A","type":"Domingo","psalm":"Procurai o Senhor, enquanto se pode encontrar","theme":"próximo, misericórdia, amor, Palavra"},"2026-07-19":{"title":"DOMINGO XVI DO TEMPO COMUM","color":"Verde","season":"tempocomum","year":"A","type":"Domingo","psalm":"Vós, Senhor, sois clemente e compassivo","theme":"paciência, misericórdia, perdão, esperança"},"2026-07-26":{"title":"DOMINGO XVII DO TEMPO COMUM","color":"Verde","season":"tempocomum","year":"A","type":"Domingo","psalm":"Quanto amo, Senhor, a vossa lei","theme":"sabedoria, reino, tesouro, vontade de Deus"},"2026-08-02":{"title":"DOMINGO XVIII DO TEMPO COMUM","color":"Verde","season":"tempocomum","year":"A","type":"Domingo","psalm":"Vós abris, Senhor, a vossa mão e saciais a nossa fome","theme":"pão, fome, compaixão, providência"},"2026-08-09":{"title":"DOMINGO XIX DO TEMPO COMUM","color":"Verde","season":"tempocomum","year":"A","type":"Domingo","psalm":"Felizes os que esperam no Senhor","theme":"fé, vigilância, esperança"},"2026-08-15":{"title":"ASSUNÇÃO DA VIRGEM SANTA MARIA","color":"Branco","season":"tempocomum","year":"A","type":"Solenidade","psalm":"À vossa direita, Senhor, está a rainha, ornada de ouro de Ofir","theme":"Maria, Assunção, rainha, glória"},"2026-08-16":{"title":"DOMINGO XX DO TEMPO COMUM","color":"Verde","season":"tempocomum","year":"A","type":"Domingo","psalm":"Deus, vinde em meu auxílio","theme":"fé, universalidade, misericórdia"},"2026-08-23":{"title":"DOMINGO XXI DO TEMPO COMUM","color":"Verde","season":"tempocomum","year":"A","type":"Domingo","psalm":"Senhor, é eterna a vossa misericórdia","theme":"Igreja, Pedro, fé, chave, comunidade"},"2026-08-30":{"title":"DOMINGO XXII DO TEMPO COMUM","color":"Verde","season":"tempocomum","year":"A","type":"Domingo","psalm":"Senhor, pela vossa grande misericórdia, salvai-me","theme":"cruz, entrega, seguimento, misericórdia"},"2026-09-06":{"title":"DOMINGO XXIII DO TEMPO COMUM","color":"Verde","season":"tempocomum","year":"A","type":"Domingo","psalm":"Não fecheis os vossos corações","theme":"escuta, correção fraterna, comunidade, reconciliação"},"2026-09-13":{"title":"DOMINGO XXIV DO TEMPO COMUM","color":"Verde","season":"tempocomum","year":"A","type":"Domingo","psalm":"O Senhor é clemente e compassivo, paciente e cheio de bondade","theme":"perdão, misericórdia, compaixão, reconciliação"},"2026-09-20":{"title":"DOMINGO XXV DO TEMPO COMUM","color":"Verde","season":"tempocomum","year":"A","type":"Domingo","psalm":"O Senhor está perto de quantos O invocam","theme":"bondade, generosidade, conversão, reino"},"2026-09-27":{"title":"DOMINGO XXVI DO TEMPO COMUM","color":"Verde","season":"tempocomum","year":"A","type":"Domingo","psalm":"Lembrai-Vos, Senhor, da vossa misericórdia","theme":"conversão, justiça, humildade, misericórdia"},"2026-10-04":{"title":"DOMINGO XXVII DO TEMPO COMUM","color":"Verde","season":"tempocomum","year":"A","type":"Domingo","psalm":"A vinha do Senhor é a casa de Israel","theme":"vinha, frutos, povo de Deus, fidelidade"},"2026-10-11":{"title":"DOMINGO XXVIII DO TEMPO COMUM","color":"Verde","season":"tempocomum","year":"A","type":"Domingo","psalm":"Habitarei para sempre na casa do Senhor","theme":"banquete, alegria, salvação, casa do Senhor"},"2026-10-18":{"title":"DOMINGO XXIX DO TEMPO COMUM","color":"Verde","season":"tempocomum","year":"A","type":"Domingo","psalm":"A Deus pertence a terra e tudo o que ela contém","theme":"missão, César, justiça, Deus"},"2026-10-25":{"title":"DOMINGO XXX DO TEMPO COMUM","color":"Verde","season":"tempocomum","year":"A","type":"Domingo","psalm":"Eu Vos amo, Senhor, minha força","theme":"amor a Deus, amor ao próximo, mandamento"},"2026-11-01":{"title":"TODOS OS SANTOS","color":"Branco","season":"tempocomum","year":"A","type":"Solenidade","psalm":"Esta é a geração dos que procuram o Senhor","theme":"santos, bem-aventuranças, céu, santidade"},"2026-11-02":{"title":"COMEMORAÇÃO DE TODOS OS FIÉIS DEFUNTOS","color":"Roxo","season":"tempocomum","year":"A","type":"Comemoração","psalm":"O Senhor é minha luz e salvação","theme":"defuntos, esperança, ressurreição, vida eterna"},"2026-11-08":{"title":"DOMINGO XXXII DO TEMPO COMUM","color":"Verde","season":"tempocomum","year":"A","type":"Domingo","psalm":"A minha alma tem sede de Vós, Senhor, meu Deus","theme":"vigilância, sabedoria, espera, encontro"},"2026-11-15":{"title":"DOMINGO XXXIII DO TEMPO COMUM","color":"Verde","season":"tempocomum","year":"A","type":"Domingo","psalm":"Feliz o homem que teme o Senhor","theme":"talentos, fidelidade, trabalho, vigilância"},"2026-11-22":{"title":"NOSSO SENHOR JESUS CRISTO, REI DO UNIVERSO","color":"Branco","season":"tempocomum","year":"A","type":"Solenidade","psalm":"O Senhor é meu pastor: nada me faltará","theme":"Cristo Rei, reino, pastor, misericórdia"},"2026-11-29":{"title":"DOMINGO I DO ADVENTO","color":"Roxo","season":"advento","year":"A","type":"Domingo","psalm":"Vamos com alegria para a casa do Senhor","theme":"Advento, espera, vigilância, vinda do Senhor"},"2026-12-06":{"title":"DOMINGO II DO ADVENTO","color":"Roxo","season":"advento","year":"A","type":"Domingo","psalm":"Nos seus dias florescerá a justiça e a paz para sempre","theme":"Advento, paz, justiça, conversão"},"2026-12-08":{"title":"IMACULADA CONCEIÇÃO DA VIRGEM SANTA MARIA","color":"Branco","season":"advento","year":"A","type":"Solenidade","psalm":"Cantai ao Senhor um cântico novo","theme":"Maria, Imaculada Conceição, graça, alegria"},"2026-12-13":{"title":"DOMINGO III DO ADVENTO — GAUDETE","color":"Rosa/Roxo","season":"advento","year":"A","type":"Domingo","psalm":"Vinde, Senhor, e salvai-nos","theme":"Advento, alegria, esperança, Messias"},"2026-12-20":{"title":"DOMINGO IV DO ADVENTO","color":"Roxo","season":"advento","year":"A","type":"Domingo","psalm":"O Senhor há de entrar: é Ele o Rei glorioso","theme":"Advento, Maria, José, Emanuel, encarnação"},"2026-12-25":{"title":"NATAL DO SENHOR","color":"Branco","season":"natal","year":"A","type":"Solenidade","psalm":"Hoje nasceu o nosso Salvador: Jesus Cristo, Senhor","theme":"Natal, nascimento, encarnação, alegria, luz"},"2026-12-27":{"title":"SAGRADA FAMÍLIA DE JESUS, MARIA E JOSÉ","color":"Branco","season":"natal","year":"A","type":"Festa","psalm":"Felizes os que temem o Senhor e andam nos seus caminhos","theme":"família, Jesus, Maria, José, amor"}};
+
+function seasonLabel(season){const m={tempocomum:'Tempo Comum',pascoa:'Tempo Pascal',quaresma:'Quaresma',advento:'Advento',natal:'Tempo do Natal'};return m[normSmart(season)]||String(season||'');}
+
+function getLiturgicalInfo(dateStr) {
+  if (window.CORO_LIT2026 && window.CORO_LIT2026[dateStr]) return window.CORO_LIT2026[dateStr];
+  if (LITURGICAL_CALENDAR[dateStr]) return LITURGICAL_CALENDAR[dateStr];
+  const date=new Date(dateStr+'T00:00:00'), day=date.getDay();
+  return day===0 ? {title:'Domingo do Tempo Comum',color:'Verde',season:'tempocomum',year:'A',type:'Domingo',psalm:'',theme:''} : {title:'Dia Ferial',color:'Verde',season:'tempocomum',year:'A',type:'Ferial',psalm:'',theme:''};
+}
+
+function updateLiturgicalFromDate() {
+  const dateInput=document.getElementById('date'); if(!dateInput||!dateInput.value){renderProgramAssistant();return;}
+  const info=getLiturgicalInfo(dateInput.value), titleInput=document.getElementById('liturgicalTitle'), colorInput=document.getElementById('liturgicalColor'), cycle=document.getElementById('cycleDisplay');
+  if(titleInput)titleInput.value=info.name||info.title||''; if(colorInput)colorInput.value=info.color||''; if(cycle)cycle.value=seasonLabel(info.time||info.season)+' / Ano '+(info.year||'A');
+  updateBodyLiturgicalClass(info.season);
+  const panel=document.getElementById('smartLiturgyContent');
+  const r=(window.CORO_READINGS_2026&&window.CORO_READINGS_2026[dateInput.value])||{};
+  const official='https://www.liturgia.pt/liturgiadiaria/dia.php?data='+dateInput.value.replace(/^0/,'').replace(/-0/g,'-');
+  if(panel){panel.innerHTML='<b>'+escSmart(info.name||info.title||'')+'</b>'+(info.type?' · '+escSmart(info.type):'')+'<br>Tempo: '+escSmart(info.time||info.season||'')+' · Ano: '+escSmart(info.year||'A')+' · Cor: '+escSmart(info.color||'')+(r.l1?'<br>📖 <b>Leituras:</b> '+escSmart(r.l1)+(r.l2?' · '+escSmart(r.l2):'')+(r.ev?' · Evangelho: '+escSmart(r.ev):''):'')+(info.psalm?'<br>🎵 <b>Salmo responsorial:</b> '+escSmart(info.psalm):'')+(r.refrain?'<br>↪️ <b>Refrão:</b> '+escSmart(r.refrain):'')+(info.theme?'<br>💡 <b>Tema:</b> '+escSmart(info.theme):'')+'<br><a href="'+official+'" target="_blank" rel="noopener">🔎 Ver liturgia oficial</a>'; }
+  buildSmartSuggestionList(window.currentSmartPart||'entrada');
+}
+function escSmart(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+function updateBodyLiturgicalClass(season) {
+  document.body.className = document.body.className
+    .replace(/liturgic-\w+/g, '')
+    .trim();
+  
+  if (season) {
+    document.body.classList.add(`liturgic-${season}`);
+  }
+}
+
+function getSongByTitle(title,author=''){
+  const key=normSmart(title), akey=normSmart(author);
+  const matches=(songs||[]).filter(s=>normSmart(getSongTitle(s))===key);
+  if(akey){const exact=matches.find(s=>normSmart(getSongAuthor(s))===akey); if(exact)return exact;}
+  return matches[0]||null;
+}
+function getSelectedSongForPart(partId){
+  const sel=document.getElementById(partId);
+  if(!sel)return null;
+  const title=sel.value||'';
+  const author=sel.dataset.selectedAuthor||sel.selectedOptions?.[0]?.dataset?.author||'';
+  return getSongByTitle(title,author);
+}
+function songLyricsKey(title,author=''){
+  return 'coroLyrics_'+normSmart(title)+'__'+normSmart(author);
+}
+function getSongLyrics(songOrTitle, author=''){
+  const song=typeof songOrTitle==='object'?songOrTitle:getSongByTitle(songOrTitle);
+  const title=song?getSongTitle(song):String(songOrTitle||'');
+  const auth=song?getSongAuthor(song):author;
+  const direct=song?.Letra||song?.letra||song?.Lyrics||song?.lyrics||song?.Texto||song?.texto||'';
+  if(String(direct).trim()) return String(direct).trim();
+  const exact=localStorage.getItem(songLyricsKey(title,auth));
+  if(exact) return exact;
+  const legacy=localStorage.getItem('coroLyrics_'+normSmart(title));
+  return legacy||'';
+}
+function saveSongLyrics(title,author,lyrics){
+  const key=songLyricsKey(title,author);
+  if(lyrics) localStorage.setItem(key,lyrics); else localStorage.removeItem(key);
+  // Mantém compatibilidade com versões anteriores
+  if(lyrics) localStorage.setItem('coroLyrics_'+normSmart(title),lyrics);
+}
+
+// ============================================
+// LETRAS ONLINE — LAUDATE / CANTICOS.PT
+// ============================================
+// O Laudate (canticos.pt) disponibiliza títulos, autores e, em muitos casos,
+// o texto completo. Como o Coro Litúrgico é uma aplicação estática, não
+// copiamos automaticamente o texto protegido para dentro da aplicação.
+// Em vez disso, a aplicação encontra a fonte online por título + autor e
+// abre a página correspondente. Se o catálogo tiver uma coluna LaudateURL,
+// essa ligação é usada diretamente; caso contrário é criada uma pesquisa
+// exacta limitada a canticos.pt.
+function getLaudateUrl(songOrTitle, author=''){
+  const song=typeof songOrTitle==='object'?songOrTitle:getSongByTitle(songOrTitle,author);
+  const title=song?getSongTitle(song):String(songOrTitle||'');
+  const auth=song?getSongAuthor(song):author;
+  const direct=song?.LaudateURL||song?.laudateURL||song?.LAUDATE||song?.CanticosURL||song?.canticosURL||'';
+  if(String(direct).trim()) return String(direct).trim();
+  const q=[title,auth].filter(Boolean).map(v=>'\"'+String(v).trim().replace(/\"/g,'')+'\"').join(' ');
+  return 'https://www.google.com/search?q='+encodeURIComponent('site:canticos.pt '+q);
+}
+function getLaudateSearchLabel(songOrTitle,author=''){
+  const song=typeof songOrTitle==='object'?songOrTitle:getSongByTitle(songOrTitle,author);
+  const direct=song?.LaudateURL||song?.laudateURL||song?.LAUDATE||song?.CanticosURL||song?.canticosURL||'';
+  return String(direct).trim()?'Abrir no Laudate':'Procurar no Laudate';
+}
+function openLaudateForSong(songOrTitle,author=''){
+  const url=getLaudateUrl(songOrTitle,author);
+  if(!url)return;
+  window.open(url,'_blank','noopener,noreferrer');
+}
+function getLyricsSourceHtml(songOrTitle,author=''){
+  const song=typeof songOrTitle==='object'?songOrTitle:getSongByTitle(songOrTitle,author);
+  const title=song?getSongTitle(song):String(songOrTitle||'');
+  if(!title)return '';
+  const auth=song?getSongAuthor(song):author;
+  const label=getLaudateSearchLabel(song||title,auth);
+  const url=getLaudateUrl(song||title,auth);
+  const safeUrl=escSmart(url);
+  const hasLocal=!!getSongLyrics(song||title,auth);
+  return '<div class=\"lyrics-online-box\"><div><b>🌐 Fonte online</b><div class=\"small muted\">Laudate — canticos.pt · '+escSmart(auth||'autor não indicado')+'</div></div><div class=\"lyrics-online-actions\"><a class=\"btn secondary small\" href=\"'+safeUrl+'\" target=\"_blank\" rel=\"noopener noreferrer\">🔎 '+escSmart(label)+'</a>'+(hasLocal?' <span class=\"tiny muted\">✓ Letra guardada localmente</span>':'')+'</div></div>';
+}
+function autoLoadLyricsForPart(partId){
+  const title=document.getElementById(partId)?.value||'';
+  const song=getSelectedSongForPart(partId)||getSongByTitle(title);
+  return getSongLyrics(song||title);
+}
+function autoApplyLyricsToPart(partId){
+  const title=document.getElementById(partId)?.value||'';
+  if(!title)return;
+  const song=getSelectedSongForPart(partId)||getSongByTitle(title);
+  const lyrics=getSongLyrics(song||title);
+  if(lyrics){
+    partLyricsOverrides[partId]=lyrics;
+    let status=document.getElementById('lyricsStatus_'+partId);
+    if(!status){
+      const btns=document.querySelector(`.program-buttons .program-lyrics-btn[data-part-id="${partId}"]`)?.parentElement;
+      if(btns){status=document.createElement('span');status.id='lyricsStatus_'+partId;status.className='tiny muted lyrics-auto-status';btns.appendChild(status);}
+    }
+    if(status)status.textContent='✓ Letra associada automaticamente';
+  }
+}
+function localISODate(d=new Date()){
+  const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+function nextCelebrationDate(){
+  const today=localISODate();
+  const entries=Object.entries(LITURGICAL_CALENDAR||{}).filter(([date])=>date>=today).sort((a,b)=>a[0].localeCompare(b[0]));
+  return entries[0]?.[0]||'';
+}
+function openNewProgramModal(){
+  const m=document.getElementById('newProgramModal');
+  if(!m)return;
+  m.hidden=false; m.setAttribute('aria-hidden','false');
+}
+function closeNewProgramModal(){
+  const m=document.getElementById('newProgramModal');
+  if(!m)return;
+  m.hidden=true; m.setAttribute('aria-hidden','true');
+}
+function goToProgramWithDate(dateValue=''){
+  const form=document.getElementById('programForm');
+  if(form) form.reset();
+  const date=document.getElementById('date');
+  if(date) date.value=dateValue||'';
+  const title=document.getElementById('liturgicalTitle'); if(title)title.value='';
+  const color=document.getElementById('liturgicalColor'); if(color)color.value='';
+  const extra=document.getElementById('extraTheme'); if(extra)extra.value='';
+  closeNewProgramModal();
+  document.querySelector('button[data-tab="tab-programa"]')?.click();
+  if(dateValue) updateLiturgicalFromDate(); else renderProgramAssistant();
+  setTimeout(()=>date?.focus(),80);
+}
+function prepareNewProgram(){ openNewProgramModal(); }
+function duplicatePreviousProgram(){
+  loadHistory();
+  if(!history.length){ alert('Ainda não existem programas guardados para duplicar.'); return; }
+  const labels=history.slice(0,20).map((h,i)=>`${i+1}. ${h.date} — ${h.title||'Programa'}`).join('\n');
+  const answer=prompt('Escolha o número do programa que pretende duplicar:\n\n'+labels,'1');
+  if(answer===null)return;
+  const idx=Number(answer)-1;
+  const record=history[idx];
+  if(!record){alert('Programa inválido.');return;}
+  const copy=JSON.parse(JSON.stringify(record));
+  copy.date='';
+  goToProgramWithDate('');
+  applyProgramToForm({...copy,date:''});
+  const date=document.getElementById('date'); if(date)date.value='';
+  document.getElementById('liturgicalTitle')?.setAttribute('value','');
+  renderProgramAssistant();
+}
+function initDashboardV3(){
+  document.getElementById('newProgramBtn')?.addEventListener('click',prepareNewProgram);
+  document.getElementById('dashNewProgramAction')?.addEventListener('click',prepareNewProgram);
+  document.querySelectorAll('[data-dash-tab]').forEach(b=>b.addEventListener('click',()=>{
+    if(b.dataset.dashTab==='tab-programa') prepareNewProgram();
+    else document.querySelector(`button[data-tab="${b.dataset.dashTab}"]`)?.click();
+  }));
+  ['dashboardCalendarBtn','dashboardAllCalendarBtn'].forEach(id=>document.getElementById(id)?.addEventListener('click',()=>document.querySelector('button[data-tab="tab-calendario"]')?.click()));
+  document.getElementById('dashboardHistoryBtn')?.addEventListener('click',()=>document.querySelector('button[data-tab="tab-historico"]')?.click());
+  const close=()=>closeNewProgramModal();
+  document.getElementById('newProgramCloseBtn')?.addEventListener('click',close);
+  document.getElementById('newProgramCancelBtn')?.addEventListener('click',close);
+  document.getElementById('newProgramExistingBtn')?.addEventListener('click',()=>{close();document.querySelector('button[data-tab="tab-calendario"]')?.click();});
+  document.getElementById('newProgramNextBtn')?.addEventListener('click',()=>goToProgramWithDate(nextCelebrationDate()));
+  document.getElementById('newProgramDateBtn')?.addEventListener('click',()=>goToProgramWithDate(''));
+  document.getElementById('newProgramDuplicateBtn')?.addEventListener('click',duplicatePreviousProgram);
+  document.getElementById('newProgramModal')?.addEventListener('click',e=>{if(e.target.id==='newProgramModal')close();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){const m=document.getElementById('newProgramModal');if(m&&!m.hidden)close();}});
+  renderDashboardV3();
+}
+function renderDashboardV3(){
+  const nextBox=document.getElementById('dashboardNextEvent');
+  const upcomingBox=document.getElementById('dashboardUpcoming');
+  const recentBox=document.getElementById('dashboardRecent');
+  const today=new Date(); today.setHours(0,0,0,0);
+  const upcoming=Object.entries(LITURGICAL_CALENDAR).map(([date,info])=>({date,...info})).filter(x=>new Date(x.date+'T00:00:00')>=today).sort((a,b)=>a.date.localeCompare(b.date));
+  const next=upcoming[0];
+  if(nextBox){
+    if(next){const d=new Date(next.date+'T00:00:00'); nextBox.innerHTML=`<div class="dash-date"><small>${d.toLocaleDateString('pt-PT',{weekday:'short'})}</small><strong>${d.getDate()}</strong><small>${d.toLocaleDateString('pt-PT',{month:'short',year:'numeric'})}</small></div><div><div class="dash-event-title">${escSmart(next.title||next.name)}</div><div class="dash-event-meta">${escSmart(next.type||'Celebração')} · ${escSmart(next.color||'')}</div>${next.theme?`<div class="dash-event-meta">${escSmart(next.theme)}</div>`:''}</div>`;} else nextBox.innerHTML='<div class="dash-muted">Não há celebrações futuras no calendário integrado.</div>';
+  }
+  if(upcomingBox){upcomingBox.innerHTML=upcoming.slice(0,5).map(x=>{const d=new Date(x.date+'T00:00:00');return `<div class="dash-list-row"><div class="dash-list-date">${d.toLocaleDateString('pt-PT',{day:'2-digit',month:'short'})}</div><div><div class="dash-list-title">${escSmart(x.title||x.name)}</div><div class="dash-list-sub">${escSmart(x.time||'')} · Ano ${escSmart(x.year||'')}</div></div><span>●</span></div>`}).join('')||'<div class="dash-muted">Sem dados.</div>';}
+  loadHistory();
+  if(recentBox){recentBox.innerHTML=history.slice(0,5).map((r,i)=>{const d=new Date(r.date+'T00:00:00');return `<div class="dash-list-row"><div class="dash-list-date">${d.toLocaleDateString('pt-PT',{day:'2-digit',month:'short'})}</div><div><div class="dash-list-title">${escSmart(r.title||'Programa')}</div><div class="dash-list-sub">${Object.values(r.program||{}).filter(Boolean).length} cânticos</div></div><button type="button" class="btn secondary tiny dash-view" onclick="loadHistoryItem(${i})">Ver</button></div>`}).join('')||'<div class="dash-muted">Ainda não existem programas guardados.</div>';}
+}
+
+function updateDashboard() {
+  const container = document.getElementById('upcomingEvents');
+  if (!container) return;
+  
+  const today = new Date();
+  const upcoming = [];
+  
+  Object.entries(LITURGICAL_CALENDAR).forEach(([dateStr, info]) => {
+    const date = new Date(dateStr + 'T00:00:00');
+    if (date >= today) {
+      upcoming.push({date: dateStr, ...info});
+    }
+  });
+  
+  upcoming.sort((a, b) => new Date(a.date) - new Date(b.date));
+  
+  let html = '<ul>';
+  upcoming.slice(0, 5).forEach(item => {
+    const dateObj = new Date(item.date + 'T00:00:00');
+    const formatted = dateObj.toLocaleDateString('pt-PT', {
+      day: 'numeric',
+      month: 'long'
+    });
+    html += `<li><strong>${formatted}</strong> - ${item.title} (${item.color})</li>`;
+  });
+  html += '</ul>';
+  
+  container.innerHTML = html;
+}
+
+// ============================================
+// CALENDÁRIO INTERATIVO
+// ============================================
+
+let currentCalendarDate = new Date();
+
+function renderCalendar() {
+  const grid = document.getElementById('calendarGrid');
+  const monthYear = document.getElementById('calendarMonthYear');
+  
+  if (!grid || !monthYear) return;
+  
+  const year = currentCalendarDate.getFullYear();
+  const month = currentCalendarDate.getMonth();
+  
+  // Atualiza título
+  monthYear.textContent = currentCalendarDate.toLocaleDateString('pt-PT', {
+    month: 'long',
+    year: 'numeric'
+  });
+  
+  // Limpa grid (mantém headers)
+  const headers = grid.querySelectorAll('.calendar-day-header');
+  grid.innerHTML = '';
+  headers.forEach(h => grid.appendChild(h));
+  
+  // Primeiro dia do mês
+  const firstDay = new Date(year, month, 1);
+  const startingDayOfWeek = firstDay.getDay();
+  
+  // Último dia do mês
+  const lastDay = new Date(year, month + 1, 0);
+  const daysInMonth = lastDay.getDate();
+  
+  // Dias vazios antes do primeiro dia
+  for (let i = 0; i < startingDayOfWeek; i++) {
+    const emptyDay = document.createElement('div');
+    emptyDay.className = 'calendar-day empty';
+    grid.appendChild(emptyDay);
+  }
+  
+  // Dias do mês
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  loadHistory();
+  
+  for (let day = 1; day <= daysInMonth; day++) {
+    const date = new Date(year, month, day);
+    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    
+    const dayDiv = document.createElement('div');
+    dayDiv.className = 'calendar-day';
+    dayDiv.textContent = day;
+    
+    // Verifica se é hoje
+    if (date.getTime() === today.getTime()) {
+      dayDiv.classList.add('today');
+    }
+    
+    // Verifica se tem programa guardado
+    const existingProgram = history.find(h => h.date === dateStr);
+    if (existingProgram) {
+      dayDiv.classList.add('has-program');
+      dayDiv.title = 'Abrir programa guardado';
+    }
+    // Verifica se é data litúrgica especial
+    if (LITURGICAL_CALENDAR[dateStr]) {
+      const info = LITURGICAL_CALENDAR[dateStr];
+      dayDiv.classList.add('liturgical');
+      dayDiv.classList.add(info.season);
+      dayDiv.title = existingProgram ? info.title + ' — abrir programa' : info.title + ' — criar programa';
+    }
+    // Qualquer celebração do calendário pode abrir o programa.
+    if (existingProgram || LITURGICAL_CALENDAR[dateStr]) {
+      dayDiv.style.cursor = 'pointer';
+      dayDiv.addEventListener('click', () => {
+        if (existingProgram) applyProgramToForm(existingProgram);
+        else goToProgramWithDate(dateStr);
+        document.querySelector('button[data-tab="tab-programa"]')?.click();
+      });
+    }
+    
+    grid.appendChild(dayDiv);
+  }
+}
+
+function initCalendar() {
+  const prevBtn = document.getElementById('prevMonth');
+  const nextBtn = document.getElementById('nextMonth');
+  const todayBtn = document.getElementById('todayBtn');
+  
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+      renderCalendar();
+    });
+  }
+  
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+      renderCalendar();
+    });
+  }
+  
+  if (todayBtn) {
+    todayBtn.addEventListener('click', () => {
+      currentCalendarDate = new Date();
+      renderCalendar();
+    });
+  }
+  
+  renderCalendar();
+}
+
+// ============================================
+// UPLOAD DE IMAGEM DO DOMINGO
+// ============================================
+
+function initSundayImage() {
+  const input = document.getElementById('uploadSundayImage');
+  const preview = document.getElementById('sundayImagePreview');
+  const previewImg = document.getElementById('sundayImagePreviewImg');
+  const removeBtn = document.getElementById('removeSundayImage');
+  if (!input || !preview) return;
+
+  const show = (imgData) => {
+    if (previewImg) previewImg.src = imgData;
+    preview.style.display = 'block';
+    if (removeBtn) removeBtn.style.display = 'inline-flex';
+  };
+  const hide = () => {
+    preview.style.display = 'none';
+    if (previewImg) previewImg.removeAttribute('src');
+    if (removeBtn) removeBtn.style.display = 'none';
+  };
+
+  const saved = localStorage.getItem('coroSundayImage');
+  if (saved) show(saved); else hide();
+
+  input.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      alert('Imagem muito grande! Máximo 2MB.'); input.value=''; return;
+    }
+    if (!file.type.startsWith('image/')) {
+      alert('Por favor selecione uma imagem válida.'); input.value=''; return;
+    }
+    const reader = new FileReader();
+    reader.onload = ev => {
+      localStorage.setItem('coroSundayImage', ev.target.result);
+      show(ev.target.result);
+    };
+    reader.readAsDataURL(file);
+  });
+
+  if (removeBtn) removeBtn.addEventListener('click', () => {
+    if (!confirm('Remover imagem do domingo?')) return;
+    localStorage.removeItem('coroSundayImage');
+    input.value='';
+    hide();
+  });
+}
+
+function loadSavedSundayImage() {
+  const imgData = localStorage.getItem('coroSundayImage');
+  const preview = document.getElementById('sundayImagePreview');
+  const img = document.getElementById('sundayImagePreviewImg');
+  const removeBtn = document.getElementById('removeSundayImage');
+  if (!preview) return;
+  if (imgData) {
+    if (img) img.src = imgData;
+    preview.style.display='block';
+    if (removeBtn) removeBtn.style.display='inline-flex';
+  }
+}
+
+function displaySundayImage(imgData) {
+  const preview = document.getElementById('sundayImagePreview');
+  const img = document.getElementById('sundayImagePreviewImg');
+  if (!preview || !img) return;
+  img.src = imgData;
+  preview.style.display='block';
+}
+
+// ============================================
+// CATÁLOGO DE CÂNTICOS (CSV)
+// ============================================
+
+function parseCsvText(text) {
+  const rows=[]; let row=[], cell='', quoted=false;
+  for(let i=0;i<text.length;i++){
+    const ch=text[i], next=text[i+1];
+    if(ch==='"'){
+      if(quoted && next==='"'){ cell+='"'; i++; }
+      else quoted=!quoted;
+    } else if(ch===',' && !quoted){ row.push(cell); cell=''; }
+    else if((ch==='\n' || ch==='\r') && !quoted){
+      if(ch==='\r' && next==='\n') i++;
+      row.push(cell); cell='';
+      if(row.some(v=>String(v).trim()!=='')){ rows.push(row); }
+      row=[];
+    } else cell+=ch;
+  }
+  if(cell!=='' || row.length){ row.push(cell); if(row.some(v=>String(v).trim()!=='')) rows.push(row); }
+  if(!rows.length) return [];
+  const headers=rows[0].map(x=>String(x).trim());
+  return rows.slice(1).map(cols=>{const o={}; headers.forEach((h,i)=>o[h]=(cols[i]??'').trim()); return o;}).filter(o=>Object.values(o).some(v=>v));
+}
+
+function useCatalogRows(rows, source='catálogo') {
+  if(!Array.isArray(rows) || !rows.length){
+    document.getElementById('catalogStatus')?.replaceChildren(document.createTextNode('Nenhum cântico encontrado.'));
+    songs=[]; populateProgramSelects(); renderSongsTable(); return;
+  }
+  songs=rows;
+  populateProgramSelects(); renderSongsTable(); renderVideos();
+  renderProgramAssistant();
+  document.dispatchEvent(new CustomEvent('coro:catalog-updated'));
+  const st=document.getElementById('catalogStatus');
+  if(st) st.textContent=`${songs.length} cânticos carregados (${source}).`;
+}
+
+function loadCsvFromGoogleSheets(forceRemote=false) {
+  if(!forceRemote && Array.isArray(window.CORO_EMBEDDED_CATALOG)&&window.CORO_EMBEDDED_CATALOG.length){
+    useCatalogRows(window.CORO_EMBEDDED_CATALOG.slice(),'catálogo integrado');
+    return;
+  }
+  const url="https://docs.google.com/spreadsheets/d/e/2PACX-1vTv7BD5eoTpio0s2Vjb6YCuZNmjCyG_leoWxl6v-IkIMV-LiJZNmCwhqA9j68IESZQJiU-H3ri3_flR/pub?gid=1808635095&single=true&output=csv";
+  // O catálogo atualiza-se sem recarregar a página. O fallback incorporado continua disponível se a rede falhar.
+  fetch(url).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.text();}).then(text=>useCatalogRows(parseCsvText(text),'Google Sheets')).catch(()=>{
+    if(Array.isArray(window.CORO_EMBEDDED_CATALOG)) useCatalogRows(window.CORO_EMBEDDED_CATALOG.slice(),'catálogo integrado (fallback)');
+    else useCatalogRows([],'erro');
+  });
+}
+
+function initCatalogControls(){
+  document.getElementById('refreshCatalogBtn')?.addEventListener('click',()=>{
+    loadCsvFromGoogleSheets(true);
+    const st=document.getElementById('catalogStatus'); if(st) st.textContent='A atualizar catálogo…';
+  });
+  const csvInput=document.getElementById('csvFile');
+  document.getElementById('loadCsvBtn')?.addEventListener('click',()=>{
+    const f=csvInput?.files?.[0];
+    const err=document.getElementById('csvError');
+    if(!f){if(err){err.textContent='Selecione primeiro um ficheiro CSV.';err.style.display='block';}return;}
+    const reader=new FileReader();
+    reader.onload=e=>{try{const rows=parseCsvText(e.target.result);useCatalogRows(rows,'CSV manual');if(err)err.style.display='none';}catch(ex){if(err){err.textContent='Não foi possível ler o CSV.';err.style.display='block';}}};
+    reader.readAsText(f,'utf-8');
+  });
+}
+
+function populateProgramSelects() {
+  PROGRAM_PARTS.forEach(part => {
+    const select = document.getElementById(part.id);
+    if (!select) return;
+    
+    const currentValue = select.value;
+    select.innerHTML = '<option value="">-- Selecione --</option>';
+    
+    // Adiciona cânticos do CSV
+    songs.forEach(song => {
+      const title = song["Título"] || song["Titulo"] || song["titulo"] || "";
+      if (title) {
+        const option = document.createElement("option");
+        option.value = title;
+        option.textContent = title;
+        option.dataset.author = getSongAuthor(song);
+        select.appendChild(option);
+      }
+    });
+    
+    // Adiciona cânticos personalizados
+    customSongs.forEach(song => {
+      const option = document.createElement("option");
+      option.value = `[CUSTOM] ${song.title}`;
+      option.textContent = `${song.title} ⭐`;
+      select.appendChild(option);
+    });
+    
+    // Restaura valor anterior
+    if (currentValue) {
+      select.value = currentValue;
+    }
+  });
+}
+
+function renderSongsTable() {
+  const container=document.getElementById('songsTableContainer'); if(!container)return;
+  const q=(document.getElementById('songSearch')?.value||'').toLowerCase(), av=(document.getElementById('filterAuthor')?.value||'').toLowerCase(), tv=(document.getElementById('filterTheme')?.value||'').toLowerCase();
+  const all=[...(songs||[])]; if(!all.length){container.innerHTML='<p>Nenhum cântico disponível.</p>';return;}
+  const arr=all.filter(s=>{const t=getSongTitle(s).toLowerCase(),a=getSongAuthor(s).toLowerCase(),th=String(s.Tema||'').toLowerCase();return(!q||t.includes(q)||a.includes(q)||th.includes(q))&&(!av||a===av)&&(!tv||th.split(';').map(x=>x.trim()).includes(tv));});
+  let h='<table><thead><tr><th>Título</th><th>Tema</th><th>Autor</th><th>Partitura</th><th>Vídeo</th><th>Utilizações</th></tr></thead><tbody>';
+  arr.forEach(s=>{const t=getSongTitle(s),u=s._uses||0,p=s.Partitura||'',v=s.Video||'';h+='<tr><td><b>'+t+'</b></td><td>'+(s.Tema||'—')+'</td><td>'+(getSongAuthor(s)||'—')+'</td><td>'+(p?'<a href="'+p+'" target="_blank">📄 Abrir</a>':'⚠️ Não associada')+'</td><td>'+(v?'<a href="'+v+'" target="_blank">▶️ Ver</a>':'—')+'</td><td>'+u+' <button class="btn small secondary" onclick="viewSongUsage(\''+t.replace(/'/g,"\'")+'\')">📊</button></td></tr>';});
+  h+='</tbody></table>';container.innerHTML=h;
+  const fa=document.getElementById('filterAuthor'),ft=document.getElementById('filterTheme'); if(fa){const vals=Array.from(new Set(all.map(s=>getSongAuthor(s)).filter(Boolean))).sort((a,b)=>a.localeCompare(b,'pt'));fa.innerHTML='<option value="">Todos</option>'+vals.map(x=>'<option value="'+x.replace(/"/g,'&quot;')+'">'+x+'</option>').join('');if(av)fa.value=av;} if(ft){const vals=Array.from(new Set(all.flatMap(s=>String(s.Tema||'').split(';').map(x=>x.trim()).filter(Boolean)))).sort((a,b)=>a.localeCompare(b,'pt'));ft.innerHTML='<option value="">Todos</option>'+vals.map(x=>'<option value="'+x.replace(/"/g,'&quot;')+'">'+x+'</option>').join('');if(tv)ft.value=tv;}
+}
+
+function viewSongUsage(title){let h=[];try{h=JSON.parse(localStorage.getItem('coroSongUsage_v1')||'[]')}catch(e){}h=(Array.isArray(h)?h:[]).filter(x=>normSmart(x.title)===normSmart(title));alert(title+'\n\n'+(h.length?h.map(x=>x.date+' — '+(x.section||'')).join('\n'):'Sem utilizações registadas.'));}
+
+// ============================================
+// PROGRAMA
+// ============================================
+
+function collectProgramFromForm() {
+  const date = document.getElementById('date')?.value || '';
+  const title = document.getElementById('liturgicalTitle')?.value || '';
+  const color = document.getElementById('liturgicalColor')?.value || getLiturgicalInfo(date).color || '';
+  const extraTheme = document.getElementById('extraTheme')?.value || '';
+  const salmista = document.getElementById('salmistaPrograma')?.value || '';
+  const organista = document.getElementById('organistaPrograma')?.value || '';
+  const info = getLiturgicalInfo(date);
+  
+  const program = {};
+  const programAuthors = {};
+  PROGRAM_PARTS.forEach(part => {
+    const el=document.getElementById(part.id);
+    const value = el?.value || '';
+    program[part.id] = value;
+    programAuthors[part.id] = el?.dataset?.selectedAuthor || el?.selectedOptions?.[0]?.dataset?.author || '';
+  });
+  
+  return {date, title, color, extraTheme, season:info.season||'', cycle:info.year||'A', psalm:info.psalm||'', theme:info.theme||'', salmista, organista, program, programAuthors};
+}
+
+function applyProgramToForm(record) {
+  if (!record) return;
+  
+  const dateInput = document.getElementById('date');
+  const titleInput = document.getElementById('liturgicalTitle');
+  const colorInput = document.getElementById('liturgicalColor');
+  const extraInput = document.getElementById('extraTheme');
+  
+  if (dateInput) dateInput.value = record.date || '';
+  if (titleInput) titleInput.value = record.title || '';
+  if (colorInput) colorInput.value = record.color || '';
+  if (extraInput) extraInput.value = record.extraTheme || '';
+  const salEl=document.getElementById('salmistaPrograma'); if(salEl) salEl.value=record.salmista||'';
+  const orgEl=document.getElementById('organistaPrograma'); if(orgEl) orgEl.value=record.organista||'';
+  
+  PROGRAM_PARTS.forEach(part => {
+    const input = document.getElementById(part.id);
+    if (input) {
+      input.value = (record.program || {})[part.id] || '';
+      input.dataset.selectedAuthor = (record.programAuthors || {})[part.id] || input.selectedOptions?.[0]?.dataset?.author || '';
+    }
+  });
+  
+  updateLiturgicalFromDate();
+  updatePreview();
+}
+
+function updatePreview() {
+  const container = document.getElementById('previewContainer');
+  if (!container) return;
+  
+  const record = collectProgramFromForm();
+  container.innerHTML = buildLeafletHtml(record);
+}
+
+function buildLeafletHtml(record) {
+  let html = `
+    <div style="font-family: 'Noto Serif', serif; max-width: 800px; margin: 0 auto; padding: 2rem;">
+      <h1 style="text-align: center; margin-bottom: 0.5rem;">${record.title}</h1>
+      <p style="text-align: center; color: #666; margin-bottom: 2rem;">
+        ${new Date(record.date + 'T00:00:00').toLocaleDateString('pt-PT', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric'
+        })}
+      </p>
+  `;
+  
+  if (record.extraTheme) {
+    html += `<p style="text-align: center; font-style: italic; margin-bottom: 2rem;">${record.extraTheme}</p>`;
+  }
+  
+  html += '<div style="line-height: 1.8;">';
+  
+  PROGRAM_PARTS.forEach(part => {
+    const value = record.program[part.id];
+    if (value) {
+      html += `
+        <div style="margin-bottom: 1rem;">
+          <strong>${part.label}:</strong> ${value}
+        </div>
+      `;
+    }
+  });
+  
+  html += '</div></div>';
+  return html;
+}
+
+// ============================================
+// HISTÓRICO
+// ============================================
+
+function loadHistory() {
+  try { const raw=localStorage.getItem('coroHistory'); history=raw?JSON.parse(raw):[]; if(!raw&&Array.isArray(window.CORO_EMBEDDED_HISTORY)){history=window.CORO_EMBEDDED_HISTORY.slice();localStorage.setItem('coroHistory',JSON.stringify(history));} } catch(e){history=Array.isArray(window.CORO_EMBEDDED_HISTORY)?window.CORO_EMBEDDED_HISTORY.slice():[];} return history;
+}
+
+function saveHistory() {
+  localStorage.setItem('coroHistory', JSON.stringify(history));
+}
+
+
+function getSongTitle(s){return (s&& (s["Título"]||s.Titulo||s.titulo||'' )).trim();}
+function getSongAuthor(s){return (s&&(s.Autor||s.autor||'' )).trim();}
+function normSmart(v){let x=String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim(); x=x.replace(/acto penitencial/g,'ato penitencial').replace(/accao de gracas/g,'acao de gracas').replace(/acao de gracas/g,'acao de gracas').replace(/piedadede/g,'piedade de'); return x;}
+function songMoment(song){const obs=String(song?.Observações||song?.Observacoes||'');const m=obs.match(/Momento:\s*([^|]+)/i);return m?m[1].trim():'';}
+function songPsalm(song){const obs=String(song?.Observações||song?.Observacoes||'');const m=obs.match(/Salmo:\s*([^|]+)/i);return m?m[1].trim():'';}
+function getUsageHistory(){try{const a=JSON.parse(localStorage.getItem('coroSongUsage')||'[]');const b=JSON.parse(localStorage.getItem('coroSongUsage_v1')||'[]');return [...(Array.isArray(a)?a:[]),...(Array.isArray(b)?b:[])];}catch(e){return [];}}
+function lastUse(title){const key=normSmart(title);try{return getUsageHistory().filter(x=>normSmart(x.song||x.title)===key).sort((a,b)=>String(b.date).localeCompare(String(a.date)))[0]||null;}catch(e){return null;}}
+function usageCount(title){return getUsageHistory().filter(x=>normSmart(x.song||x.title)===normSmart(title)).length;}
+function currentProgramTitles(exceptPartId=''){return new Set(PROGRAM_PARTS.filter(p=>p.id!==exceptPartId).map(p=>document.getElementById(p.id)?.value||'').filter(Boolean).map(normSmart));}
+function smartReasonScore(song,partId){
+ const info=getLiturgicalInfo(document.getElementById('date')?.value||'');
+ const title=getSongTitle(song), titleN=normSmart(title), tema=normSmart(song.Tema||''), tempo=normSmart(song.Tempo||''), obs=normSmart(song.Observações||song.Observacoes||'');
+ const label=normSmart((PROGRAM_PARTS.find(p=>p.id===partId)||{}).label||'');
+ const moment=normSmart(songMoment(song));
+ const psalm=songPsalm(song), targetPsalm=String((window.CORO_READINGS_2026?.[document.getElementById('date')?.value||'']?.refrain)||info.psalm||'');
+ let score=0, reasons=[];
+ if(moment && (moment===label || moment.includes(label) || label.includes(moment))){score+=38; reasons.push('momento litúrgico');}
+ else if(label && obs.includes(label)){score+=18; reasons.push('momento compatível');}
+ const season=normSmart(info.time||info.season||'');
+ const seasonAliases={tempocomum:'tempo comum',pascoa:'tempo pascal',quaresma:'quaresma',advento:'advento',natal:'tempo do natal'};
+ const targetSeason=seasonAliases[season]||season;
+ if(targetSeason && tempo.split(';').map(x=>normSmart(x)).some(x=>x===targetSeason || x.includes(targetSeason) || targetSeason.includes(x))){score+=22; reasons.push('tempo litúrgico');}
+ const titleLit=normSmart(info.title||info.name||'');
+ if(titleLit && (tema.includes(titleLit)||titleLit.includes(tema)) && tema.length>5){score+=35; reasons.push('celebração específica');}
+ const words=String(info.theme||'').toLowerCase().split(/[,;]+/).map(x=>normSmart(x)).filter(x=>x.length>3);
+ const matches=words.filter(w=>tema.includes(w)||obs.includes(w)||titleN.includes(w));
+ if(matches.length){score+=Math.min(28,matches.length*7);reasons.push('tema da liturgia');}
+ if(partId==='salmo' && targetPsalm){
+   const pN=normSmart(targetPsalm), spN=normSmart(psalm);
+   if(spN && (spN===pN || spN.includes(pN) || pN.includes(spN))){score+=90;reasons.push('salmo exato');}
+   else if(spN){const A=new Set(pN.split(' ').filter(x=>x.length>3)),B=new Set(spN.split(' ').filter(x=>x.length>3));const inter=[...A].filter(x=>B.has(x)).length;const union=new Set([...A,...B]).size;if(union && inter/union>=0.45){score+=55;reasons.push('texto do salmo semelhante');}}
+   else if(titleN && (titleN.includes(pN)||pN.includes(titleN))){score+=75;reasons.push('título corresponde ao salmo');}
+ }
+ const lu=lastUse(title), uses=usageCount(title);
+ if(!lu){score+=18;reasons.push('nunca utilizado');}
+ else {const days=Math.max(0,Math.round((Date.now()-new Date(lu.date+'T12:00:00').getTime())/86400000));if(days<90){score-=22;reasons.push('utilizado recentemente');}else if(days>365){score+=12;reasons.push('há mais de 1 ano');}else if(days>180){score+=6;reasons.push('há algum tempo');}}
+ if(uses===0 && song._uses>0){score-=Math.min(10,Number(song._uses)||0);}
+ return {score,reasons,lu,uses,partMoment:songMoment(song),psalm:psalm};
+}
+function scoreSmartSong(song,partId){return smartReasonScore(song,partId).score;}
+function smartSuggestions(partId){
+ const used=currentProgramTitles(partId);
+ return (songs||[]).filter(s=>!used.has(normSmart(getSongTitle(s)))).map(s=>({s,meta:smartReasonScore(s,partId)})).sort((a,b)=>b.meta.score-a.meta.score).slice(0,8);
+}
+function fitLabel(score){return score>=75?'🟢 Muito adequado':score>=48?'🟡 Adequado':'⚪ Possível';}
+function openSongSelectModal(partId){
+ const modal=document.getElementById('songSelectModal'); if(!modal)return; window.currentSmartPart=partId; const label=(PROGRAM_PARTS.find(p=>p.id===partId)||{}).label||partId;
+ const lab=document.getElementById('songSelectPartLabel'); if(lab)lab.textContent='Escolher para: '+label;
+ const search=document.getElementById('songSelectSearch'); if(search)search.value=''; const theme=document.getElementById('songSelectTheme'); if(theme){theme.innerHTML='<option value="">Todos</option>'+Array.from(new Set((songs||[]).flatMap(s=>String(s.Tema||'').split(';').map(x=>x.trim()).filter(Boolean)))).sort((a,b)=>a.localeCompare(b,'pt')).map(x=>'<option>'+x.replace(/</g,'&lt;')+'</option>').join('');}
+ buildSmartSuggestionList(partId); renderSongListModal(); modal.hidden=false; modal.setAttribute('aria-hidden','false');
+}
+function buildSmartSuggestionList(partId){
+ const box=document.getElementById('songSelectSuggestions'),list=document.getElementById('songSelectSuggestionsList');if(!box||!list)return;
+ const info=getLiturgicalInfo(document.getElementById('date')?.value||''); const top=smartSuggestions(partId);
+ list.innerHTML=(info.psalm&&partId==='salmo'?'<div class="small" style="margin-bottom:.5rem;padding:.5rem;background:rgba(37,99,235,.08);border-radius:.35rem;"><b>📖 Salmo do dia:</b> '+escSmart(info.psalm)+'</div>':'')+top.map(x=>{const t=getSongTitle(x.s),m=x.meta,lu=m.lu;const status=lu?('Último uso: '+lu.date):'⭐ Nunca utilizado';const why=m.reasons.slice(0,3).join(' · ');return '<div class="smart-suggestion-row"><div><b>'+escSmart(t)+'</b><div class="small muted">'+fitLabel(m.score)+' · '+escSmart(status)+(getSongAuthor(x.s)?' · '+escSmart(getSongAuthor(x.s)):'')+'</div><div class="small">'+escSmart(why)+'</div></div><button type="button" class="btn small" data-smart-title="'+t.replace(/"/g,'&quot;')+'">Usar</button></div>';}).join('')||'<p class="small muted">Não há sugestões disponíveis.</p>';
+ box.style.display=top.length?'block':'none';list.querySelectorAll('[data-smart-title]').forEach(b=>b.onclick=()=>useSongInPart(partId,b.dataset.smartTitle,b.dataset.smartAuthor||''));
+}
+function renderSongListModal(){const el=document.getElementById('songSelectList');if(!el)return;const q=(document.getElementById('songSelectSearch')?.value||'').toLowerCase(),th=(document.getElementById('songSelectTheme')?.value||'').toLowerCase();const arr=(songs||[]).filter(s=>(!q||getSongTitle(s).toLowerCase().includes(q)||getSongAuthor(s).toLowerCase().includes(q)||String(s.Tema||'').toLowerCase().includes(q))&&(!th||String(s.Tema||'').toLowerCase().split(';').map(x=>x.trim()).includes(th))).slice(0,80);el.innerHTML=arr.map(s=>'<div class="song-select-item"><div class="song-select-item-header"><div class="song-select-title">'+escSmart(getSongTitle(s))+'</div><div class="song-select-meta">'+escSmart(getSongAuthor(s))+' '+(s.Tema?' · '+escSmart(s.Tema):'')+'</div></div><div class="song-select-actions"><button type="button" class="btn small program-use-song-btn" data-title="'+getSongTitle(s).replace(/"/g,'&quot;')+'" data-author="'+getSongAuthor(s).replace(/"/g,'&quot;')+'">Usar</button></div></div>').join('')||'<p class="small muted">Nenhum cântico encontrado.</p>';el.querySelectorAll('[data-title]').forEach(b=>b.onclick=()=>useSongInPart(window.currentSmartPart,b.dataset.title,b.dataset.author||''));}
+function useSongInPart(partId,title,author='',silent=false){
+  const sel=document.getElementById(partId);if(!sel)return;
+  let opt=Array.from(sel.options).find(o=>o.value===title && (!author || normSmart(o.dataset.author||'')===normSmart(author)));
+  if(!opt)opt=Array.from(sel.options).find(o=>o.value===title);
+  if(!opt){opt=document.createElement('option');opt.value=title;opt.textContent=title;opt.dataset.author=author||'';sel.appendChild(opt);}
+  sel.value=title; sel.dataset.selectedAuthor=author||opt.dataset.author||'';
+  sel.dispatchEvent(new Event('change'));
+  autoApplyLyricsToPart(partId);
+  buildSmartSuggestionList(partId); closeSongSelectModal(); renderProgramAssistant();
+}
+
+function closeSongSelectModal(){
+  const modal=document.getElementById('songSelectModal');
+  if(!modal)return;
+  modal.hidden=true;
+  modal.setAttribute('aria-hidden','true');
+  window.currentSmartPart=null;
+}
+function setupSmartSelectors(){
+  document.querySelectorAll('.program-select-btn').forEach(b=>b.addEventListener('click',()=>openSongSelectModal(b.dataset.partId)));
+  document.getElementById('songSelectCloseBtn')?.addEventListener('click',closeSongSelectModal);
+  document.getElementById('songSelectCancelBtn')?.addEventListener('click',closeSongSelectModal);
+  document.getElementById('songSelectSearch')?.addEventListener('input',renderSongListModal);
+  document.getElementById('songSelectTheme')?.addEventListener('change',renderSongListModal);
+  document.getElementById('songSelectModal')?.addEventListener('click',e=>{if(e.target.id==='songSelectModal')closeSongSelectModal();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape' && !document.getElementById('songSelectModal')?.hidden)closeSongSelectModal();});
+}
+
+// ============================================
+// ASSISTENTE DE PREPARAÇÃO DO PROGRAMA — v3
+// ============================================
+function currentLitInfo(){
+  const d=document.getElementById('date')?.value||'';
+  return getLiturgicalInfo(d)||{};
+}
+function assistantParts(){
+  return PROGRAM_PARTS.filter(p=>document.getElementById(p.id));
+}
+function selectedProgramMap(){
+  const out={};
+  assistantParts().forEach(p=>out[p.id]=document.getElementById(p.id)?.value||'');
+  return out;
+}
+function assistantScore(song,partId,selected){
+  const meta=smartReasonScore(song,partId);
+  const title=normSmart(getSongTitle(song));
+  const duplicates=Object.entries(selected).filter(([id,t])=>id!==partId&&normSmart(t)===title).length;
+  if(duplicates) meta.score-=45, meta.reasons.push('evitar repetição');
+  return meta;
+}
+function assistantTop(partId,limit=3){
+  const selected=selectedProgramMap();
+  return (songs||[]).map(s=>({song:s,meta:assistantScore(s,partId,selected)}))
+    .filter(x=>getSongTitle(x.song))
+    .sort((a,b)=>b.meta.score-a.meta.score).slice(0,limit);
+}
+function assistantStatus(score){
+  if(score>=95)return '🟢 Excelente';
+  if(score>=70)return '🟢 Muito adequado';
+  if(score>=48)return '🟡 Adequado';
+  return '⚪ Possível';
+}
+function renderProgramAssistant(){
+  const box=document.getElementById('assistantList'),summary=document.getElementById('assistantSummary');
+  if(!box||!summary)return;
+  const info=currentLitInfo(), selected=selectedProgramMap();
+  const parts=assistantParts();
+  const missing=parts.filter(p=>!selected[p.id]).length;
+  const duplicates=Object.entries(selected).filter(([id,t],i,a)=>t&&a.slice(i+1).some(x=>normSmart(x[1])===normSmart(t))).length;
+  summary.innerHTML=`<b>${escSmart(info.title||info.name||'Celebração')}</b>${info.year?' · Ano '+escSmart(info.year):''}${info.color?' · '+escSmart(info.color):''}<br><span class="muted">${missing?`⚠️ ${missing} secção(ões) sem cântico.`:'✅ Todas as secções visíveis têm seleção.'}${duplicates?` · ⚠️ ${duplicates} repetição(ões) detectada(s).`:''}</span>`;
+  box.innerHTML=parts.map(p=>{
+    const current=selected[p.id];
+    const tops=assistantTop(p.id,3);
+    const best=tops[0];
+    const currentMeta=current ? assistantScore((songs||[]).find(s=>normSmart(getSongTitle(s))===normSmart(current))||{Título:current},p.id,selected) : null;
+    const display=current||'— sem seleção —';
+    const reason=best?.meta?.reasons?.slice(0,3).join(' · ')||'Sem correspondência forte no repertório.';
+    return `<div class="assistant-item"><div><b>${escSmart(p.label)}</b><div class="assistant-reason">Atual: ${escSmart(display)}</div></div><div><div class="assistant-score">${best?assistantStatus(best.meta.score):'⚪ Sem sugestão'}</div><div class="assistant-reason">${best?escSmart(getSongTitle(best.song))+' · '+escSmart(reason):'Reveja o catálogo para esta secção.'}</div>${currentMeta?`<div class="assistant-reason">Seleção atual: ${assistantStatus(currentMeta.score)}</div>`:''}</div><button type="button" class="btn secondary small" data-assistant-use="${p.id}" ${best?'':'disabled'}>${current?'Trocar':'Usar sugestão'}</button></div>`;
+  }).join('');
+  box.querySelectorAll('[data-assistant-use]').forEach(btn=>btn.onclick=()=>{
+    const part=btn.dataset.assistantUse, best=assistantTop(part,1)[0];
+    if(best)useSongInPart(part,getSongTitle(best.song),getSongAuthor(best.song));
+    renderProgramAssistant();
+  });
+}
+function fillProgramWithSuggestions(){
+  const selected=selectedProgramMap();
+  assistantParts().forEach(p=>{
+    if(!selected[p.id]){
+      const best=assistantTop(p.id,5)[0];
+      if(best && best.meta.score>=48){
+        useSongInPart(p.id,getSongTitle(best.song),getSongAuthor(best.song),true);
+        selected[p.id]=getSongTitle(best.song);
+      }
+    }
+  });
+  renderProgramAssistant();
+}
+function refreshProgramLyricsSourceIndicators(){
+  PROGRAM_PARTS.forEach(p=>{
+    const el=document.getElementById(p.id);
+    const btn=document.querySelector('.program-lyrics-btn[data-part-id=\"'+p.id+'\"]');
+    if(!el||!btn)return;
+    const title=el.value||'';
+    let badge=btn.parentElement?.querySelector('.lyrics-online-mini');
+    if(!title){if(badge)badge.remove();return;}
+    const song=getSelectedSongForPart(p.id)||getSongByTitle(title);
+    if(!badge){badge=document.createElement('span');badge.className='tiny muted lyrics-online-mini';btn.parentElement?.appendChild(badge);}
+    badge.innerHTML='🌐 <a href=\"'+escSmart(getLaudateUrl(song||title,getSongAuthor(song)))+'\" target=\"_blank\" rel=\"noopener noreferrer\">'+escSmart(getLaudateSearchLabel(song||title,getSongAuthor(song)))+'</a>';
+  });
+}
+
+function setupProgramAssistant(){
+  document.getElementById('assistantFillBtn')?.addEventListener('click',fillProgramWithSuggestions);
+  assistantParts().forEach(p=>{
+    const el=document.getElementById(p.id);
+    el?.addEventListener('change',()=>{
+      el.dataset.selectedAuthor=el.selectedOptions?.[0]?.dataset?.author||el.dataset.selectedAuthor||'';
+      autoApplyLyricsToPart(p.id);refreshProgramLyricsSourceIndicators();renderProgramAssistant();
+    });
+    el?.addEventListener('input',()=>renderProgramAssistant());
+  });
+  document.addEventListener('coro:catalog-updated',()=>{renderProgramAssistant();refreshProgramLyricsSourceIndicators();});
+  refreshProgramLyricsSourceIndicators();
+  renderProgramAssistant();
+}
+
+function saveProgram() {
+  const record = collectProgramFromForm();
+  
+  if (!record.date) {
+    alert('Por favor preencha a data.');
+    return;
+  }
+  
+  loadHistory();
+  
+  // Remove duplicado
+  history = history.filter(h => h.date !== record.date);
+  
+  // Adiciona novo
+  history.unshift(record);
+  
+  // Limita a 50
+  if (history.length > 50) {
+    history = history.slice(0, 50);
+  }
+  
+  saveHistory();
+  recordSongUsage(record);
+  renderHistory();
+  renderCalendar();
+  populateRehearsalPrograms();
+  renderDashboardV3();
+  alert('Programa guardado!');
+}
+
+function renderHistory() {
+  const container = document.getElementById('historyContainer');
+  if (!container) return;
+  
+  loadHistory();
+  
+  if (!history.length) {
+    container.innerHTML = '<p>Nenhum programa guardado.</p>';
+    return;
+  }
+  
+  let html = '<div class="history-list">';
+  
+  history.forEach((record, index) => {
+    const dateObj = new Date(record.date + 'T00:00:00');
+    const formatted = dateObj.toLocaleDateString('pt-PT', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+    
+    html += `
+      <div class="history-item" style="padding: 1rem; border: 1px solid #ddd; border-radius: 0.5rem; margin-bottom: 0.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+          <div>
+            <strong>${formatted}</strong><br>
+            <span style="color: #666;">${record.title}</span>
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="btn small" onclick="loadHistoryItem(${index})">📝 Carregar</button>
+            <button class="btn small secondary" onclick="deleteHistoryItem(${index})">🗑️</button>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+  
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+window.loadHistoryItem = function(index) {
+  loadHistory();
+  if (history[index]) {
+    applyProgramToForm(history[index]);
+    // Muda para tab Programa
+    const programTab = document.querySelector('button[data-tab="tab-programa"]');
+    if (programTab) programTab.click();
+    alert('Programa carregado!');
+  }
+};
+
+window.deleteHistoryItem = function(index) {
+  if (!confirm('Eliminar este programa?')) return;
+  
+  loadHistory();
+  history.splice(index, 1);
+  saveHistory();
+  renderHistory();
+};
+
+// ============================================
+// FOLHETOS GUARDADOS
+// ============================================
+
+function loadSavedLeaflets() {
+  try {
+    savedLeaflets = JSON.parse(localStorage.getItem('coroLeaflets') || '[]');
+  } catch (e) {
+    savedLeaflets = [];
+  }
+  return savedLeaflets;
+}
+
+function saveSavedLeaflets() {
+  localStorage.setItem('coroLeaflets', JSON.stringify(savedLeaflets));
+}
+
+function saveCurrentLeaflet() {
+  const record = collectProgramFromForm();
+  
+  if (!record.date) {
+    alert('Por favor preencha a data primeiro.');
+    return;
+  }
+  
+  loadSavedLeaflets();
+  
+  const leaflet = {
+    id: Date.now(),
+    date: record.date,
+    title: record.title,
+    html: buildLeafletHtml(record),
+    savedAt: new Date().toISOString()
+  };
+  
+  savedLeaflets.unshift(leaflet);
+  
+  if (savedLeaflets.length > 30) {
+    savedLeaflets = savedLeaflets.slice(0, 30);
+  }
+  
+  saveSavedLeaflets();
+  alert('Folheto guardado!');
+  renderSavedLeaflets();
+}
+
+function renderSavedLeaflets() {
+  const container = document.getElementById('savedLeafletsContainer');
+  if (!container) return;
+  
+  loadSavedLeaflets();
+  
+  if (!savedLeaflets.length) {
+    container.innerHTML = '<p>Nenhum folheto guardado.</p>';
+    return;
+  }
+  
+  let html = '<div class="leaflets-grid">';
+  
+  savedLeaflets.forEach(leaflet => {
+    const dateObj = new Date(leaflet.date + 'T00:00:00');
+    const formatted = dateObj.toLocaleDateString('pt-PT', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+    
+    html += `
+      <div class="leaflet-card" style="border: 1px solid #ddd; padding: 1rem; border-radius: 0.5rem;">
+        <strong>${formatted}</strong><br>
+        <span style="color: #666; font-size: 0.9rem;">${leaflet.title}</span>
+        <div style="margin-top: 0.5rem; display: flex; gap: 0.5rem;">
+          <button class="btn small" onclick="viewLeaflet(${leaflet.id})">👁️ Ver</button>
+          <button class="btn small secondary" onclick="deleteLeaflet(${leaflet.id})">🗑️</button>
+        </div>
+      </div>
+    `;
+  });
+  
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+window.viewLeaflet = function(id) {
+  loadSavedLeaflets();
+  const leaflet = savedLeaflets.find(l => l.id === id);
+  if (!leaflet) return;
+  
+  const modal = document.getElementById('leafletModalBackdrop');
+  const content = document.getElementById('leafletModalContent');
+  
+  if (modal && content) {
+    content.innerHTML = leaflet.html;
+    modal.hidden = false;
+  }
+};
+
+window.deleteLeaflet = function(id) {
+  if (!confirm('Eliminar este folheto?')) return;
+  
+  loadSavedLeaflets();
+  savedLeaflets = savedLeaflets.filter(l => l.id !== id);
+  saveSavedLeaflets();
+  renderSavedLeaflets();
+};
+
+// ============================================
+// MODAL DO FOLHETO
+// ============================================
+
+function initLeafletModal() {
+  const saveBtn = document.getElementById('saveCurrentLeafletBtn');
+  const closeBtn = document.getElementById('leafletModalCloseBtn');
+  const printBtn = document.getElementById('leafletModalPrintBtn');
+  
+  if (saveBtn) {
+    saveBtn.addEventListener('click', saveCurrentLeaflet);
+  }
+  
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      const modal = document.getElementById('leafletModalBackdrop');
+      if (modal) modal.hidden = true;
+    });
+  }
+  
+  if (printBtn) {
+    printBtn.addEventListener('click', () => {
+      const content = document.getElementById('leafletModalContent');
+      if (content) {
+        const printWindow = window.open('', '', 'width=800,height=600');
+        printWindow.document.write(`
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>Folheto</title>
+            <style>
+              body { font-family: 'Noto Serif', serif; padding: 2rem; }
+              @media print {
+                body { padding: 1rem; }
+              }
+            </style>
+          </head>
+          <body>
+            ${content.innerHTML}
+          </body>
+          </html>
+        `);
+        printWindow.document.close();
+        printWindow.print();
+      }
+    });
+  }
+}
+
+// ============================================
+// HISTÓRICO DE USO DE CÂNTICOS
+// ============================================
+
+function recordSongUsage(record) {
+  try { songUsageHistory = JSON.parse(localStorage.getItem('coroSongUsage') || '[]'); } catch (e) { songUsageHistory = []; }
+  if (!Array.isArray(songUsageHistory)) songUsageHistory=[];
+  const date=record.date;
+  // Regravar o mesmo domingo substitui os usos desse domingo, evitando contagens duplicadas.
+  const partLabels=new Set(PROGRAM_PARTS.map(p=>p.label));
+  songUsageHistory=songUsageHistory.filter(u=>!(u.date===date && partLabels.has(u.part)));
+  PROGRAM_PARTS.forEach(part => {
+    const songTitle=record.program?.[part.id];
+    if(songTitle){
+      songUsageHistory.push({song:songTitle,date,part:part.label,liturgicalTitle:record.title,timestamp:new Date().toISOString()});
+    }
+  });
+  if(songUsageHistory.length>500) songUsageHistory=songUsageHistory.slice(-500);
+  localStorage.setItem('coroSongUsage',JSON.stringify(songUsageHistory));
+}
+
+window.viewSongUsage = function(songTitle) {
+  try {
+    songUsageHistory = JSON.parse(localStorage.getItem('coroSongUsage') || '[]');
+  } catch (e) {
+    songUsageHistory = [];
+  }
+  
+  const usage = songUsageHistory.filter(u => u.song === songTitle);
+  
+  const modal = document.getElementById('songUsageModal');
+  const title = document.getElementById('songUsageModalTitle');
+  const content = document.getElementById('songUsageModalContent');
+  
+  if (!modal || !title || !content) return;
+  
+  title.textContent = `Histórico: ${songTitle}`;
+  
+  if (!usage.length) {
+    content.innerHTML = '<p>Este cântico ainda não foi utilizado.</p>';
+  } else {
+    let html = '<div style="max-height: 400px; overflow-y: auto;">';
+    usage.reverse().forEach(u => {
+      const dateObj = new Date(u.date + 'T00:00:00');
+      const formatted = dateObj.toLocaleDateString('pt-PT', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
+      html += `
+        <div style="padding: 0.75rem; border-bottom: 1px solid #eee;">
+          <strong>${formatted}</strong><br>
+          <span style="color: #666;">${u.liturgicalTitle}</span><br>
+          <span style="font-size: 0.85rem; color: #999;">Usado como: ${u.part}</span>
+        </div>
+      `;
+    });
+    html += '</div>';
+    content.innerHTML = html;
+  }
+  
+  modal.style.display = 'flex';
+};
+
+// Fechar modal de histórico
+document.addEventListener('click', (e) => {
+  if (e.target.id === 'songUsageModalClose') {
+    document.getElementById('songUsageModal').style.display = 'none';
+  }
+});
+
+// ============================================
+// CÂNTICOS PERSONALIZADOS
+// ============================================
+
+function renderCustomSongs(){
+  const c=document.getElementById('customSongsContainer'); if(!c)return;
+  if(!customSongs.length){c.innerHTML='<p class="small muted">Ainda não existem cânticos personalizados.</p>';return;}
+  c.innerHTML=customSongs.map(s=>`<div class="card" style="padding:.65rem;margin:.35rem 0;display:flex;justify-content:space-between;gap:.5rem;align-items:center"><div><b>${escSmart(s.title)}</b><div class="small muted">${escSmart(s.author||'')} ${s.section?'· '+escSmart(s.section):''}</div></div><div style="display:flex;gap:.35rem"><button type="button" class="btn small secondary" data-custom-view="${s.id}">Ver</button><button type="button" class="btn small secondary" data-custom-delete="${s.id}">Eliminar</button></div></div>`).join('');
+  c.querySelectorAll('[data-custom-view]').forEach(b=>b.addEventListener('click',()=>window.viewCustomSong(Number(b.dataset.customView))));
+  c.querySelectorAll('[data-custom-delete]').forEach(b=>b.addEventListener('click',()=>window.deleteCustomSong(Number(b.dataset.customDelete))));
+}
+
+function loadCustomSongs() {
+  try {
+    customSongs = JSON.parse(localStorage.getItem('coroCustomSongs') || '[]');
+  } catch (e) {
+    customSongs = [];
+  }
+  populateProgramSelects();
+  renderCustomSongs();
+}
+
+function saveCustomSongs() {
+  localStorage.setItem('coroCustomSongs', JSON.stringify(customSongs));
+}
+
+function initCustomSongs() {
+  const openBtn = document.getElementById('addCustomSongBtn');
+  const closeBtn = document.getElementById('customSongModalClose');
+  const modal = document.getElementById('customSongModal');
+  const form = document.getElementById('customSongForm');
+  
+  if (openBtn) {
+    openBtn.addEventListener('click', () => {
+      if (modal) modal.style.display = 'flex';
+    });
+  }
+  
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      if (modal) modal.style.display = 'none';
+      form.reset();
+      document.getElementById('filePreview').style.display = 'none';
+    });
+  }
+  
+  // Upload de ficheiro
+  const uploadBtn = document.getElementById('uploadFileBtn');
+  const fileInput = document.getElementById('customSongFile');
+  
+  if (uploadBtn && fileInput) {
+    uploadBtn.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', handleCustomSongFile);
+  }
+  
+  // Câmara
+  const cameraBtn = document.getElementById('takePictureBtn');
+  const cameraInput = document.getElementById('customSongCamera');
+  
+  if (cameraBtn && cameraInput) {
+    cameraBtn.addEventListener('click', () => cameraInput.click());
+    cameraInput.addEventListener('change', handleCustomSongFile);
+  }
+  
+  // Remover ficheiro
+  const removeBtn = document.getElementById('removeFileBtn');
+  if (removeBtn) {
+    removeBtn.addEventListener('click', () => {
+      fileInput.value = '';
+      cameraInput.value = '';
+      document.getElementById('filePreview').style.display = 'none';
+      delete window.customSongFileData;
+    });
+  }
+  
+  // Submit form
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      saveCustomSong();
+    });
+  }
+}
+
+function handleCustomSongFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  
+  // Validação de tamanho
+  if (file.size > 5 * 1024 * 1024) {
+    alert('Ficheiro muito grande! Máximo 5MB.');
+    e.target.value = '';
+    return;
+  }
+  
+  // Preview
+  document.getElementById('fileName').textContent = file.name;
+  document.getElementById('fileSize').textContent = formatFileSize(file.size);
+  document.getElementById('filePreview').style.display = 'block';
+  
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    window.customSongFileData = {
+      name: file.name,
+      type: file.type,
+      data: e.target.result
+    };
+    
+    // Preview de imagem
+    if (file.type.startsWith('image/')) {
+      const img = document.getElementById('imagePreview');
+      img.src = e.target.result;
+      img.style.display = 'block';
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function formatFileSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
+function saveCustomSong() {
+  const title = document.getElementById('customSongTitle').value.trim();
+  const section = document.getElementById('customSongSection').value;
+  const author = document.getElementById('customSongAuthor').value.trim();
+  const notes = document.getElementById('customSongNotes').value.trim();
+  
+  if (!title) {
+    alert('Por favor indique o título.');
+    return;
+  }
+  
+  loadCustomSongs();
+  
+  const song = {
+    id: Date.now(),
+    title,
+    section,
+    author,
+    notes,
+    file: window.customSongFileData || null,
+    createdAt: new Date().toISOString()
+  };
+  
+  customSongs.push(song);
+  saveCustomSongs();
+  
+  document.getElementById('customSongModal').style.display = 'none';
+  document.getElementById('customSongForm').reset();
+  document.getElementById('filePreview').style.display = 'none';
+  delete window.customSongFileData;
+  
+  populateProgramSelects();
+  renderCustomSongs();
+  renderSongsTable();
+  alert('Cântico personalizado guardado!');
+}
+
+window.viewCustomSong = function(id) {
+  loadCustomSongs();
+  const song = customSongs.find(s => s.id === id);
+  if (!song) return;
+  
+  const modal = document.getElementById('viewCustomSongModal');
+  
+  document.getElementById('viewCustomSongTitle').textContent = song.title;
+  document.getElementById('viewSongSection').textContent = song.section || '-';
+  document.getElementById('viewSongAuthor').textContent = song.author || '-';
+  
+  if (song.notes) {
+    document.getElementById('viewSongNotes').textContent = song.notes;
+    document.getElementById('viewSongNotesContainer').style.display = 'block';
+  } else {
+    document.getElementById('viewSongNotesContainer').style.display = 'none';
+  }
+  
+  if (song.file) {
+    document.getElementById('viewSongFileContainer').style.display = 'block';
+    
+    // Download
+    document.getElementById('downloadSongFileBtn').onclick = () => {
+      const a = document.createElement('a');
+      a.href = song.file.data;
+      a.download = song.file.name;
+      a.click();
+    };
+    
+    // Abrir em nova aba
+    document.getElementById('openSongFileBtn').onclick = () => {
+      window.open(song.file.data, '_blank');
+    };
+    
+    // Viewer
+    if (song.file.type === 'application/pdf') {
+      document.getElementById('pdfViewer').style.display = 'block';
+      document.getElementById('imageViewer').style.display = 'none';
+      document.getElementById('pdfEmbed').src = song.file.data;
+    } else if (song.file.type.startsWith('image/')) {
+      document.getElementById('imageViewer').style.display = 'block';
+      document.getElementById('pdfViewer').style.display = 'none';
+      document.getElementById('imageView').src = song.file.data;
+    }
+  } else {
+    document.getElementById('viewSongFileContainer').style.display = 'none';
+  }
+  
+  modal.style.display = 'flex';
+};
+
+window.deleteCustomSong = function(id) {
+  if (!confirm('Eliminar este cântico personalizado?')) return;
+  
+  loadCustomSongs();
+  customSongs = customSongs.filter(s => s.id !== id);
+  saveCustomSongs();
+  populateProgramSelects();
+  renderCustomSongs();
+  renderSongsTable();
+};
+
+// Fechar modal de visualização
+document.addEventListener('click', (e) => {
+  if (e.target.id === 'viewCustomSongClose') {
+    document.getElementById('viewCustomSongModal').style.display = 'none';
+  }
+});
+
+
+function renderVideos(){const c=document.getElementById('videosContainer');if(!c)return;const q=(document.getElementById('videoSearch')?.value||'').toLowerCase(),sec=(document.getElementById('videoSection')?.value||'').toLowerCase();const arr=(songs||[]).filter(s=>(s.Video||s.video)&&(!q||getSongTitle(s).toLowerCase().includes(q))&&(!sec||String(s.Tema||'').toLowerCase().includes(sec)));c.innerHTML=arr.map(s=>'<div class="card"><b>'+getSongTitle(s)+'</b><div class="small">'+getSongAuthor(s)+'</div><p><a class="btn" href="'+(s.Video||s.video)+'" target="_blank">▶️ Abrir vídeo</a></p></div>').join('')||'<p class="small muted">Não há vídeos associados ao catálogo atual.</p>';}
+
+// Referências litúrgicas verificadas no Secretariado Nacional de Liturgia (Portugal).
+window.CORO_READINGS_2026={
+ '2026-09-06':{l1:'Ez 33, 7-9; Sl 94 (95), 1-2. 6-7. 8-9',l2:'Rm 13, 8-10',ev:'Mt 18, 15-20',refrain:'Não fecheis os vossos corações'},
+ '2026-09-13':{l1:'Sir 27, 33 – 28, 9; Sl 102 (103), 1-2. 3-4. 9-10. 11-12',l2:'Rm 14, 7-8',ev:'Mt 18, 21-35',refrain:'O Senhor é clemente e compassivo, paciente e cheio de bondade'},
+ '2026-09-20':{l1:'Is 55, 6-9; Sl 144 (145), 2-3. 8-9. 17-18',l2:'Flp 1, 20c-24. 27a',ev:'Mt 20, 1-16a',refrain:'O Senhor está perto de quantos O invocam'},
+ '2026-09-27':{l1:'Ez 18, 25-28; Sl 24 (25), 4-5. 6-7. 8-9',l2:'Flp 2, 1-11 ou Flp 2, 1-5',ev:'Mt 21, 28-32',refrain:'Lembrai-Vos, Senhor, da vossa misericórdia'},
+ '2026-10-04':{l1:'Is 5, 1-7; Sl 79 (80), 9 e 12. 13-14. 15-16. 19-20',l2:'Flp 4, 6-9',ev:'Mt 21, 33-43',refrain:'A vinha do Senhor é a casa de Israel'},
+ '2026-10-11':{l1:'Is 25, 6-10a; Sl 22 (23), 1-3a. 3b-4. 5. 6',l2:'Flp 4, 12-14. 19-20',ev:'Mt 22, 1-14 ou Mt 22, 1-10',refrain:'Habitarei para sempre na casa do Senhor'}
+};
+
+function initSongEditModal(){
+  const modal=document.getElementById('songEditModal');
+  const partSel=document.getElementById('songEditPartSelect');
+  if(partSel) partSel.innerHTML=PROGRAM_PARTS.map(p=>`<option value="${p.id}">${escSmart(p.label)}</option>`).join('');
+  document.getElementById('songEditSaveInsertBtn')?.addEventListener('click',()=>{
+    const part=partSel?.value, title=document.getElementById('songEditTitle')?.value.trim();
+    if(!part||!title){alert('Indique o título e a secção.');return;}
+    const sel=document.getElementById(part); if(sel){let opt=Array.from(sel.options).find(o=>o.value===title);if(!opt){opt=document.createElement('option');opt.value=title;opt.textContent=title;sel.appendChild(opt);}sel.value=title;sel.dispatchEvent(new Event('change'));}
+    if(document.getElementById('songEditLyrics')?.value) localStorage.setItem('coroLyrics_'+normSmart(title),document.getElementById('songEditLyrics').value);
+    modal.hidden=true;
+  });
+  document.getElementById('lyricsModalSave')?.addEventListener('click',()=>{
+    const title=document.getElementById('lyricsModalTitle')?.textContent?.trim();
+    const editor=document.getElementById('lyricsEditor');
+    if(title && editor){const song=getSongByTitle(title);saveSongLyrics(title,getSongAuthor(song),editor.innerHTML||editor.textContent||'');}
+    const m=document.getElementById('lyricsModal'); if(m)m.style.display='none';
+  });
+}
+
+function initLegacyModals(){
+  document.getElementById('leafletViewClose')?.addEventListener('click',()=>{const m=document.getElementById('leafletViewModal');if(m)m.style.display='none';});
+  document.getElementById('leafletViewPrint')?.addEventListener('click',()=>{const c=document.getElementById('leafletViewContent');if(c)printHtml(c.innerHTML,'Folheto');});
+  document.getElementById('lyricsModalCancel')?.addEventListener('click',()=>{const m=document.getElementById('lyricsModal');if(m)m.style.display='none';});
+  document.getElementById('lyricsSearchCloseBtn')?.addEventListener('click',()=>{const m=document.getElementById('lyricsSearchBackdrop');if(m)m.hidden=true;});
+  document.getElementById('songEditCancelBtn')?.addEventListener('click',()=>{const m=document.getElementById('songEditModal');if(m)m.hidden=true;});
+}
+
+// ============================================
+// FUNCIONALIDADES DA INTERFACE / COMPATIBILIDADE
+// ============================================
+
+function initProgramForm(){
+  const form=document.getElementById('programForm');
+  if(form) form.addEventListener('submit',e=>{e.preventDefault();saveProgram();});
+}
+
+function getProgramForDate(date){
+  loadHistory();
+  return history.find(h=>h.date===date)||null;
+}
+
+function populateRehearsalPrograms(){
+  const sel=document.getElementById('rehearsalProgram'); if(!sel)return;
+  loadHistory();
+  const current=sel.value;
+  sel.innerHTML='<option value="">— escolher domingo —</option>'+history.map((h,i)=>`<option value="${i}">${escSmart(h.date)} — ${escSmart(h.title||'Programa')}</option>`).join('');
+  if(current)sel.value=current;
+}
+
+function buildRehearsalMessage(){
+  const sel=document.getElementById('rehearsalProgram');
+  const date=document.getElementById('rehearsalDate')?.value||'';
+  const time=document.getElementById('rehearsalTime')?.value||'';
+  const place=document.getElementById('rehearsalPlace')?.value||'';
+  const notes=document.getElementById('rehearsalNotes')?.value||'';
+  loadHistory();
+  const record=(sel&&sel.value!==''?history[Number(sel.value)]:null)||getProgramForDate(date);
+  if(!record) return {record:null,text:'Selecione um programa/domingo.'};
+  const lines=[`🎵 Ensaio — ${record.title||'Programa'}`,record.date?`📅 Celebração: ${new Date(record.date+'T00:00:00').toLocaleDateString('pt-PT')}`:'',time?`🕒 Hora: ${time}`:'',place?`📍 Local: ${place}`:'','',...PROGRAM_PARTS.filter(p=>record.program?.[p.id]).map(p=>`${p.label}: ${record.program[p.id]}`),notes?'':null,notes?`\n📝 ${notes}`:''].filter(Boolean);
+  return {record,text:lines.join('\n')};
+}
+
+function initRehearsal(){
+  populateRehearsalPrograms();
+  const date=document.getElementById('rehearsalDate');
+  if(date && !date.value){const d=new Date(); d.setDate(d.getDate()+1); date.value=d.toISOString().split('T')[0];}
+  document.getElementById('rehearsalWhatsAppBtn')?.addEventListener('click',()=>{const r=buildRehearsalMessage(); if(!r.record){alert(r.text);return;} window.open('https://wa.me/?text='+encodeURIComponent(r.text),'_blank','noopener');});
+  document.getElementById('rehearsalEmailBtn')?.addEventListener('click',()=>{const r=buildRehearsalMessage(); if(!r.record){alert(r.text);return;} const subject=encodeURIComponent('Ensaio — '+(r.record.title||'Programa')); window.location.href=`mailto:?subject=${subject}&body=${encodeURIComponent(r.text)}`;});
+}
+
+function initClearActions(){
+  document.getElementById('clearAllHistoryBtn')?.addEventListener('click',()=>{
+    if(!confirm('Eliminar TODO o histórico de domingos guardados neste dispositivo?'))return;
+    localStorage.removeItem('coroHistory'); localStorage.removeItem('coroSongUsage'); localStorage.removeItem('coroSongUsage_v1'); history=[]; songUsageHistory=[]; renderHistory(); renderCalendar(); populateRehearsalPrograms(); renderSongsTable(); alert('Histórico eliminado.');
+  });
+  document.getElementById('clearAllLeafletsBtn')?.addEventListener('click',()=>{
+    if(!confirm('Eliminar TODOS os folhetos guardados neste dispositivo?'))return;
+    localStorage.removeItem('coroLeaflets'); savedLeaflets=[]; renderSavedLeaflets(); alert('Folhetos eliminados.');
+  });
+}
+
+function initLegacyProgramButtons(){
+  document.querySelectorAll('.program-lyrics-btn').forEach(btn=>btn.addEventListener('click',()=>{
+    const part=btn.dataset.partId, title=document.getElementById(part)?.value;
+    if(!title){alert('Escolha primeiro um cântico.');return;}
+    const modal=document.getElementById('programLyricsModal');
+    if(!modal)return;
+    const titleEl=document.getElementById('programLyricsModalTitle'); const songEl=document.getElementById('programLyricsModalSong'); const ta=document.getElementById('programLyricsTextarea');
+    if(titleEl)titleEl.textContent='Editar letra — '+title; if(songEl)songEl.textContent=title;
+    const song=getSelectedSongForPart(part)||getSongByTitle(title); const lyrics=getSongLyrics(song||title); if(ta)ta.value=lyrics;
+    const online=document.getElementById('programLyricsOnline'); if(online) online.innerHTML=getLyricsSourceHtml(song||title,getSongAuthor(song));
+    modal.hidden=false; modal.dataset.partId=part;
+  }));
+  document.getElementById('programLyricsCancelBtn')?.addEventListener('click',()=>{document.getElementById('programLyricsModal').hidden=true;});
+  document.getElementById('programLyricsSaveBtn')?.addEventListener('click',()=>{const modal=document.getElementById('programLyricsModal'),part=modal?.dataset.partId,title=document.getElementById(part)?.value,ta=document.getElementById('programLyricsTextarea');if(!modal||!title)return;const song=getSelectedSongForPart(part)||getSongByTitle(title); saveSongLyrics(title,getSongAuthor(song),ta?.value||'');modal.hidden=true;alert('Letra guardada neste dispositivo.');});
+  document.querySelectorAll('.program-media-btn').forEach(btn=>btn.addEventListener('click',()=>{
+    const title=document.getElementById(btn.dataset.partId)?.value; if(!title){alert('Escolha primeiro um cântico.');return;}
+    const song=(songs||[]).find(s=>normSmart(getSongTitle(s))===normSmart(title));
+    const url=song?.Video||song?.video||'';
+    if(url) window.open(url,'_blank','noopener'); else alert('Este cântico não tem vídeo associado no catálogo.');
+  }));
+}
+
+function buildAssemblyLeaflet(includeLyrics=true){
+  const record=collectProgramFromForm();
+  let html=buildLeafletHtml(record);
+  if(!includeLyrics){return html;}
+  const parts=PROGRAM_PARTS.filter(p=>record.program[p.id]);
+  const lyrics=parts.map(p=>{const t=record.program[p.id], song=getSelectedSongForPart(p.id)||getSongByTitle(t), l=getSongLyrics(song||t);return l?`<div style="margin:1rem 0"><strong>${escSmart(p.label)} — ${escSmart(t)}</strong><div style="white-space:pre-wrap;margin-top:.4rem">${escSmart(l)}</div></div>`:''}).join('');
+  return html.replace('</div></div>',lyrics+'</div></div>');
+}
+function initAssemblyButtons(){
+  document.getElementById('assemblySheetBtn')?.addEventListener('click',()=>printHtml(buildAssemblyLeaflet(true),'Folheto da assembleia'));
+  document.getElementById('assemblySheetBtnNoLyrics')?.addEventListener('click',()=>printHtml(buildAssemblyLeaflet(false),'Folheto da assembleia'));
+}
+function printHtml(content,title='Coro Litúrgico'){
+  const w=window.open('','_blank','width=900,height=800'); if(!w){alert('O navegador bloqueou a janela de impressão. Permita pop-ups para este site.');return;}
+  w.document.write(`<!doctype html><html lang="pt"><head><meta charset="utf-8"><title>${escSmart(title)}</title><style>body{font-family:Arial,sans-serif;padding:20mm;line-height:1.5} @media print{body{padding:10mm}}</style></head><body>${content}</body></html>`);w.document.close();w.focus();setTimeout(()=>w.print(),250);
+}
+
+function initPartituraSearch(){
+  const input=document.getElementById('partituraSearch'); if(!input)return;
+  let box=document.getElementById('partituraSearchResults');
+  if(!box){box=document.createElement('div');box.id='partituraSearchResults';box.className='small';input.parentElement?.appendChild(box);}
+  const render=()=>{const q=normSmart(input.value);if(!q){box.innerHTML='';return;}const arr=(songs||[]).filter(s=>normSmart(getSongTitle(s)).includes(q)||normSmart(s.Partitura||'').includes(q)).slice(0,20);box.innerHTML=arr.length?'<div style="margin-top:.75rem">'+arr.map(s=>{const p=s.Partitura||'';return `<div class="card" style="padding:.5rem;margin:.35rem 0"><b>${escSmart(getSongTitle(s))}</b> — ${escSmart(getSongAuthor(s)||'')} ${p?`<a href="${escSmart(p)}" target="_blank" rel="noopener">📄 Abrir</a>`:'<span class="muted">⚠️ Partitura não associada</span>'}</div>`}).join('')+'</div>':'<p class="muted">Nenhum resultado no catálogo local.</p>';};
+  input.addEventListener('input',render);
+}
+
+// ============================================
+// INICIALIZAÇÃO
+// ============================================
+
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('🎵 Gestão Litúrgica - Iniciando...');
+  
+  // Sistemas principais
+  initTabs();
+  initTheme();
+  initDashboardV3();
+  initCalendar();
+  updateDashboard();
+  
+  // Programa
+  const dateInput = document.getElementById('date');
+  if (dateInput) {
+    // Define data de hoje
+    dateInput.value = new Date().toISOString().split('T')[0];
+    updateLiturgicalFromDate();
+    
+    dateInput.addEventListener('change', ()=>{updateLiturgicalFromDate();renderProgramAssistant();});
+  }
+  
+  // Atualiza preview ao mudar qualquer campo
+  PROGRAM_PARTS.forEach(part => {
+    const input = document.getElementById(part.id);
+    if (input) {
+      input.addEventListener('change', ()=>{ updatePreview(); renderProgramAssistant(); });
+      input.addEventListener('input', ()=>renderProgramAssistant());
+    }
+  });
+  
+  // Guardar programa pelo submit real do formulário
+  initProgramForm();
+
+  // Imagem do domingo
+  initSundayImage();
+  
+  // Catálogo
+  loadCsvFromGoogleSheets();
+  window.setInterval(()=>{ if(document.visibilityState==='visible') loadCsvFromGoogleSheets(true); }, 300000);
+  document.getElementById('videoSearch')?.addEventListener('input',renderVideos); document.getElementById('videoSection')?.addEventListener('change',renderVideos);
+  ['songSearch','filterAuthor','filterTheme'].forEach(id=>document.getElementById(id)?.addEventListener('input',renderSongsTable));
+  ['filterAuthor','filterTheme'].forEach(id=>document.getElementById(id)?.addEventListener('change',renderSongsTable));
+  
+  // Folhetos
+  initLeafletModal();
+  initAssemblyButtons();
+  initLegacyProgramButtons();
+  initCatalogControls();
+  initPartituraSearch();
+  initRehearsal();
+  initClearActions();
+  initLegacyModals();
+  initSongEditModal();
+  
+  // Cânticos personalizados
+  loadCustomSongs();
+  initCustomSongs();
+  setupSmartSelectors();
+  PROGRAM_PARTS.forEach(p=>{
+    const el=document.getElementById(p.id);
+    if(el){el.dataset.selectedAuthor=el.selectedOptions?.[0]?.dataset?.author||el.dataset.selectedAuthor||'';autoApplyLyricsToPart(p.id);}
+  });
+  setupProgramAssistant();
+  loadHistory();
+  populateRehearsalPrograms();
+  console.log('✅ Aplicação carregada!');
+});

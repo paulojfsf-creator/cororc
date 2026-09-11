@@ -2014,6 +2014,73 @@ input,select,textarea,.btn,.tabs button,.liturgical-pill{border-radius:0!importa
 @media(max-width:800px){.leaflet-editor-list{grid-template-columns:1fr}.leaflet-editor-toolbar{align-items:flex-start;flex-direction:column}.leaflet-editor-actions{justify-content:flex-start}}
 @media print{.leaflet-print-root{margin:0;padding:9mm}.leaflet-print-cols{height:246mm}}
 </style>
+
+<style id="coro-more-nav-v41">
+/* 4.1 — menu Mais funcional: dropdown real, não ocupa uma linha fixa */
+main > .card:has(.clean-nav){position:relative!important;}
+.tabs-more[hidden]{display:none!important;}
+.tabs-more{
+  position:absolute!important;
+  top:4.1rem!important;
+  right:1rem!important;
+  z-index:1200!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  gap:0!important;
+  min-width:190px!important;
+  padding:.35rem!important;
+  margin:0!important;
+  border:1px solid var(--clean-line)!important;
+  background:#fff!important;
+  box-shadow:0 10px 28px rgba(23,32,51,.12)!important;
+}
+.tabs-more button{
+  width:100%!important;
+  text-align:left!important;
+  border:0!important;
+  border-bottom:1px solid #edf0f3!important;
+  background:transparent!important;
+  border-radius:0!important;
+  padding:.65rem .75rem!important;
+  color:var(--clean-text)!important;
+  font-size:.78rem!important;
+}
+.tabs-more button:last-of-type{border-bottom:0!important;}
+.tabs-more button:hover{background:#f5f8fb!important;color:var(--clean-accent)!important;}
+.tabs-more input{display:none!important;}
+:root.dark .tabs-more{background:#171b21!important;border-color:#303743!important;box-shadow:0 10px 28px rgba(0,0,0,.35)!important;}
+:root.dark .tabs-more button{border-color:#292f38!important;color:#dbe2ea!important;}
+:root.dark .tabs-more button:hover{background:#202630!important;}
+@media(max-width:768px){
+  .tabs-more{top:4rem!important;right:.5rem!important;left:.5rem!important;min-width:0!important;}
+}
+
+/* Coro Litúrgico 4.3 — editor e impressão inteligente */
+.leaflet-editor-toolbar-main{display:grid;gap:.55rem;min-width:0}
+.leaflet-image-tools{display:flex;align-items:center;gap:.45rem;flex-wrap:wrap;font-size:.75rem}
+.leaflet-image-tools input[type=file]{max-width:230px;font-size:.72rem}
+.leaflet-editor-image-preview{width:44px;height:32px;object-fit:cover;border:1px solid var(--v4-line);background:#fff}
+.leaflet-fit-notice{font-size:.7rem;padding:.42rem .55rem;border-left:3px solid #6b7280;background:#f7f9fb;color:#4b5563}
+.leaflet-fit-notice.ok{border-left-color:#2f855a}.leaflet-fit-notice.info{border-left-color:#b7791f}.leaflet-fit-notice.warn{border-left-color:#c53030}
+.leaflet-editor-item-head{align-items:flex-start}
+.leaflet-editor-fields{display:grid;gap:.28rem;min-width:0;flex:1}
+.leaflet-editor-title-input,.leaflet-editor-author-input{width:100%;box-sizing:border-box;border:1px solid var(--v4-line);padding:.42rem .5rem;background:#fff;border-radius:0!important;font-family:inherit}
+.leaflet-editor-title-input{font-size:.86rem;font-weight:700}.leaflet-editor-author-input{font-size:.72rem;color:#555}
+.leaflet-editor-item-actions{display:flex;align-items:center;gap:.25rem;flex-wrap:wrap;justify-content:flex-end}
+.btn.tiny{padding:.3rem .45rem;font-size:.7rem;min-height:30px}
+.leaflet-print-grid{display:grid;grid-template-columns:1fr 1fr;gap:7mm;height:246mm;overflow:hidden}
+.leaflet-print-col{min-width:0}
+.leaflet-print-song{break-inside:avoid;page-break-inside:avoid}
+.leaflet-print-root.compact .leaflet-print-song{margin-bottom:2mm}
+.leaflet-print-root.compact .leaflet-print-song h2{font-size:8.1pt}
+.leaflet-print-root.compact .leaflet-print-song .lyrics{font-size:6.7pt;line-height:1.18}
+.leaflet-print-root.ultra-compact .leaflet-print-song{margin-bottom:1.5mm}
+.leaflet-print-root.ultra-compact .leaflet-print-song h2{font-size:7.6pt}
+.leaflet-print-root.ultra-compact .leaflet-print-song .lyrics{font-size:6.2pt;line-height:1.12}
+@media(max-width:800px){.leaflet-editor-item-actions{justify-content:flex-start}.leaflet-editor-toolbar-main{width:100%}}
+</style>
+
 </head>
 <body>
 <header>
@@ -3034,9 +3101,15 @@ input,select,textarea,.btn,.tabs button,.liturgical-pill{border-radius:0!importa
       <button type="button" class="btn secondary small" id="leafletEditorClose">Fechar</button>
     </div>
     <div class="leaflet-editor-toolbar">
-      <div>
-        <strong id="leafletEditorCelebration">Folheto da celebração</strong>
-        <span id="leafletEditorMeta" class="small muted"></span>
+      <div class="leaflet-editor-toolbar-main">
+        <div><strong id="leafletEditorCelebration">Folheto da celebração</strong><span id="leafletEditorMeta" class="small muted"></span></div>
+        <div class="leaflet-image-tools">
+          <span class="small muted">Imagem:</span>
+          <input type="file" id="leafletEditorImage" accept="image/*">
+          <button type="button" class="btn secondary tiny" id="leafletEditorRemoveImage">Remover</button>
+          <img id="leafletEditorImagePreview" class="leaflet-editor-image-preview" alt="Pré-visualização da imagem" hidden>
+        </div>
+        <div id="leafletEditorFitNotice" class="leaflet-fit-notice ok">✓ O conteúdo está dentro de um volume confortável para A4 em duas colunas.</div>
       </div>
       <div class="leaflet-editor-actions">
         <button type="button" class="btn secondary small" id="leafletEditorReset">Repor letras originais</button>

@@ -37,7 +37,7 @@ let partLyricsOverrides = {};
 // ============================================
 
 function initTabs() {
-  const tabButtons = document.querySelectorAll('.tabs button[data-tab]');
+  const tabButtons = document.querySelectorAll('.tabs button[data-tab], .tabs-more button[data-tab]');
   const tabContents = document.querySelectorAll('section.tab');
   
   tabButtons.forEach(button => {
@@ -98,8 +98,22 @@ function initMoreNav(){
     box.hidden=open;
   });
   box.querySelectorAll('button[data-tab]').forEach(b=>b.addEventListener('click',()=>{
-    box.hidden=true;btn.setAttribute('aria-expanded','false');
+    box.hidden=true;
+    btn.setAttribute('aria-expanded','false');
   }));
+  document.addEventListener('click',e=>{
+    if(!box.hidden && !box.contains(e.target) && !btn.contains(e.target)){
+      box.hidden=true;
+      btn.setAttribute('aria-expanded','false');
+    }
+  });
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape' && !box.hidden){
+      box.hidden=true;
+      btn.setAttribute('aria-expanded','false');
+      btn.focus();
+    }
+  });
 }
 
 function renderPeople(){
@@ -1808,7 +1822,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ============================================
-// CORO LITÚRGICO 4.0 — FOLHETO A4 EDITÁVEL
+// CORO LITÚRGICO 4.3 — FOLHETO A4 INTELIGENTE
 // ============================================
 let leafletV4Draft = null;
 
@@ -1818,46 +1832,79 @@ function leafletV4CurrentImage(){
 
 function leafletV4DefaultItems(includeLyrics=true){
   const record=collectProgramFromForm();
-  return PROGRAM_PARTS.filter(p=>record.program?.[p.id]).map(p=>{
+  return PROGRAM_PARTS.filter(p=>record.program?.[p.id]).map((p,index)=>{
     const title=record.program[p.id]||'';
     const song=getSelectedSongForPart(p.id)||getSongByTitle(title);
     const author=record.programAuthors?.[p.id] || getSongAuthor(song);
     const lyrics=includeLyrics ? getSongLyrics(song||title) : '';
-    return {partId:p.id,moment:p.label,title,author,lyrics,include:true};
+    return {id:`leaflet-${p.id}-${index}`,partId:p.id,moment:p.label,title,author,lyrics,include:true};
   });
+}
+
+function leafletV4RenderList(){
+  const list=document.getElementById('leafletEditorList');
+  if(!list||!leafletV4Draft)return;
+  const items=leafletV4Draft.items||[];
+  list.innerHTML=items.length ? items.map((item,i)=>`
+    <article class="leaflet-editor-item ${item.include?'':'is-off'}" data-index="${i}">
+      <div class="leaflet-editor-item-head">
+        <div class="leaflet-editor-fields">
+          <input class="leaflet-editor-title-input" value="${escSmart(item.title||'')}" aria-label="Título do cântico">
+          <input class="leaflet-editor-author-input" value="${escSmart(item.author||'')}" aria-label="Autor do cântico" placeholder="Autor">
+          <div class="leaflet-editor-meta">${escSmart(item.moment)}</div>
+        </div>
+        <div class="leaflet-editor-item-actions">
+          <label class="leaflet-editor-check"><input type="checkbox" class="leaflet-include" ${item.include?'checked':''}> incluir</label>
+          <button type="button" class="btn secondary tiny" data-move-up="${i}" ${i===0?'disabled':''} aria-label="Mover para cima">↑</button>
+          <button type="button" class="btn secondary tiny" data-move-down="${i}" ${i===items.length-1?'disabled':''} aria-label="Mover para baixo">↓</button>
+        </div>
+      </div>
+      <textarea class="leaflet-lyrics" aria-label="Letra de ${escSmart(item.title||'cântico')}">${escSmart(item.lyrics||'')}</textarea>
+    </article>`).join('') : '<div class="leaflet-editor-empty">Não existem cânticos preenchidos no programa.</div>';
+
+  list.querySelectorAll('.leaflet-editor-item').forEach((el,i)=>{
+    el.querySelector('.leaflet-lyrics')?.addEventListener('input',e=>{leafletV4Draft.items[i].lyrics=e.target.value;});
+    el.querySelector('.leaflet-editor-title-input')?.addEventListener('input',e=>{leafletV4Draft.items[i].title=e.target.value;});
+    el.querySelector('.leaflet-editor-author-input')?.addEventListener('input',e=>{leafletV4Draft.items[i].author=e.target.value;});
+    el.querySelector('.leaflet-include')?.addEventListener('change',e=>{leafletV4Draft.items[i].include=e.target.checked;el.classList.toggle('is-off',!e.target.checked);});
+  });
+  list.querySelectorAll('[data-move-up]').forEach(b=>b.addEventListener('click',()=>leafletV4Move(Number(b.dataset.moveUp),-1)));
+  list.querySelectorAll('[data-move-down]').forEach(b=>b.addEventListener('click',()=>leafletV4Move(Number(b.dataset.moveDown),1)));
+  leafletV4UpdateFitNotice();
+}
+
+function leafletV4Move(index,delta){
+  if(!leafletV4Draft?.items)return;
+  const target=index+delta;
+  if(target<0||target>=leafletV4Draft.items.length)return;
+  const [item]=leafletV4Draft.items.splice(index,1);
+  leafletV4Draft.items.splice(target,0,item);
+  leafletV4RenderList();
+}
+
+function leafletV4UpdateFitNotice(){
+  const box=document.getElementById('leafletEditorFitNotice');
+  if(!box||!leafletV4Draft)return;
+  const items=(leafletV4Draft.items||[]).filter(x=>x.include);
+  const chars=items.reduce((n,x)=>n+(x.title?.length||0)+(x.author?.length||0)+(x.lyrics?.length||0),0);
+  box.textContent = chars>9000 ? '⚠️ Conteúdo muito extenso para uma única A4. Considere retirar cânticos ou algumas estrofes.' : chars>6500 ? 'ℹ️ O folheto está bastante preenchido. A aplicação reduzirá automaticamente a tipografia para tentar caber numa A4.' : '✓ O conteúdo está dentro de um volume confortável para A4 em duas colunas.';
+  box.className='leaflet-fit-notice '+(chars>9000?'warn':chars>6500?'info':'ok');
 }
 
 function openLeafletEditor(includeLyrics=true){
   const modal=document.getElementById('leafletEditorModal');
-  const list=document.getElementById('leafletEditorList');
   const record=collectProgramFromForm();
-  if(!modal||!list)return;
+  if(!modal)return;
   if(!record.date){alert('Preencha primeiro a data da celebração.');return;}
   const info=getLiturgicalInfo(record.date)||{};
-  leafletV4Draft={
-    record:JSON.parse(JSON.stringify(record)),
-    image:leafletV4CurrentImage(),
-    items:leafletV4DefaultItems(includeLyrics)
-  };
+  leafletV4Draft={record:JSON.parse(JSON.stringify(record)),image:leafletV4CurrentImage(),items:leafletV4DefaultItems(includeLyrics)};
   const d=new Date(record.date+'T00:00:00');
   const formatted=d.toLocaleDateString('pt-PT',{day:'numeric',month:'long',year:'numeric'});
   const c=document.getElementById('leafletEditorCelebration'); if(c)c.textContent=record.title||'Celebração';
   const m=document.getElementById('leafletEditorMeta'); if(m)m.textContent=` · ${formatted}${info.season?' · '+info.season:''}`;
-  list.innerHTML=leafletV4Draft.items.length ? leafletV4Draft.items.map((item,i)=>`
-    <div class="leaflet-editor-item" data-index="${i}">
-      <div class="leaflet-editor-item-head">
-        <div>
-          <div class="leaflet-editor-title">${escSmart(item.title)}</div>
-          <div class="leaflet-editor-meta">${escSmart(item.moment)}${item.author?' · '+escSmart(item.author):''}</div>
-        </div>
-        <label class="leaflet-editor-check"><input type="checkbox" class="leaflet-include" ${item.include?'checked':''}> incluir</label>
-      </div>
-      <textarea class="leaflet-lyrics" aria-label="Letra de ${escSmart(item.title)}">${escSmart(item.lyrics||'')}</textarea>
-    </div>`).join('') : '<div class="leaflet-editor-empty">Não existem cânticos preenchidos no programa.</div>';
-  list.querySelectorAll('.leaflet-editor-item').forEach((el,i)=>{
-    el.querySelector('.leaflet-lyrics')?.addEventListener('input',e=>{leafletV4Draft.items[i].lyrics=e.target.value;});
-    el.querySelector('.leaflet-include')?.addEventListener('change',e=>{leafletV4Draft.items[i].include=e.target.checked;el.classList.toggle('is-off',!e.target.checked);});
-  });
+  const input=document.getElementById('leafletEditorImage'); if(input)input.value='';
+  const preview=document.getElementById('leafletEditorImagePreview'); if(preview){preview.src=leafletV4Draft.image||'';preview.hidden=!leafletV4Draft.image;}
+  leafletV4RenderList();
   modal.hidden=false;
 }
 
@@ -1870,26 +1917,53 @@ function leafletV4CollectDraft(){
     if(!leafletV4Draft.items[i])return;
     const ta=el.querySelector('.leaflet-lyrics');
     const cb=el.querySelector('.leaflet-include');
+    const ti=el.querySelector('.leaflet-editor-title-input');
+    const au=el.querySelector('.leaflet-editor-author-input');
     if(ta)leafletV4Draft.items[i].lyrics=ta.value;
     if(cb)leafletV4Draft.items[i].include=cb.checked;
+    if(ti)leafletV4Draft.items[i].title=ti.value.trim();
+    if(au)leafletV4Draft.items[i].author=au.value.trim();
   });
   return leafletV4Draft;
+}
+
+function leafletV4Estimate(item){
+  const chars=(item.title?.length||0)+(item.author?.length||0)+(item.lyrics?.length||0);
+  return 10 + Math.ceil(chars/72);
+}
+
+function leafletV4SplitColumns(items){
+  const arr=items.filter(x=>x.include);
+  if(!arr.length)return [[],[]];
+  const total=arr.reduce((n,x)=>n+leafletV4Estimate(x),0);
+  let best=1,bestDiff=Infinity,acc=0;
+  for(let i=1;i<arr.length;i++){
+    acc+=leafletV4Estimate(arr[i-1]);
+    const diff=Math.abs(acc-(total-acc));
+    if(diff<bestDiff){bestDiff=diff;best=i;}
+  }
+  return [arr.slice(0,best),arr.slice(best)];
+}
+
+function leafletV4SongHtml(x){
+  return `<article class="leaflet-print-song">
+    <div class="moment">${escSmart(x.moment)}</div>
+    <h2>${escSmart(x.title||'')}</h2>
+    ${x.author?`<div class="author">${escSmart(x.author)}</div>`:''}
+    ${x.lyrics?`<div class="lyrics">${escSmart(x.lyrics)}</div>`:''}
+  </article>`;
 }
 
 function buildLeafletV4Html(draft){
   const r=draft.record||{};
   const dt=r.date?new Date(r.date+'T00:00:00').toLocaleDateString('pt-PT',{day:'numeric',month:'long',year:'numeric'}):'';
   const info=getLiturgicalInfo(r.date)||{};
-  const logo=new URL('logo.png',location.href).href;
+  const logo=new URL('logo_light.png',location.href).href;
   const image=draft.image||'';
-  const items=(draft.items||[]).filter(x=>x.include);
-  const songsHtml=items.map(x=>`<article class="leaflet-print-song">
-    <div class="moment">${escSmart(x.moment)}</div>
-    <h2>${escSmart(x.title)}</h2>
-    ${x.author?`<div class="author">${escSmart(x.author)}</div>`:''}
-    ${x.lyrics?`<div class="lyrics">${escSmart(x.lyrics)}</div>`:''}
-  </article>`).join('');
-  return `<div class="leaflet-print-root">
+  const [left,right]=leafletV4SplitColumns(draft.items||[]);
+  const total=(draft.items||[]).filter(x=>x.include).reduce((n,x)=>n+leafletV4Estimate(x),0);
+  const density=total>900? 'ultra-compact': total>650 ? 'compact' : '';
+  return `<div class="leaflet-print-root ${density}">
     <header class="leaflet-print-head">
       <img class="leaflet-print-logo" src="${escSmart(logo)}" alt="Coro Paroquial São João Batista">
       <div class="leaflet-print-title">
@@ -1899,7 +1973,10 @@ function buildLeafletV4Html(draft){
       </div>
       ${image?`<img class="leaflet-print-image" src="${escSmart(image)}" alt="Imagem da celebração">`:'<div class="leaflet-print-image" aria-hidden="true"></div>'}
     </header>
-    <main class="leaflet-print-cols">${songsHtml||'<p>Não foram selecionados cânticos para o folheto.</p>'}</main>
+    <main class="leaflet-print-grid">
+      <div class="leaflet-print-col">${left.map(leafletV4SongHtml).join('')}</div>
+      <div class="leaflet-print-col">${right.map(leafletV4SongHtml).join('')}</div>
+    </main>
     <footer class="leaflet-print-footer"><span>Coro Paroquial São João Batista de Rio Caldo</span><span>${escSmart(r.date||'')}</span></footer>
   </div>`;
 }
@@ -1917,21 +1994,20 @@ function printLeafletV4(){
   const w=window.open('','_blank','width=1000,height=850');
   if(!w){alert('O navegador bloqueou a janela de impressão. Permita pop-ups para este site.');return;}
   w.document.write(`<!doctype html><html lang="pt"><head><meta charset="utf-8"><title>Folheto — ${escSmart(draft.record.title||'Celebração')}</title><style>
-  @page{size:A4 portrait;margin:0}html,body{margin:0;padding:0;background:#fff}body{font-family:Arial,Helvetica,sans-serif}.leaflet-print-root{width:210mm;height:297mm;box-sizing:border-box;background:#fff;color:#111;padding:9mm;overflow:hidden}.leaflet-print-head{display:grid;grid-template-columns:34mm 1fr 34mm;align-items:start;gap:5mm;min-height:29mm;padding-bottom:4mm;border-bottom:1px solid #cfd5dc;margin-bottom:4mm}.leaflet-print-logo,.leaflet-print-image{width:34mm;height:27mm;object-fit:contain;display:block}.leaflet-print-image{object-fit:cover;border:1px solid #d8dde3}.leaflet-print-title{text-align:center;align-self:center;min-width:0}.leaflet-print-title h1{font-size:15pt;line-height:1.1;margin:0 0 2mm;font-weight:700}.leaflet-print-title .date{font-size:8.5pt;color:#555;margin:0}.leaflet-print-title .season{font-size:7.5pt;color:#666;margin-top:1mm}.leaflet-print-cols{column-count:2;column-gap:7mm;column-fill:auto;font-size:7.6pt;line-height:1.25;height:246mm;overflow:hidden}.leaflet-print-song{break-inside:avoid;page-break-inside:avoid;margin:0 0 3mm}.leaflet-print-song h2{font-size:8.7pt;line-height:1.12;margin:0 0 .7mm;font-weight:700}.leaflet-print-song .author{font-size:6.9pt;color:#555;margin-bottom:1mm}.leaflet-print-song .moment{font-size:6.5pt;color:#777;text-transform:uppercase;letter-spacing:.02em;margin-bottom:.8mm}.leaflet-print-song .lyrics{white-space:pre-wrap;font-size:7.2pt;line-height:1.24}.leaflet-print-footer{margin-top:2mm;padding-top:1.5mm;border-top:1px solid #d8dde3;font-size:6.5pt;color:#777;display:flex;justify-content:space-between}@media print{.leaflet-print-root{width:210mm;height:297mm}}
+  @page{size:A4 portrait;margin:0}html,body{margin:0;padding:0;background:#fff}body{font-family:Arial,Helvetica,sans-serif}.leaflet-print-root{width:210mm;height:297mm;box-sizing:border-box;background:#fff;color:#111;padding:9mm;overflow:hidden}.leaflet-print-head{display:grid;grid-template-columns:34mm 1fr 34mm;align-items:start;gap:5mm;min-height:29mm;padding-bottom:4mm;border-bottom:1px solid #cfd5dc;margin-bottom:4mm}.leaflet-print-logo,.leaflet-print-image{width:34mm;height:27mm;object-fit:contain;display:block}.leaflet-print-image{object-fit:cover;border:1px solid #d8dde3}.leaflet-print-title{text-align:center;align-self:center;min-width:0}.leaflet-print-title h1{font-size:15pt;line-height:1.1;margin:0 0 2mm;font-weight:700}.leaflet-print-title .date{font-size:8.5pt;color:#555;margin:0}.leaflet-print-title .season{font-size:7.5pt;color:#666;margin-top:1mm}.leaflet-print-grid{display:grid;grid-template-columns:1fr 1fr;gap:7mm;height:246mm;overflow:hidden}.leaflet-print-col{min-width:0}.leaflet-print-song{break-inside:avoid;page-break-inside:avoid;margin:0 0 3mm}.leaflet-print-song h2{font-size:8.7pt;line-height:1.12;margin:0 0 .7mm;font-weight:700}.leaflet-print-song .author{font-size:6.9pt;color:#555;margin-bottom:1mm}.leaflet-print-song .moment{font-size:6.5pt;color:#777;text-transform:uppercase;letter-spacing:.02em;margin-bottom:.8mm}.leaflet-print-song .lyrics{white-space:pre-wrap;font-size:7.2pt;line-height:1.24}.leaflet-print-root.compact .leaflet-print-song{margin-bottom:2mm}.leaflet-print-root.compact .leaflet-print-song h2{font-size:8.1pt}.leaflet-print-root.compact .leaflet-print-song .lyrics{font-size:6.7pt;line-height:1.18}.leaflet-print-root.ultra-compact .leaflet-print-song{margin-bottom:1.5mm}.leaflet-print-root.ultra-compact .leaflet-print-song h2{font-size:7.6pt}.leaflet-print-root.ultra-compact .leaflet-print-song .lyrics{font-size:6.2pt;line-height:1.12}.leaflet-print-footer{margin-top:2mm;padding-top:1.5mm;border-top:1px solid #d8dde3;font-size:6.5pt;color:#777;display:flex;justify-content:space-between}@media print{.leaflet-print-root{width:210mm;height:297mm}}
   </style></head><body>${content}</body></html>`);
-  w.document.close();w.focus();setTimeout(()=>w.print(),300);
+  w.document.close();w.focus();setTimeout(()=>w.print(),500);
 }
 
 function saveLeafletV4(){
   const draft=leafletV4CollectDraft(); if(!draft)return;
   loadSavedLeaflets();
   const r=draft.record||{};
-  savedLeaflets.unshift({id:Date.now(),date:r.date||'',title:r.title||'Folheto',html:buildLeafletV4Html(draft),savedAt:new Date().toISOString(),version:'4.0'});
+  savedLeaflets.unshift({id:Date.now(),date:r.date||'',title:r.title||'Folheto',html:buildLeafletV4Html(draft),savedAt:new Date().toISOString(),version:'4.3'});
   savedLeaflets=savedLeaflets.slice(0,30);saveSavedLeaflets();renderSavedLeaflets();
   alert('Folheto guardado.');
 }
 
-// 4.0 substitui a geração antiga: o utilizador edita as letras antes de imprimir/guardar.
 function initAssemblyButtons(){
   document.getElementById('assemblySheetBtn')?.addEventListener('click',()=>openLeafletEditor(true));
   document.getElementById('assemblySheetBtnNoLyrics')?.addEventListener('click',()=>openLeafletEditor(false));
@@ -1942,14 +2018,21 @@ function initAssemblyButtons(){
     if(!leafletV4Draft)return;
     const fresh=leafletV4DefaultItems(true);
     leafletV4Draft.items.forEach((x,i)=>{if(fresh[i])x.lyrics=fresh[i].lyrics;});
-    document.querySelectorAll('#leafletEditorList .leaflet-editor-item').forEach((el,i)=>{const ta=el.querySelector('.leaflet-lyrics');if(ta)ta.value=leafletV4Draft.items[i]?.lyrics||'';});
+    leafletV4RenderList();
   });
+  document.getElementById('leafletEditorImage')?.addEventListener('change',e=>{
+    const file=e.target.files?.[0]; if(!file||!leafletV4Draft)return;
+    if(!file.type.startsWith('image/')){alert('Escolha uma imagem válida.');return;}
+    if(file.size>3*1024*1024){alert('A imagem deve ter no máximo 3 MB.');return;}
+    const reader=new FileReader();
+    reader.onload=()=>{leafletV4Draft.image=reader.result;const img=document.getElementById('leafletEditorImagePreview');if(img){img.src=leafletV4Draft.image;img.hidden=false;}};
+    reader.readAsDataURL(file);
+  });
+  document.getElementById('leafletEditorRemoveImage')?.addEventListener('click',()=>{if(!leafletV4Draft)return;leafletV4Draft.image='';const i=document.getElementById('leafletEditorImage');if(i)i.value='';const img=document.getElementById('leafletEditorImagePreview');if(img){img.src='';img.hidden=true;}});
   document.getElementById('leafletEditorModal')?.addEventListener('click',e=>{if(e.target.id==='leafletEditorModal')closeLeafletEditor();});
   document.getElementById('leafletEditorSave')?.addEventListener('click',saveLeafletV4);
   document.addEventListener('keydown',e=>{if(e.key==='Escape'){const m=document.getElementById('leafletEditorModal');if(m&&!m.hidden)closeLeafletEditor();}});
 }
-
-// O botão Guardar Folheto Atual passa a usar o novo editor.
 function initLeafletsV4Save(){
   const b=document.getElementById('saveCurrentLeafletBtn');
   if(b){b.replaceWith(b.cloneNode(true));document.getElementById('saveCurrentLeafletBtn').addEventListener('click',()=>openLeafletEditor(true));}

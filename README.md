@@ -1,6 +1,6 @@
-# Coro Litúrgico 4.0 — Assistente e Folhetos A4
+# Coro Litúrgico 4.2 — Assistente e Folhetos A4
 
-## Novidades da versão 4.0
+## Novidades da versão 4.2
 
 - Assistente de preparação litúrgica e sugestões automáticas.
 - Navegação simplificada: Início, Calendário, Programas, Cânticos, Pessoas, Histórico e Mais.
@@ -17,6 +17,18 @@
 - Interface clean, tipografia simples e linhas retas.
 
 > Nota: as letras provenientes de fontes online continuam a ser abertas na fonte original; o texto integral só é usado no folheto quando existe no catálogo/localStorage ou quando é introduzido/editado pelo utilizador.
+
+---
+
+## ✨ V4.3: FOLHETO A4 INTELIGENTE
+
+- Duas colunas com divisão por blocos completos: um cântico nunca é partido entre colunas.
+- Reordenação dos cânticos no editor através de ↑ / ↓.
+- Título e autor editáveis apenas no folheto.
+- Letras editáveis apenas para o folheto, sem alterar o catálogo.
+- Escolha/substituição da imagem da celebração diretamente no editor.
+- Aviso automático sobre densidade do conteúdo e redução tipográfica quando necessário.
+- Cabeçalho A4 com logótipo e imagem da celebração.
 
 ---
 

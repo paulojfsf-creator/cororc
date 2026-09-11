@@ -49,3 +49,23 @@ A aplicação mantém os acessos às pastas do Google Drive, mas não pressupõe
 - Cada cântico selecionado no programa mostra também um atalho `🌐 Procurar no Laudate`.
 - O catálogo apresenta uma coluna própria para a fonte online da letra.
 - As letras não são copiadas automaticamente do site externo para a base local; quando a letra for fornecida/importada pelo coro, continua a poder ser guardada localmente e usada nos folhetos.
+
+## Evolução 3.4 — Integração Laudate reforçada
+- O Laudate passa a ser a fonte online principal para pesquisa de letras, em vez de depender apenas de uma pesquisa Google.
+- Foram associadas ligações diretas verificadas para vários cânticos frequentes do repertório.
+- Quando não existe correspondência direta conhecida, a aplicação abre a pesquisa interna do canticos.pt e disponibiliza também uma pesquisa ampla no Google.
+- O botão `🌐 Sugestões Laudate` abre automaticamente a página do domingo no Laudate para os Domingos do Tempo Comum, usando o número do domingo e o Ano litúrgico.
+- O indicador junto a cada cântico distingue `📖` (ligação direta conhecida) de `🌐` (pesquisa online).
+- Mantida a opção de guardar letras localmente para utilização nos folhetos.
+- Corrigido o refrão oficial associado a 06/09/2026 para `Não fecheis os vossos corações`.
+
+### Nota sobre letras
+O Coro Litúrgico continua a não copiar automaticamente textos integrais de sites externos. A integração fornece a fonte e a navegação para a página original; o texto integral pode ser guardado na aplicação quando for fornecido pelo coro ou quando o uso desse conteúdo for autorizado.
+
+
+## 3.5 — Visual clean / moderno
+- Interface redesenhada com tipografia Inter, espaços mais generosos e hierarquia simples.
+- Fundo claro, cartões discretos, bordas finas e sombras suaves.
+- Navegação compacta e moderna, mantendo as funcionalidades existentes.
+- Responsivo para computador e telemóvel.
+- Mantida a integração Laudate da versão 3.4.

@@ -61,6 +61,8 @@ function initTabs() {
       // Atualiza conteúdo se necessário
       if (targetTab === 'tab-catalogo') {
         renderSongsTable();
+      } else if (targetTab === 'tab-pessoas') {
+        renderPeople();
       } else if (targetTab === 'tab-historico') {
         renderHistory();
       } else if (targetTab === 'tab-folhetos') {
@@ -83,6 +85,30 @@ function initTabs() {
       tabButtons[0].click();
     }
   }
+}
+
+// Navegação secundária
+function initMoreNav(){
+  const btn=document.getElementById('moreNavBtn');
+  const box=document.getElementById('moreNav');
+  if(!btn||!box)return;
+  btn.addEventListener('click',()=>{
+    const open=btn.getAttribute('aria-expanded')==='true';
+    btn.setAttribute('aria-expanded',String(!open));
+    box.hidden=open;
+  });
+  box.querySelectorAll('button[data-tab]').forEach(b=>b.addEventListener('click',()=>{
+    box.hidden=true;btn.setAttribute('aria-expanded','false');
+  }));
+}
+
+function renderPeople(){
+  const people=JSON.parse(localStorage.getItem('coroPeople')||'{}');
+  const salmistas=new Set([...(people.salmistas||[])].filter(Boolean));
+  const organistas=new Set([...(people.organistas||[])].filter(Boolean));
+  (history||[]).forEach(h=>{ if(h.salmista) salmistas.add(String(h.salmista).trim()); if(h.organista) organistas.add(String(h.organista).trim()); });
+  const render=(id,set)=>{const el=document.getElementById(id); if(!el)return; const arr=[...set].sort((a,b)=>a.localeCompare(b,'pt')); el.innerHTML=arr.length?arr.map(n=>`<span class="person-chip">${escSmart(n)}</span>`).join(''):'<span class="muted">Ainda não existem pessoas registadas.</span>';};
+  render('peopleSalmistas',salmistas);render('peopleOrganistas',organistas);
 }
 
 // ============================================
@@ -194,35 +220,77 @@ function saveSongLyrics(title,author,lyrics){
 // abre a página correspondente. Se o catálogo tiver uma coluna LaudateURL,
 // essa ligação é usada diretamente; caso contrário é criada uma pesquisa
 // exacta limitada a canticos.pt.
-function getLaudateUrl(songOrTitle, author=''){
+const LAUDATE_KNOWN_LINKS = {
+  'hoje se escutardes||manuel luis':'https://www.canticos.pt/hoje-se-escutardes-mluis/',
+  'o senhor é clemente e compassivo||manuel luis':'https://www.canticos.pt/o-senhor-e-clemente-e-compassivo-mluis/',
+  'dou-vos um mandamento novo||josé pedro martins':'https://www.canticos.pt/dou-vos-um-mandamento-novo-j-p-martins/',
+  'onde há caridade e amor||manuel luis':'https://www.canticos.pt/onde-ha-caridade-e-amor-mluis/',
+  'a minha alma tem sede de vós||manuel luis':'https://www.canticos.pt/a-minha-alma-tem-sede-de-vos-mluis/',
+  'o senhor está próximo||manuel luis':'https://www.canticos.pt/o-senhor-esta-proximo-mluis/',
+  'vós abris senhor a vossa mão||manuel luis':'https://www.canticos.pt/vos-abris-senhor-as-vossas-maos-mluis/',
+  'ide por todo o mundo||manuel luis':'https://www.canticos.pt/ide-por-todo-o-mundo-mluis/'
+};
+function laudateKey(title,author=''){return normSmart(title)+'||'+normSmart(author);}
+function getLaudateDirectUrl(songOrTitle, author=''){
   const song=typeof songOrTitle==='object'?songOrTitle:getSongByTitle(songOrTitle,author);
   const title=song?getSongTitle(song):String(songOrTitle||'');
   const auth=song?getSongAuthor(song):author;
   const direct=song?.LaudateURL||song?.laudateURL||song?.LAUDATE||song?.CanticosURL||song?.canticosURL||'';
   if(String(direct).trim()) return String(direct).trim();
-  const q=[title,auth].filter(Boolean).map(v=>'\"'+String(v).trim().replace(/\"/g,'')+'\"').join(' ');
+  return LAUDATE_KNOWN_LINKS[laudateKey(title,auth)]||'';
+}
+function getLaudateUrl(songOrTitle, author=''){
+  const song=typeof songOrTitle==='object'?songOrTitle:getSongByTitle(songOrTitle,author);
+  const title=song?getSongTitle(song):String(songOrTitle||'');
+  const auth=song?getSongAuthor(song):author;
+  const direct=getLaudateDirectUrl(song||title,auth);
+  if(direct) return direct;
+  const q=[title,auth].filter(Boolean).join(' ').trim();
+  return 'https://www.canticos.pt/?s='+encodeURIComponent(q);
+}
+function getLaudateGoogleUrl(songOrTitle,author=''){
+  const song=typeof songOrTitle==='object'?songOrTitle:getSongByTitle(songOrTitle,author);
+  const title=song?getSongTitle(song):String(songOrTitle||'');
+  const auth=song?getSongAuthor(song):author;
+  const q=[title,auth].filter(Boolean).map(v=>'"'+String(v).trim().replace(/"/g,'')+'"').join(' ');
   return 'https://www.google.com/search?q='+encodeURIComponent('site:canticos.pt '+q);
 }
 function getLaudateSearchLabel(songOrTitle,author=''){
-  const song=typeof songOrTitle==='object'?songOrTitle:getSongByTitle(songOrTitle,author);
-  const direct=song?.LaudateURL||song?.laudateURL||song?.LAUDATE||song?.CanticosURL||song?.canticosURL||'';
-  return String(direct).trim()?'Abrir no Laudate':'Procurar no Laudate';
+  return getLaudateDirectUrl(songOrTitle,author)?'Abrir no Laudate':'Pesquisar no Laudate';
 }
 function openLaudateForSong(songOrTitle,author=''){
   const url=getLaudateUrl(songOrTitle,author);
-  if(!url)return;
-  window.open(url,'_blank','noopener,noreferrer');
+  if(url)window.open(url,'_blank','noopener,noreferrer');
+}
+function getLaudateSundayUrl(date){
+  const info=getLiturgicalInfo(date||'');
+  const name=String(info?.name||'');
+  const m=name.match(/DOMINGO\s+([IVXLCDM]+)\s+DO\s+TEMPO\s+COMUM/i);
+  if(!m)return '';
+  const roman=m[1].toUpperCase(), vals={I:1,V:5,X:10,L:50,C:100,D:500,M:1000};
+  let n=0,last=0;
+  for(let i=roman.length-1;i>=0;i--){const v=vals[roman[i]]||0;if(v<last)n-=v;else{n+=v;last=v;}}
+  const y=String(info.year||'A').toLowerCase();
+  const prefix=y==='a'?'ac_':y==='b'?'bc_':'cc_';
+  return 'https://www.canticos.pt/domingo/'+prefix+n+'/';
+}
+function openLaudateSundayForCurrentDate(){
+  const date=document.getElementById('date')?.value||'';
+  const url=getLaudateSundayUrl(date);
+  if(url){window.open(url,'_blank','noopener,noreferrer');return true;}
+  alert('O Laudate ainda não tem uma página dominical automática para esta celebração.');
+  return false;
 }
 function getLyricsSourceHtml(songOrTitle,author=''){
   const song=typeof songOrTitle==='object'?songOrTitle:getSongByTitle(songOrTitle,author);
   const title=song?getSongTitle(song):String(songOrTitle||'');
   if(!title)return '';
   const auth=song?getSongAuthor(song):author;
-  const label=getLaudateSearchLabel(song||title,auth);
+  const direct=getLaudateDirectUrl(song||title,auth);
   const url=getLaudateUrl(song||title,auth);
-  const safeUrl=escSmart(url);
+  const google=getLaudateGoogleUrl(song||title,auth);
   const hasLocal=!!getSongLyrics(song||title,auth);
-  return '<div class=\"lyrics-online-box\"><div><b>🌐 Fonte online</b><div class=\"small muted\">Laudate — canticos.pt · '+escSmart(auth||'autor não indicado')+'</div></div><div class=\"lyrics-online-actions\"><a class=\"btn secondary small\" href=\"'+safeUrl+'\" target=\"_blank\" rel=\"noopener noreferrer\">🔎 '+escSmart(label)+'</a>'+(hasLocal?' <span class=\"tiny muted\">✓ Letra guardada localmente</span>':'')+'</div></div>';
+  return '<div class="lyrics-online-box"><div><b>🌐 Fonte online</b><div class="small muted">Laudate — canticos.pt · '+escSmart(auth||'autor não indicado')+(direct?' · correspondência conhecida':'')+'</div></div><div class="lyrics-online-actions"><a class="btn secondary small" href="'+escSmart(url)+'" target="_blank" rel="noopener noreferrer">📖 '+escSmart(getLaudateSearchLabel(song||title,auth))+'</a><a class="btn secondary small" href="'+escSmart(google)+'" target="_blank" rel="noopener noreferrer">🔎 Pesquisa ampla</a>'+(hasLocal?' <span class="tiny muted">✓ Letra guardada localmente</span>':'')+'</div></div>';
 }
 function autoLoadLyricsForPart(partId){
   const title=document.getElementById(partId)?.value||'';
@@ -934,12 +1002,15 @@ function refreshProgramLyricsSourceIndicators(){
     if(!title){if(badge)badge.remove();return;}
     const song=getSelectedSongForPart(p.id)||getSongByTitle(title);
     if(!badge){badge=document.createElement('span');badge.className='tiny muted lyrics-online-mini';btn.parentElement?.appendChild(badge);}
-    badge.innerHTML='🌐 <a href=\"'+escSmart(getLaudateUrl(song||title,getSongAuthor(song)))+'\" target=\"_blank\" rel=\"noopener noreferrer\">'+escSmart(getLaudateSearchLabel(song||title,getSongAuthor(song)))+'</a>';
+    const la=getLaudateUrl(song||title,getSongAuthor(song));
+    const direct=!!getLaudateDirectUrl(song||title,getSongAuthor(song));
+    badge.innerHTML=(direct?'📖 ':'🌐 ')+'<a href=\"'+escSmart(la)+'\" target=\"_blank\" rel=\"noopener noreferrer\">'+escSmart(getLaudateSearchLabel(song||title,getSongAuthor(song)))+'</a>';
   });
 }
 
 function setupProgramAssistant(){
   document.getElementById('assistantFillBtn')?.addEventListener('click',fillProgramWithSuggestions);
+  document.getElementById('assistantLaudateBtn')?.addEventListener('click',openLaudateSundayForCurrentDate);
   assistantParts().forEach(p=>{
     const el=document.getElementById(p.id);
     el?.addEventListener('change',()=>{
@@ -1650,6 +1721,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Sistemas principais
   initTabs();
+  initMoreNav();
   initTheme();
   initDashboardV3();
   initCalendar();

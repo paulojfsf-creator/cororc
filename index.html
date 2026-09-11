@@ -7,7 +7,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Lato:wght@400;700&family=Noto+Serif:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600&family=Lato:wght@400;700&family=Noto+Serif:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
     :root {
@@ -1683,12 +1683,269 @@ body.lit-gold {
 
     .lyrics-online-box{display:flex;align-items:center;justify-content:space-between;gap:.8rem;flex-wrap:wrap;background:#f8fafc;border:1px solid var(--border-subtle);border-radius:12px;padding:.75rem .9rem;margin:.65rem 0 1rem}.lyrics-online-actions{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}.lyrics-online-mini{margin-left:.45rem;white-space:nowrap}.lyrics-online-mini a{color:var(--primary);text-decoration:none}.lyrics-online-mini a:hover{text-decoration:underline}
 </style>
+
+<style id="coro-clean-modern-v35">
+/* Coro Litúrgico 3.5 — clean / modern / minimal */
+:root{
+  --clean-bg:#f7f8fa;
+  --clean-card:#ffffff;
+  --clean-line:#e7e9ee;
+  --clean-text:#172033;
+  --clean-muted:#697386;
+  --clean-accent:#1769aa;
+  --clean-accent-soft:#edf5fb;
+  --clean-radius:14px;
+}
+html{scroll-behavior:smooth}
+body,
+body.liturgic-advento,body.liturgic-quaresma,body.liturgic-natal,body.liturgic-pascoa,body.liturgic-tempocomum{
+  background:var(--clean-bg)!important;
+  color:var(--clean-text)!important;
+  font-family:'Inter',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif!important;
+}
+header{
+  position:relative!important;
+  background:#fff!important;
+  color:var(--clean-text)!important;
+  padding:.75rem 1.5rem!important;
+  border-bottom:1px solid var(--clean-line)!important;
+  box-shadow:none!important;
+}
+.header-inner{max-width:1400px;margin:0 auto;flex-wrap:nowrap!important}
+.header-main{gap:.85rem}
+.header-logo{
+  height:58px!important;width:58px!important;padding:0!important;border-radius:12px!important;
+  background:#f3f6f9!important;filter:none!important;object-fit:contain!important;
+}
+.header-logo:hover{transform:none!important}
+.header-text{gap:.12rem}
+header h1{font-size:1.08rem!important;font-weight:650!important;letter-spacing:-.025em!important;white-space:normal!important}
+header p{font-size:.76rem!important;color:var(--clean-muted)!important;opacity:1!important}
+.liturgical-pill{
+  background:var(--clean-accent-soft)!important;color:var(--clean-accent)!important;
+  border:1px solid #dcebf5!important;padding:.28rem .65rem!important;font-size:.7rem!important;
+}
+.header-actions .btn-toggle{background:#f5f6f8!important;color:#4b5565!important;border:1px solid var(--clean-line)!important}
+main{max-width:1400px!important;margin:1.1rem auto 2.5rem!important;padding:0 1.25rem!important}
+.card,.dash-card{
+  background:var(--clean-card)!important;border:1px solid var(--clean-line)!important;
+  border-radius:var(--clean-radius)!important;box-shadow:0 4px 18px rgba(23,32,51,.045)!important;
+  backdrop-filter:none!important;
+}
+.card{padding:1rem 1.15rem 1.15rem!important}
+.tabs{
+  position:sticky!important;top:0!important;z-index:15!important;
+  background:rgba(247,248,250,.94)!important;backdrop-filter:blur(10px)!important;
+  border-bottom:1px solid var(--clean-line)!important;
+  padding:.5rem 0!important;margin:0 0 1rem!important;gap:.2rem!important;
+}
+.tabs button{
+  color:#667085!important;background:transparent!important;border-radius:9px!important;
+  padding:.55rem .72rem!important;font-size:.78rem!important;font-weight:550!important;
+  box-shadow:none!important;transform:none!important;
+}
+.tabs button:hover:not(.active){background:#eef1f4!important;color:var(--clean-text)!important;transform:none!important}
+.tabs button.active{background:#fff!important;color:var(--clean-accent)!important;border:1px solid var(--clean-line)!important;box-shadow:0 2px 8px rgba(23,32,51,.06)!important;transform:none!important}
+.tabs button span.dot{width:5px!important;height:5px!important;border-radius:50%!important;background:#c5cad3!important}
+.tabs button.active span.dot{background:var(--clean-accent)!important}
+label{font-size:.78rem!important;color:#4b5565!important;font-weight:600!important;letter-spacing:.005em}
+input[type="text"],input[type="number"],input[type="date"],input[type="time"],select,textarea{
+  background:#fff!important;border:1px solid #dfe3e8!important;border-radius:9px!important;
+  padding:.62rem .72rem!important;font-size:.86rem!important;color:var(--clean-text)!important;
+  box-shadow:none!important;
+}
+input:focus,select:focus,textarea:focus{border-color:#8db9d8!important;box-shadow:0 0 0 3px rgba(23,105,170,.09)!important;background:#fff!important}
+textarea{min-height:150px!important}
+.btn{
+  background:var(--clean-accent)!important;color:#fff!important;border:1px solid var(--clean-accent)!important;
+  border-radius:9px!important;padding:.58rem .82rem!important;font-size:.8rem!important;font-weight:600!important;
+  box-shadow:none!important;margin-top:.25rem!important;
+}
+.btn:hover:not(:disabled){transform:translateY(-1px)!important;box-shadow:0 5px 12px rgba(23,105,170,.16)!important}
+.btn.secondary{background:#fff!important;color:#4b5565!important;border:1px solid #dfe3e8!important}
+.btn.secondary:hover:not(:disabled){background:#f7f8fa!important;box-shadow:none!important}
+.btn.small{padding:.4rem .62rem!important;font-size:.74rem!important}
+.small{font-size:.76rem!important;color:var(--clean-muted)!important}
+.muted{color:#87909f!important;font-size:.7rem!important}
+table{font-size:.76rem!important}
+th,td{border-bottom:1px solid #edf0f3!important;padding:.58rem .45rem!important}
+th{background:#fafbfc!important;color:#697386!important;font-size:.72rem!important}
+a{color:var(--clean-accent)!important;font-size:.78rem!important}
+
+/* Dashboard */
+.dashboard-v3{gap:1rem!important;padding:.25rem 0!important}
+.dash-top,.dash-lists{gap:1rem!important}
+.dash-card{padding:1.1rem!important}
+.dash-create{background:#fff!important}
+.dash-plus{width:52px!important;height:52px!important;border-radius:13px!important;background:var(--clean-accent)!important;font-size:2rem!important}
+.dash-create h2{font-size:1.18rem!important;letter-spacing:-.025em!important}
+.dash-card h3{font-size:.92rem!important;font-weight:650!important}
+.dash-muted,.dash-event-meta,.dash-list-sub{color:var(--clean-muted)!important}
+.dash-event-title{font-size:.94rem!important}
+.dash-date{min-width:78px!important}
+.dash-date strong{font-size:1.8rem!important;font-weight:650!important}
+.dash-actions{gap:.5rem!important}
+.dash-action{background:#fff!important;border:1px solid var(--clean-line)!important;border-radius:11px!important;padding:.72rem .45rem!important}
+.dash-action:hover{background:#fafbfd!important;box-shadow:0 4px 12px rgba(23,32,51,.06)!important}
+.dash-action span{font-size:1.25rem!important}
+.dash-action b{font-size:.7rem!important;font-weight:600!important}
+.dash-list-row{padding:.62rem 0!important;border-bottom:1px solid #edf0f3!important}
+.dash-quote{background:#fff!important;border:1px solid var(--clean-line)!important;border-radius:var(--clean-radius)!important;font-family:'Noto Serif',serif!important;color:#475467!important}
+
+/* Program / assistant */
+.program-section-title{font-size:.9rem!important;font-weight:650!important;color:var(--clean-text)!important}
+#programAssistantPanel{background:#fafbfc!important;border:1px solid var(--clean-line)!important;border-radius:12px!important}
+#assistantLiveStatus{color:#2f855a!important;font-weight:600!important}
+.lyrics-online-box{background:#f8fafc!important;border:1px solid var(--clean-line)!important;border-radius:10px!important}
+
+/* Modals */
+.modal-backdrop{background:rgba(15,23,42,.42)!important;backdrop-filter:blur(3px)!important}
+.modal{border-radius:15px!important;border:1px solid var(--clean-line)!important;box-shadow:0 24px 70px rgba(15,23,42,.18)!important}
+.modal-header{border-bottom:1px solid #edf0f3!important}
+.modal-actions{border-top:1px solid #edf0f3!important}
+
+@media(max-width:768px){
+  header{padding:.65rem .9rem!important}
+  .header-inner{align-items:center!important}
+  .header-logo{height:46px!important;width:46px!important}
+  header h1{font-size:.94rem!important}
+  header p{font-size:.68rem!important}
+  main{padding:0 .75rem!important;margin-top:.65rem!important}
+  .tabs{overflow-x:auto!important;scrollbar-width:none!important;margin-bottom:.7rem!important}
+  .tabs::-webkit-scrollbar{display:none}
+  .tabs button{padding:.5rem .62rem!important;font-size:.72rem!important}
+  .dash-top,.dash-lists{grid-template-columns:1fr!important}
+  .dash-actions{grid-template-columns:repeat(3,1fr)!important}
+  .dash-action span{font-size:1.1rem!important}
+  .card{padding:.85rem!important}
+}
+
+:root.dark body{background:#11151b!important;color:#edf1f5!important}
+:root.dark header{background:#171b21!important;color:#edf1f5!important;border-color:#272d35!important}
+:root.dark .tabs{background:rgba(17,21,27,.94)!important;border-color:#272d35!important}
+:root.dark .tabs button{color:#aeb7c4!important}
+:root.dark .tabs button.active{background:#1b2129!important;color:#75b6e4!important;border-color:#303743!important}
+:root.dark .card,:root.dark .dash-card{background:#171b21!important;border-color:#292f38!important;box-shadow:none!important}
+:root.dark input[type="text"],:root.dark input[type="number"],:root.dark input[type="date"],:root.dark input[type="time"],:root.dark select,:root.dark textarea{background:#12161c!important;color:#edf1f5!important;border-color:#303743!important}
+:root.dark .btn.secondary{background:#1b2129!important;color:#d5dbe3!important;border-color:#303743!important}
+:root.dark .dash-action{background:#171b21!important;border-color:#292f38!important;color:#edf1f5!important}
+:root.dark th{background:#1b2129!important;color:#aeb7c4!important}
+
+/* 3.6 — navigation and people */
+.clean-nav{display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:.15rem!important;border-bottom:0!important;margin-bottom:.25rem!important;padding:.35rem 0!important}
+.clean-nav button{display:inline-flex!important;align-items:center!important;gap:.38rem!important;white-space:nowrap!important}
+.clean-nav .nav-icon{font-size:.9rem!important;line-height:1!important;opacity:.72}
+.clean-nav .more-toggle{margin-left:auto!important}
+.tabs-more{display:flex;align-items:center;gap:.35rem;padding:.2rem 0 .7rem;border-bottom:1px solid var(--clean-line);margin-bottom:.9rem}
+.tabs-more button{border:1px solid var(--clean-line);background:#fff;color:#697386;border-radius:8px;padding:.42rem .65rem;font:inherit;font-size:.74rem;cursor:pointer}
+.tabs-more button:hover{background:#f6f8fa;color:var(--clean-text)}
+.page-heading{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:1rem}
+.eyebrow{font-size:.66rem;letter-spacing:.12em;color:var(--clean-accent);font-weight:700}
+.page-heading h2{margin:.18rem 0 .15rem;font-size:1.45rem;letter-spacing:-.035em}
+.people-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.people-card{padding:1.1rem!important}
+.people-card-head{display:flex;align-items:center;gap:.75rem;padding-bottom:.8rem;border-bottom:1px solid #edf0f3}
+.people-symbol{width:38px;height:38px;border-radius:10px;background:var(--clean-accent-soft);color:var(--clean-accent);display:grid;place-items:center;font-weight:700}
+.people-card h3{margin:0;font-size:.92rem}.people-list{padding-top:.65rem;display:flex;flex-wrap:wrap;gap:.4rem}
+.person-chip{border:1px solid var(--clean-line);background:#fafbfc;border-radius:999px;padding:.38rem .62rem;font-size:.73rem;color:#4b5565}
+@media(max-width:768px){.clean-nav{overflow-x:auto!important}.clean-nav .more-toggle{margin-left:0!important}.people-grid{grid-template-columns:1fr}.tabs-more{overflow-x:auto;scrollbar-width:none}.tabs-more::-webkit-scrollbar{display:none}}
+:root.dark .tabs-more{border-color:#272d35}:root.dark .tabs-more button,.dark .person-chip{background:#171b21;color:#cbd3de;border-color:#303743}
+:root.dark .people-card-head{border-color:#292f38}
+</style>
+
+
+<style id="coro-clean-straight-v37">
+/* 3.7 — linhas retas, visual clean e logótipo visível */
+:root{
+  --clean-radius:0px;
+}
+.header-logo{
+  width:58px!important;height:58px!important;
+  border-radius:0!important;background:transparent!important;
+  padding:0!important;filter:none!important;object-fit:contain!important;
+}
+.card,.dash-card,#programAssistantPanel,.lyrics-online-box,.dash-quote,
+.dash-action,.btn,input[type="text"],input[type="number"],input[type="date"],input[type="time"],
+select,textarea,.modal,.tabs button,.tabs-more button,.liturgical-pill,
+.song-select-item,.assistant-empty,.modal-backdrop .modal-body,
+.leaflet-header,.calendar-day,.program-section,.person-card{
+  border-radius:0!important;
+}
+.dash-plus{border-radius:0!important}
+.dash-card,.card{box-shadow:0 2px 10px rgba(23,32,51,.035)!important}
+.btn:hover:not(:disabled),.dash-action:hover{transform:none!important}
+.tabs button.active{box-shadow:none!important}
+.modal{box-shadow:0 18px 50px rgba(15,23,42,.16)!important}
+.lyrics-online-box{border-left:3px solid var(--clean-accent)!important}
+@media(max-width:768px){
+  .header-logo{width:46px!important;height:46px!important}
+}
+</style>
+
+
+<style id="coro-modal-overflow-fix-v38">
+/* 3.8 — modal Novo programa: conteúdo contido, sem overflow */
+#newProgramModal .modal{
+  width:min(680px,calc(100vw - 32px))!important;
+  max-width:680px!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+}
+#newProgramModal .new-program-choice{
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  box-sizing:border-box!important;
+  display:grid!important;
+  grid-template-columns:34px minmax(0,1fr)!important;
+  align-items:center!important;
+  gap:.75rem!important;
+  text-align:left!important;
+  white-space:normal!important;
+  overflow:hidden!important;
+  padding:.82rem .9rem!important;
+  line-height:1.25!important;
+}
+#newProgramModal .new-program-icon{
+  width:34px;height:34px;display:grid;place-items:center;
+  font-size:1.05rem;
+  flex:0 0 auto;
+}
+#newProgramModal .new-program-copy{
+  min-width:0!important;
+  overflow:hidden!important;
+}
+#newProgramModal .new-program-copy b{
+  display:block!important;
+  margin:0!important;
+  font-size:.9rem!important;
+  line-height:1.3!important;
+  white-space:normal!important;
+  overflow-wrap:anywhere!important;
+}
+#newProgramModal .new-program-copy .tiny{
+  display:block!important;
+  margin-top:.18rem!important;
+  font-size:.72rem!important;
+  line-height:1.35!important;
+  white-space:normal!important;
+  overflow-wrap:anywhere!important;
+}
+@media(max-width:600px){
+  #newProgramModal .modal{width:calc(100vw - 20px)!important;}
+  #newProgramModal .new-program-choice{grid-template-columns:30px minmax(0,1fr)!important;gap:.55rem!important;padding:.72rem!important;}
+  #newProgramModal .new-program-icon{width:30px;height:30px;font-size:.95rem;}
+  #newProgramModal .new-program-copy b{font-size:.82rem!important;}
+  #newProgramModal .new-program-copy .tiny{font-size:.68rem!important;}
+}
+</style>
+
 </head>
 <body>
 <header>
   <div class="header-inner">
     <div class="header-main">
-      <img class="header-logo" src="logo_light.png" alt="Logotipo do Coro">
+      <img class="header-logo" src="logo_clean.png" alt="Logotipo do Coro">
       <div class="header-text">
         <h1 id="headerTitle">Coro Paroquial São João Batista de Rio Caldo</h1>
         <p id="headerSubtitle">Ferramenta litúrgica para preparação de cânticos dominicais</p>
@@ -1707,16 +1964,20 @@ body.lit-gold {
 <main>
   <div class="card">
     
-    <nav class="tabs">
-      <button type="button" class="active" data-tab="tab-dashboard"><span class="dot"></span> Página inicial</button>
-      <button type="button" data-tab="tab-calendario"><span class="dot"></span> Calendário</button>
-      <button type="button" data-tab="tab-programa"><span class="dot"></span> Programa</button>
-      <button type="button" data-tab="tab-folhetos"><span class="dot"></span> Folhetos</button>
-      <button type="button" data-tab="tab-catalogo"><span class="dot"></span> Catálogo</button>
-      <button type="button" data-tab="tab-partituras"><span class="dot"></span> Partituras</button>
-      <button type="button" data-tab="tab-videos"><span class="dot"></span> Vídeos</button>
-      <button type="button" data-tab="tab-historico"><span class="dot"></span> Histórico</button>
-      <button type="button" data-tab="tab-ensaios"><span class="dot"></span> Ensaios</button>
+    <nav class="tabs clean-nav">
+      <button type="button" class="active" data-tab="tab-dashboard"><span class="nav-icon">⌂</span> Início</button>
+      <button type="button" data-tab="tab-calendario"><span class="nav-icon">□</span> Calendário</button>
+      <button type="button" data-tab="tab-programa"><span class="nav-icon">＋</span> Programas</button>
+      <button type="button" data-tab="tab-catalogo"><span class="nav-icon">♪</span> Cânticos</button>
+      <button type="button" data-tab="tab-pessoas"><span class="nav-icon">○</span> Pessoas</button>
+      <button type="button" data-tab="tab-historico"><span class="nav-icon">◷</span> Histórico</button>
+      <button type="button" class="more-toggle" id="moreNavBtn" aria-expanded="false"><span class="nav-icon">•••</span> Mais</button>
+    </nav>
+    <nav class="tabs-more" id="moreNav" hidden aria-label="Mais opções">
+      <button type="button" data-tab="tab-folhetos">Folhetos</button>
+      <button type="button" data-tab="tab-partituras">Partituras</button>
+      <button type="button" data-tab="tab-videos">Vídeos</button>
+      <button type="button" data-tab="tab-ensaios">Ensaios</button>
     </nav>
 
 
@@ -1821,7 +2082,7 @@ body.lit-gold {
             </div>
             <div style="display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;">
               <span class="tiny muted" id="assistantLiveStatus">● Sugestões automáticas</span>
-              <button type="button" class="btn small" id="assistantFillBtn">✨ Preencher programa</button>
+              <button type="button" class="btn secondary small" id="assistantLaudateBtn">🌐 Sugestões Laudate</button><button type="button" class="btn small" id="assistantFillBtn">✨ Preencher programa</button>
             </div>
           </div>
           <div id="assistantSummary" class="small" style="margin-top:.75rem;"></div>
@@ -2119,6 +2380,18 @@ body.lit-gold {
       </div>
     </section>
 
+    <section id="tab-pessoas" class="tab">
+      <div class="people-page">
+        <div class="page-heading">
+          <div><span class="eyebrow">GESTÃO</span><h2>Pessoas</h2><p class="small muted">Salmistas e organistas usados nos programas do coro.</p></div>
+        </div>
+        <div class="people-grid">
+          <div class="card people-card"><div class="people-card-head"><div class="people-symbol">S</div><div><h3>Salmistas</h3><p class="small muted">Pessoas registadas nos programas.</p></div></div><div id="peopleSalmistas" class="people-list"><span class="muted">A carregar…</span></div></div>
+          <div class="card people-card"><div class="people-card-head"><div class="people-symbol">O</div><div><h3>Organistas</h3><p class="small muted">Pessoas registadas nos programas.</p></div></div><div id="peopleOrganistas" class="people-list"><span class="muted">A carregar…</span></div></div>
+        </div>
+      </div>
+    </section>
+
     <section id="tab-historico" class="tab">
       <h2>Histórico de domingos</h2>
       <p class="small">Os programas guardados ficam apenas neste dispositivo (localStorage).</p>
@@ -2328,10 +2601,10 @@ body.lit-gold {
       <button type="button" class="btn secondary small" id="newProgramCloseBtn" aria-label="Fechar">✕</button>
     </div>
     <div style="display:grid;gap:.65rem;margin-top:1rem;">
-      <button type="button" class="btn secondary" id="newProgramExistingBtn" style="text-align:left;">📅 <b>Criar programa para uma celebração existente</b><br><span class="tiny muted">Escolher a data no calendário e preparar o programa.</span></button>
-      <button type="button" class="btn secondary" id="newProgramNextBtn" style="text-align:left;">✨ <b>Criar programa para a próxima celebração</b><br><span class="tiny muted">Usar automaticamente a próxima celebração disponível.</span></button>
-      <button type="button" class="btn secondary" id="newProgramDateBtn" style="text-align:left;">📝 <b>Criar programa para uma nova data</b><br><span class="tiny muted">Escolher manualmente uma data.</span></button>
-      <button type="button" class="btn secondary" id="newProgramDuplicateBtn" style="text-align:left;">📋 <b>Duplicar um programa anterior</b><br><span class="tiny muted">Escolher um programa já guardado como base.</span></button>
+      <button type="button" class="btn secondary new-program-choice" id="newProgramExistingBtn"><span class="new-program-icon">📅</span><span class="new-program-copy"><b>Criar programa para uma celebração existente</b><span class="tiny muted">Escolher a data no calendário e preparar o programa.</span></span></button>
+      <button type="button" class="btn secondary new-program-choice" id="newProgramNextBtn"><span class="new-program-icon">✨</span><span class="new-program-copy"><b>Criar programa para a próxima celebração</b><span class="tiny muted">Usar automaticamente a próxima celebração disponível.</span></span></button>
+      <button type="button" class="btn secondary new-program-choice" id="newProgramDateBtn"><span class="new-program-icon">📝</span><span class="new-program-copy"><b>Criar programa para uma nova data</b><span class="tiny muted">Escolher manualmente uma data.</span></span></button>
+      <button type="button" class="btn secondary new-program-choice" id="newProgramDuplicateBtn"><span class="new-program-icon">📋</span><span class="new-program-copy"><b>Duplicar um programa anterior</b><span class="tiny muted">Escolher um programa já guardado como base.</span></span></button>
     </div>
     <div style="display:flex;justify-content:flex-end;margin-top:1rem;">
       <button type="button" class="btn secondary" id="newProgramCancelBtn">Cancelar</button>
@@ -2612,7 +2885,7 @@ body.lit-gold {
 "2026-08-16":{name:"DOMINGO XX DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"Deus, vinde em meu auxílio",theme:"fé, universalidade, misericórdia"},
 "2026-08-23":{name:"DOMINGO XXI DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"Senhor, é eterna a vossa misericórdia",theme:"Igreja, Pedro, fé, chave, comunidade"},
 "2026-08-30":{name:"DOMINGO XXII DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"Senhor, pela vossa grande misericórdia, salvai-me",theme:"cruz, entrega, seguimento, misericórdia"},
-"2026-09-06":{name:"DOMINGO XXIII DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"Se hoje ouvirdes a voz do Senhor",theme:"escuta, correção fraterna, comunidade, reconciliação"},
+"2026-09-06":{name:"DOMINGO XXIII DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"Não fecheis os vossos corações",theme:"escuta, correção fraterna, comunidade, reconciliação"},
 "2026-09-13":{name:"DOMINGO XXIV DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"O Senhor é clemente e compassivo, paciente e cheio de bondade",theme:"perdão, misericórdia, compaixão, reconciliação"},
 "2026-09-20":{name:"DOMINGO XXV DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"O Senhor está perto de quantos O invocam",theme:"bondade, generosidade, conversão, reino"},
 "2026-09-27":{name:"DOMINGO XXVI DO TEMPO COMUM",time:"Tempo Comum",color:"Verde",year:"A",type:"Domingo",psalm:"Lembrai-Vos, Senhor, da vossa misericórdia",theme:"conversão, justiça, humildade, misericórdia"},

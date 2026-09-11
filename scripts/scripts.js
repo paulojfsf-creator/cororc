@@ -153,9 +153,32 @@ function getLiturgicalInfo(dateStr) {
   return day===0 ? {title:'Domingo do Tempo Comum',color:'Verde',season:'tempocomum',year:'A',type:'Domingo',psalm:'',theme:''} : {title:'Dia Ferial',color:'Verde',season:'tempocomum',year:'A',type:'Ferial',psalm:'',theme:''};
 }
 
+function updateHeaderLiturgicalInfo(info) {
+  const pill=document.getElementById('liturgicalInfoPill');
+  const text=document.getElementById('liturgicalInfoText');
+  const icon=document.getElementById('liturgicalIcon');
+  if(!pill||!text)return;
+  if(!info){
+    text.textContent='Tempo litúrgico não definido';
+    if(icon)icon.textContent='♪';
+    pill.dataset.season='';
+    pill.dataset.color='';
+    return;
+  }
+  const season=info.time||seasonLabel(info.season)||'Tempo litúrgico';
+  const year=info.year?` · Ano ${info.year}`:'';
+  const color=info.color?` · ${info.color}`:'';
+  text.textContent=season+year+color;
+  if(icon) icon.textContent = info.type==='Solenidade' ? '✦' : '♪';
+  pill.dataset.season=info.season||'';
+  pill.dataset.color=info.color||'';
+  pill.title=info.name||info.title||season;
+}
+
 function updateLiturgicalFromDate() {
-  const dateInput=document.getElementById('date'); if(!dateInput||!dateInput.value){renderProgramAssistant();return;}
+  const dateInput=document.getElementById('date'); if(!dateInput||!dateInput.value){updateHeaderLiturgicalInfo(null);renderProgramAssistant();return;}
   const info=getLiturgicalInfo(dateInput.value), titleInput=document.getElementById('liturgicalTitle'), colorInput=document.getElementById('liturgicalColor'), cycle=document.getElementById('cycleDisplay');
+  updateHeaderLiturgicalInfo(info);
   if(titleInput)titleInput.value=info.name||info.title||''; if(colorInput)colorInput.value=info.color||''; if(cycle)cycle.value=seasonLabel(info.time||info.season)+' / Ano '+(info.year||'A');
   updateBodyLiturgicalClass(info.season);
   const panel=document.getElementById('smartLiturgyContent');
@@ -1782,4 +1805,187 @@ document.addEventListener('DOMContentLoaded', () => {
   loadHistory();
   populateRehearsalPrograms();
   console.log('✅ Aplicação carregada!');
+});
+
+// ============================================
+// CORO LITÚRGICO 4.0 — FOLHETO A4 EDITÁVEL
+// ============================================
+let leafletV4Draft = null;
+
+function leafletV4CurrentImage(){
+  return localStorage.getItem('coroSundayImage') || '';
+}
+
+function leafletV4DefaultItems(includeLyrics=true){
+  const record=collectProgramFromForm();
+  return PROGRAM_PARTS.filter(p=>record.program?.[p.id]).map(p=>{
+    const title=record.program[p.id]||'';
+    const song=getSelectedSongForPart(p.id)||getSongByTitle(title);
+    const author=record.programAuthors?.[p.id] || getSongAuthor(song);
+    const lyrics=includeLyrics ? getSongLyrics(song||title) : '';
+    return {partId:p.id,moment:p.label,title,author,lyrics,include:true};
+  });
+}
+
+function openLeafletEditor(includeLyrics=true){
+  const modal=document.getElementById('leafletEditorModal');
+  const list=document.getElementById('leafletEditorList');
+  const record=collectProgramFromForm();
+  if(!modal||!list)return;
+  if(!record.date){alert('Preencha primeiro a data da celebração.');return;}
+  const info=getLiturgicalInfo(record.date)||{};
+  leafletV4Draft={
+    record:JSON.parse(JSON.stringify(record)),
+    image:leafletV4CurrentImage(),
+    items:leafletV4DefaultItems(includeLyrics)
+  };
+  const d=new Date(record.date+'T00:00:00');
+  const formatted=d.toLocaleDateString('pt-PT',{day:'numeric',month:'long',year:'numeric'});
+  const c=document.getElementById('leafletEditorCelebration'); if(c)c.textContent=record.title||'Celebração';
+  const m=document.getElementById('leafletEditorMeta'); if(m)m.textContent=` · ${formatted}${info.season?' · '+info.season:''}`;
+  list.innerHTML=leafletV4Draft.items.length ? leafletV4Draft.items.map((item,i)=>`
+    <div class="leaflet-editor-item" data-index="${i}">
+      <div class="leaflet-editor-item-head">
+        <div>
+          <div class="leaflet-editor-title">${escSmart(item.title)}</div>
+          <div class="leaflet-editor-meta">${escSmart(item.moment)}${item.author?' · '+escSmart(item.author):''}</div>
+        </div>
+        <label class="leaflet-editor-check"><input type="checkbox" class="leaflet-include" ${item.include?'checked':''}> incluir</label>
+      </div>
+      <textarea class="leaflet-lyrics" aria-label="Letra de ${escSmart(item.title)}">${escSmart(item.lyrics||'')}</textarea>
+    </div>`).join('') : '<div class="leaflet-editor-empty">Não existem cânticos preenchidos no programa.</div>';
+  list.querySelectorAll('.leaflet-editor-item').forEach((el,i)=>{
+    el.querySelector('.leaflet-lyrics')?.addEventListener('input',e=>{leafletV4Draft.items[i].lyrics=e.target.value;});
+    el.querySelector('.leaflet-include')?.addEventListener('change',e=>{leafletV4Draft.items[i].include=e.target.checked;el.classList.toggle('is-off',!e.target.checked);});
+  });
+  modal.hidden=false;
+}
+
+function closeLeafletEditor(){const m=document.getElementById('leafletEditorModal');if(m)m.hidden=true;leafletV4Draft=null;}
+
+function leafletV4CollectDraft(){
+  if(!leafletV4Draft)return null;
+  const list=document.getElementById('leafletEditorList');
+  list?.querySelectorAll('.leaflet-editor-item').forEach((el,i)=>{
+    if(!leafletV4Draft.items[i])return;
+    const ta=el.querySelector('.leaflet-lyrics');
+    const cb=el.querySelector('.leaflet-include');
+    if(ta)leafletV4Draft.items[i].lyrics=ta.value;
+    if(cb)leafletV4Draft.items[i].include=cb.checked;
+  });
+  return leafletV4Draft;
+}
+
+function buildLeafletV4Html(draft){
+  const r=draft.record||{};
+  const dt=r.date?new Date(r.date+'T00:00:00').toLocaleDateString('pt-PT',{day:'numeric',month:'long',year:'numeric'}):'';
+  const info=getLiturgicalInfo(r.date)||{};
+  const logo=new URL('logo.png',location.href).href;
+  const image=draft.image||'';
+  const items=(draft.items||[]).filter(x=>x.include);
+  const songsHtml=items.map(x=>`<article class="leaflet-print-song">
+    <div class="moment">${escSmart(x.moment)}</div>
+    <h2>${escSmart(x.title)}</h2>
+    ${x.author?`<div class="author">${escSmart(x.author)}</div>`:''}
+    ${x.lyrics?`<div class="lyrics">${escSmart(x.lyrics)}</div>`:''}
+  </article>`).join('');
+  return `<div class="leaflet-print-root">
+    <header class="leaflet-print-head">
+      <img class="leaflet-print-logo" src="${escSmart(logo)}" alt="Coro Paroquial São João Batista">
+      <div class="leaflet-print-title">
+        <h1>${escSmart(r.title||'Celebração')}</h1>
+        <p class="date">${escSmart(dt)}</p>
+        ${info.season?`<div class="season">${escSmart(info.season)}${info.year?' · Ano '+escSmart(info.year):''}${info.color?' · '+escSmart(info.color):''}</div>`:''}
+      </div>
+      ${image?`<img class="leaflet-print-image" src="${escSmart(image)}" alt="Imagem da celebração">`:'<div class="leaflet-print-image" aria-hidden="true"></div>'}
+    </header>
+    <main class="leaflet-print-cols">${songsHtml||'<p>Não foram selecionados cânticos para o folheto.</p>'}</main>
+    <footer class="leaflet-print-footer"><span>Coro Paroquial São João Batista de Rio Caldo</span><span>${escSmart(r.date||'')}</span></footer>
+  </div>`;
+}
+
+function previewLeafletV4(){
+  const draft=leafletV4CollectDraft(); if(!draft)return;
+  const content=document.getElementById('leafletModalContent'); const modal=document.getElementById('leafletModalBackdrop');
+  if(content&&modal){content.innerHTML=draftToPreviewShell(draft);modal.hidden=false;}
+}
+function draftToPreviewShell(draft){return buildLeafletV4Html(draft);}
+
+function printLeafletV4(){
+  const draft=leafletV4CollectDraft(); if(!draft)return;
+  const content=buildLeafletV4Html(draft);
+  const w=window.open('','_blank','width=1000,height=850');
+  if(!w){alert('O navegador bloqueou a janela de impressão. Permita pop-ups para este site.');return;}
+  w.document.write(`<!doctype html><html lang="pt"><head><meta charset="utf-8"><title>Folheto — ${escSmart(draft.record.title||'Celebração')}</title><style>
+  @page{size:A4 portrait;margin:0}html,body{margin:0;padding:0;background:#fff}body{font-family:Arial,Helvetica,sans-serif}.leaflet-print-root{width:210mm;height:297mm;box-sizing:border-box;background:#fff;color:#111;padding:9mm;overflow:hidden}.leaflet-print-head{display:grid;grid-template-columns:34mm 1fr 34mm;align-items:start;gap:5mm;min-height:29mm;padding-bottom:4mm;border-bottom:1px solid #cfd5dc;margin-bottom:4mm}.leaflet-print-logo,.leaflet-print-image{width:34mm;height:27mm;object-fit:contain;display:block}.leaflet-print-image{object-fit:cover;border:1px solid #d8dde3}.leaflet-print-title{text-align:center;align-self:center;min-width:0}.leaflet-print-title h1{font-size:15pt;line-height:1.1;margin:0 0 2mm;font-weight:700}.leaflet-print-title .date{font-size:8.5pt;color:#555;margin:0}.leaflet-print-title .season{font-size:7.5pt;color:#666;margin-top:1mm}.leaflet-print-cols{column-count:2;column-gap:7mm;column-fill:auto;font-size:7.6pt;line-height:1.25;height:246mm;overflow:hidden}.leaflet-print-song{break-inside:avoid;page-break-inside:avoid;margin:0 0 3mm}.leaflet-print-song h2{font-size:8.7pt;line-height:1.12;margin:0 0 .7mm;font-weight:700}.leaflet-print-song .author{font-size:6.9pt;color:#555;margin-bottom:1mm}.leaflet-print-song .moment{font-size:6.5pt;color:#777;text-transform:uppercase;letter-spacing:.02em;margin-bottom:.8mm}.leaflet-print-song .lyrics{white-space:pre-wrap;font-size:7.2pt;line-height:1.24}.leaflet-print-footer{margin-top:2mm;padding-top:1.5mm;border-top:1px solid #d8dde3;font-size:6.5pt;color:#777;display:flex;justify-content:space-between}@media print{.leaflet-print-root{width:210mm;height:297mm}}
+  </style></head><body>${content}</body></html>`);
+  w.document.close();w.focus();setTimeout(()=>w.print(),300);
+}
+
+function saveLeafletV4(){
+  const draft=leafletV4CollectDraft(); if(!draft)return;
+  loadSavedLeaflets();
+  const r=draft.record||{};
+  savedLeaflets.unshift({id:Date.now(),date:r.date||'',title:r.title||'Folheto',html:buildLeafletV4Html(draft),savedAt:new Date().toISOString(),version:'4.0'});
+  savedLeaflets=savedLeaflets.slice(0,30);saveSavedLeaflets();renderSavedLeaflets();
+  alert('Folheto guardado.');
+}
+
+// 4.0 substitui a geração antiga: o utilizador edita as letras antes de imprimir/guardar.
+function initAssemblyButtons(){
+  document.getElementById('assemblySheetBtn')?.addEventListener('click',()=>openLeafletEditor(true));
+  document.getElementById('assemblySheetBtnNoLyrics')?.addEventListener('click',()=>openLeafletEditor(false));
+  document.getElementById('leafletEditorClose')?.addEventListener('click',closeLeafletEditor);
+  document.getElementById('leafletEditorPreview')?.addEventListener('click',previewLeafletV4);
+  document.getElementById('leafletEditorPrint')?.addEventListener('click',printLeafletV4);
+  document.getElementById('leafletEditorReset')?.addEventListener('click',()=>{
+    if(!leafletV4Draft)return;
+    const fresh=leafletV4DefaultItems(true);
+    leafletV4Draft.items.forEach((x,i)=>{if(fresh[i])x.lyrics=fresh[i].lyrics;});
+    document.querySelectorAll('#leafletEditorList .leaflet-editor-item').forEach((el,i)=>{const ta=el.querySelector('.leaflet-lyrics');if(ta)ta.value=leafletV4Draft.items[i]?.lyrics||'';});
+  });
+  document.getElementById('leafletEditorModal')?.addEventListener('click',e=>{if(e.target.id==='leafletEditorModal')closeLeafletEditor();});
+  document.getElementById('leafletEditorSave')?.addEventListener('click',saveLeafletV4);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){const m=document.getElementById('leafletEditorModal');if(m&&!m.hidden)closeLeafletEditor();}});
+}
+
+// O botão Guardar Folheto Atual passa a usar o novo editor.
+function initLeafletsV4Save(){
+  const b=document.getElementById('saveCurrentLeafletBtn');
+  if(b){b.replaceWith(b.cloneNode(true));document.getElementById('saveCurrentLeafletBtn').addEventListener('click',()=>openLeafletEditor(true));}
+}
+document.addEventListener('DOMContentLoaded',()=>{initLeafletsV4Save();});
+
+// Backup completo dos dados locais — 4.0
+function coroBackupPayload(){
+  const keys=['coroHistory','coroLeaflets','coroSongUsage','coroSongUsage_v1','coroPeople','coroLyrics_'];
+  const data={version:'4.0',exportedAt:new Date().toISOString(),storage:{}};
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i); if(!k)continue;
+    if(keys.some(prefix=>k===prefix||k.startsWith(prefix))) data.storage[k]=localStorage.getItem(k);
+  }
+  data.storage.coroTheme=localStorage.getItem('coroTheme');
+  return data;
+}
+function exportCoroBackup(){
+  const blob=new Blob([JSON.stringify(coroBackupPayload(),null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob); const a=document.createElement('a');
+  a.href=url;a.download='coro-liturgico-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function importCoroBackup(file){
+  if(!file)return;
+  const reader=new FileReader(); reader.onload=()=>{
+    try{
+      const data=JSON.parse(reader.result); if(!data||!data.storage)throw new Error('Formato inválido');
+      if(!confirm('Importar esta cópia de segurança? Os dados locais com as mesmas chaves serão substituídos.'))return;
+      Object.entries(data.storage).forEach(([k,v])=>{if(v===null||v===undefined)localStorage.removeItem(k);else localStorage.setItem(k,String(v));});
+      alert('Dados importados. A aplicação será recarregada.'); location.reload();
+    }catch(e){alert('Não foi possível importar a cópia de segurança.');}
+  }; reader.readAsText(file);
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('exportBackupBtn')?.addEventListener('click',exportCoroBackup);
+  const ib=document.getElementById('importBackupBtn'), inp=document.getElementById('importBackupInput');
+  ib?.addEventListener('click',()=>inp?.click()); inp?.addEventListener('change',e=>importCoroBackup(e.target.files?.[0]));
 });

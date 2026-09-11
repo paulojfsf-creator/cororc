@@ -1,3 +1,25 @@
+# Coro Litúrgico 4.0 — Assistente e Folhetos A4
+
+## Novidades da versão 4.0
+
+- Assistente de preparação litúrgica e sugestões automáticas.
+- Navegação simplificada: Início, Calendário, Programas, Cânticos, Pessoas, Histórico e Mais.
+- Integração com pesquisa/links do Laudate.
+- Editor de folheto antes da impressão.
+- Letras editáveis por folheto, sem alterar a letra guardada no catálogo.
+- Folheto A4 retrato com duas colunas.
+- Logótipo do coro no canto superior esquerdo.
+- Imagem da celebração no canto superior direito, usando a imagem carregada para o domingo.
+- Título, autor e momento litúrgico de cada cântico.
+- Opção para incluir/excluir cada cântico do folheto.
+- Pré-visualização e impressão/PDF.
+- Backup e restauro dos dados locais.
+- Interface clean, tipografia simples e linhas retas.
+
+> Nota: as letras provenientes de fontes online continuam a ser abertas na fonte original; o texto integral só é usado no folheto quando existe no catálogo/localStorage ou quando é introduzido/editado pelo utilizador.
+
+---
+
 # Coro Litúrgico 2.1 — revisão completa
 
 Versão revista a partir da 2.0.

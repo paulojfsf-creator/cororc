@@ -685,6 +685,7 @@
 .song-select-filters .col {
   flex: 1 1 160px;
 }
+.song-select-search-main{flex:2 1 320px!important}.song-select-search-main input{font-size:1rem;min-height:44px}.song-select-theme-filter{max-width:220px}.song-online-sources{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;padding:.55rem .65rem;margin:-.1rem 0 .7rem;border:1px solid var(--border-subtle);border-radius:.65rem;background:var(--bg-soft)}.song-online-sources .btn{white-space:nowrap}.song-search-summary{padding:.45rem .1rem;color:var(--text-muted);font-size:.75rem}.song-online-search{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;margin-top:.7rem;padding:.65rem;border-radius:.65rem;background:var(--bg-soft);border:1px dashed var(--border-subtle)}.song-online-search span{font-size:.75rem;color:var(--text-muted)}
 .song-select-list {
   max-height: 360px;
   overflow-y: auto;
@@ -2813,16 +2814,23 @@ main > .card:has(.clean-nav){position:relative!important;}
     <h3>Selecionar cântico</h3>
     <p class="small" id="songSelectPartLabel"></p>
     <div class="song-select-filters">
-      <div class="col">
-        <label for="songSelectSearch">Pesquisar</label>
-        <input type="text" id="songSelectSearch" placeholder="Título, tema, autor…">
+      <div class="col song-select-search-main">
+        <label for="songSelectSearch">🔎 Pesquisar cântico</label>
+        <input type="search" id="songSelectSearch" autocomplete="off" placeholder="Escreva o título, autor, tema ou palavra…">
+        <div class="tiny muted">Pesquisa imediatamente no catálogo do coro. Se não encontrar, pode pesquisar também nas fontes litúrgicas abaixo.</div>
       </div>
-      <div class="col">
+      <div class="col song-select-theme-filter">
         <label for="songSelectTheme">Tema</label>
         <select id="songSelectTheme">
           <option value="">Todos</option>
         </select>
       </div>
+    </div>
+    <div class="song-online-sources">
+      <span class="small"><b>Fontes litúrgicas:</b></span>
+      <a class="btn secondary small" href="https://ocantonaliturgia.pt/obras" target="_blank" rel="noopener noreferrer">🎼 O Canto na Liturgia</a>
+      <a class="btn secondary small" href="https://www.canticos.pt/" target="_blank" rel="noopener noreferrer">📖 Laudate</a>
+      <a class="btn secondary small" href="https://www.liturgia.pt/musica/cantoral.php" target="_blank" rel="noopener noreferrer">⛪ Cantoral Nacional</a>
     </div>
 
     <div id="songSelectSuggestions" class="small" style="margin-bottom:0.75rem; display:none;">

@@ -188,24 +188,36 @@ const LITURGICAL_CALENDAR = {"2026-01-01":{"title":"SANTA MARIA, MÃE DE DEUS","
 function seasonLabel(season){const m={tempocomum:'Tempo Comum',pascoa:'Tempo Pascal',quaresma:'Quaresma',advento:'Advento',natal:'Tempo do Natal'};return m[normSmart(season)]||String(season||'');}
 
 function liturgicalYearStartSunday(calendarYear){
-  const nov1=new Date(calendarYear,10,1);
-  const firstSundayOffset=(7-nov1.getDay())%7;
-  const firstSunday=new Date(calendarYear,10,1+firstSundayOffset);
-  const advent1=new Date(calendarYear,10,30);
-  advent1.setDate(30-((advent1.getDay())%7));
-  // O I Domingo do Advento é sempre o domingo entre 27/11 e 3/12.
+  // O ano litúrgico começa no I Domingo do Advento.
+  // Este domingo ocorre sempre entre 27 de novembro e 3 de dezembro.
+  const nov30=new Date(calendarYear,10,30,12,0,0,0);
+  const offsetToSunday=nov30.getDay(); // 0=domingo; recua até ao domingo dessa semana
+  const advent1=new Date(calendarYear,10,30-offsetToSunday,12,0,0,0);
   return advent1;
 }
 function cycleForLiturgicalYearStart(yearStart){
-  const idx=((yearStart-2025)%3+3)%3;
+  // 2025-2026 = Ano A; 2026-2027 = Ano B; 2027-2028 = Ano C.
+  const idx=((Number(yearStart)-2025)%3+3)%3;
   return ['A','B','C'][idx];
 }
 function cycleForDate(dateStr){
-  const d=new Date(dateStr+'T12:00:00');if(Number.isNaN(d.getTime()))return 'A';
-  const y=d.getFullYear();const advent=liturgicalYearStartSunday(y);
-  const litYear=d>=advent?y:y-1;
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(String(dateStr||'')))return 'A';
+  const [yy,mm,dd]=String(dateStr).split('-').map(Number);
+  const d=new Date(yy,mm-1,dd,12,0,0,0);
+  if(Number.isNaN(d.getTime()))return 'A';
+  const advent=liturgicalYearStartSunday(yy);
+  const litYear=d>=advent?yy:yy-1;
   return cycleForLiturgicalYearStart(litYear);
 }
+
+// Corrige também os dados históricos embutidos: nenhum ecrã deve ler o "year"
+// antigo gravado no calendário em vez do ciclo calculado pela data.
+function normalizeLiturgicalCalendarYears(){
+  Object.keys(LITURGICAL_CALENDAR||{}).forEach(date=>{
+    if(LITURGICAL_CALENDAR[date])LITURGICAL_CALENDAR[date].year=cycleForDate(date);
+  });
+}
+
 function getLiturgicalInfo(dateStr) {
   const base=(window.CORO_LIT2026 && window.CORO_LIT2026[dateStr]) || LITURGICAL_CALENDAR[dateStr] || null;
   if(base){const info={...base};info.year=cycleForDate(dateStr);return info;}
@@ -213,6 +225,8 @@ function getLiturgicalInfo(dateStr) {
   const cycle=cycleForDate(dateStr);
   return day===0 ? {title:'Domingo do Tempo Comum',color:'Verde',season:'tempocomum',year:cycle,type:'Domingo',psalm:'',theme:''} : {title:'Dia Ferial',color:'Verde',season:'tempocomum',year:cycle,type:'Ferial',psalm:'',theme:''};
 }
+
+normalizeLiturgicalCalendarYears();
 
 function updateHeaderLiturgicalInfo(info) {
   const pill=document.getElementById('liturgicalInfoPill');
@@ -342,6 +356,17 @@ function getLaudateGoogleUrl(songOrTitle,author=''){
 function getLaudateSearchLabel(songOrTitle,author=''){
   return getLaudateDirectUrl(songOrTitle,author)?'Abrir no Laudate':'Pesquisar no Laudate';
 }
+function getCantoNaLiturgiaGoogleUrl(songOrTitle,author=''){
+  const song=typeof songOrTitle==='object'?songOrTitle:getSongByTitle(songOrTitle,author);
+  const title=song?getSongTitle(song):String(songOrTitle||'');
+  const auth=song?getSongAuthor(song):author;
+  const q=[title,auth].filter(Boolean).map(v=>'\"'+String(v).trim().replace(/\"/g,'')+'\"').join(' ');
+  return 'https://www.google.com/search?q='+encodeURIComponent('site:ocantonaliturgia.pt/obras '+q);
+}
+function getCantoNaLiturgiaUrl(songOrTitle,author=''){
+  const q=getSongTitle(typeof songOrTitle==='object'?songOrTitle:{"Título":String(songOrTitle||''),"Autor":author});
+  return 'https://ocantonaliturgia.pt/obras'+(q?'?q='+encodeURIComponent(q):'');
+}
 function openLaudateForSong(songOrTitle,author=''){
   const url=getLaudateUrl(songOrTitle,author);
   if(url)window.open(url,'_blank','noopener,noreferrer');
@@ -374,7 +399,8 @@ function getLyricsSourceHtml(songOrTitle,author=''){
   const url=getLaudateUrl(song||title,auth);
   const google=getLaudateGoogleUrl(song||title,auth);
   const hasLocal=!!getSongLyrics(song||title,auth);
-  return '<div class="lyrics-online-box"><div><b>🌐 Fonte online</b><div class="small muted">Laudate — canticos.pt · '+escSmart(auth||'autor não indicado')+(direct?' · correspondência conhecida':'')+'</div></div><div class="lyrics-online-actions"><a class="btn secondary small" href="'+escSmart(url)+'" target="_blank" rel="noopener noreferrer">📖 '+escSmart(getLaudateSearchLabel(song||title,auth))+'</a><a class="btn secondary small" href="'+escSmart(google)+'" target="_blank" rel="noopener noreferrer">🔎 Pesquisa ampla</a>'+(hasLocal?' <span class="tiny muted">✓ Letra guardada localmente</span>':'')+'</div></div>';
+  const canto=getCantoNaLiturgiaGoogleUrl(song||title,auth);
+  return '<div class="lyrics-online-box"><div><b>🌐 Fontes online</b><div class="small muted">Laudate · O Canto na Liturgia · '+escSmart(auth||'autor não indicado')+'</div></div><div class="lyrics-online-actions"><a class="btn secondary small" href="'+escSmart(url)+'" target="_blank" rel="noopener noreferrer">📖 '+escSmart(getLaudateSearchLabel(song||title,auth))+'</a><a class="btn secondary small" href="'+escSmart(canto)+'" target="_blank" rel="noopener noreferrer">🎼 O Canto na Liturgia</a><a class="btn secondary small" href="'+escSmart(google)+'" target="_blank" rel="noopener noreferrer">🔎 Pesquisa ampla</a>'+(hasLocal?' <span class="tiny muted">✓ Letra guardada localmente</span>':'')+'</div></div>';
 }
 function autoLoadLyricsForPart(partId){
   const title=document.getElementById(partId)?.value||'';
@@ -472,7 +498,7 @@ function renderDashboardV3(){
   const upcomingBox=document.getElementById('dashboardUpcoming');
   const recentBox=document.getElementById('dashboardRecent');
   const today=new Date(); today.setHours(0,0,0,0);
-  const upcoming=Object.entries(LITURGICAL_CALENDAR).map(([date,info])=>({date,...info})).filter(x=>new Date(x.date+'T00:00:00')>=today).sort((a,b)=>a.date.localeCompare(b.date));
+  const upcoming=Object.entries(LITURGICAL_CALENDAR).map(([date,base])=>({date,...base,...getLiturgicalInfo(date)})).filter(x=>new Date(x.date+'T00:00:00')>=today).sort((a,b)=>a.date.localeCompare(b.date));
   const next=upcoming[0];
   if(nextBox){
     if(next){const d=new Date(next.date+'T00:00:00'); nextBox.innerHTML=`<div class="dash-date"><small>${d.toLocaleDateString('pt-PT',{weekday:'short'})}</small><strong>${d.getDate()}</strong><small>${d.toLocaleDateString('pt-PT',{month:'short',year:'numeric'})}</small></div><div><div class="dash-event-title">${escSmart(next.title||next.name)}</div><div class="dash-event-meta">${escSmart(next.type||'Celebração')} · ${escSmart(next.color||'')}</div>${next.theme?`<div class="dash-event-meta">${escSmart(next.theme)}</div>`:''}</div>`;} else nextBox.innerHTML='<div class="dash-muted">Não há celebrações futuras no calendário integrado.</div>';
@@ -580,10 +606,10 @@ function renderCalendar() {
     }
     // Verifica se é data litúrgica especial
     if (LITURGICAL_CALENDAR[dateStr]) {
-      const info = LITURGICAL_CALENDAR[dateStr];
+      const info = getLiturgicalInfo(dateStr);
       dayDiv.classList.add('liturgical');
-      dayDiv.classList.add(info.season);
-      dayDiv.title = existingProgram ? info.title + ' — abrir programa' : info.title + ' — criar programa';
+      if(info.season)dayDiv.classList.add(info.season);
+      dayDiv.title = existingProgram ? info.title + ' — abrir programa · Ano '+info.year : info.title + ' — criar programa · Ano '+info.year;
     }
     // Qualquer celebração do calendário pode abrir o programa.
     if (existingProgram || LITURGICAL_CALENDAR[dateStr]) {
@@ -980,7 +1006,21 @@ function buildSmartSuggestionList(partId){
  list.innerHTML=(info.psalm&&partId==='salmo'?'<div class="small" style="margin-bottom:.5rem;padding:.5rem;background:rgba(37,99,235,.08);border-radius:.35rem;"><b>📖 Salmo do dia:</b> '+escSmart(info.psalm)+'</div>':'')+top.map(x=>{const t=getSongTitle(x.s),m=x.meta,lu=m.lu;const status=lu?('Último uso: '+lu.date):'⭐ Nunca utilizado';const why=m.reasons.slice(0,3).join(' · ');return '<div class="smart-suggestion-row"><div><b>'+escSmart(t)+'</b><div class="small muted">'+fitLabel(m.score)+' · '+escSmart(status)+(getSongAuthor(x.s)?' · '+escSmart(getSongAuthor(x.s)):'')+'</div><div class="small">'+escSmart(why)+'</div></div><button type="button" class="btn small" data-smart-title="'+t.replace(/"/g,'&quot;')+'">Usar</button></div>';}).join('')||'<p class="small muted">Não há sugestões disponíveis.</p>';
  box.style.display=top.length?'block':'none';list.querySelectorAll('[data-smart-title]').forEach(b=>b.onclick=()=>useSongInPart(partId,b.dataset.smartTitle,b.dataset.smartAuthor||''));
 }
-function renderSongListModal(){const el=document.getElementById('songSelectList');if(!el)return;const q=(document.getElementById('songSelectSearch')?.value||'').toLowerCase(),th=(document.getElementById('songSelectTheme')?.value||'').toLowerCase();const arr=(songs||[]).filter(s=>(!q||getSongTitle(s).toLowerCase().includes(q)||getSongAuthor(s).toLowerCase().includes(q)||String(s.Tema||'').toLowerCase().includes(q))&&(!th||String(s.Tema||'').toLowerCase().split(';').map(x=>x.trim()).includes(th))).slice(0,80);el.innerHTML=arr.map(s=>'<div class="song-select-item"><div class="song-select-item-header"><div class="song-select-title">'+escSmart(getSongTitle(s))+'</div><div class="song-select-meta">'+escSmart(getSongAuthor(s))+' '+(s.Tema?' · '+escSmart(s.Tema):'')+'</div></div><div class="song-select-actions"><button type="button" class="btn small program-use-song-btn" data-title="'+getSongTitle(s).replace(/"/g,'&quot;')+'" data-author="'+getSongAuthor(s).replace(/"/g,'&quot;')+'">Usar</button></div></div>').join('')||'<p class="small muted">Nenhum cântico encontrado.</p>';el.querySelectorAll('[data-title]').forEach(b=>b.onclick=()=>useSongInPart(window.currentSmartPart,b.dataset.title,b.dataset.author||''));}
+function renderSongListModal(){
+ const el=document.getElementById('songSelectList');if(!el)return;
+ const rawQ=(document.getElementById('songSelectSearch')?.value||'').trim();
+ const q=normSmart(rawQ),th=(document.getElementById('songSelectTheme')?.value||'').toLowerCase();
+ const arr=(songs||[]).filter(s=>{
+   const hay=normSmart([getSongTitle(s),getSongAuthor(s),s.Tema||'',s.Tempo||'',s.Observações||s.Observacoes||''].join(' '));
+   return (!q||hay.includes(q))&&(!th||String(s.Tema||'').toLowerCase().split(';').map(x=>x.trim()).includes(th));
+ }).slice(0,80);
+ const count=(songs||[]).filter(s=>{const hay=normSmart([getSongTitle(s),getSongAuthor(s),s.Tema||'',s.Tempo||'',s.Observações||s.Observacoes||''].join(' '));return !q||hay.includes(q);}).length;
+ const external=rawQ?'<div class="song-online-search"><span>Não encontrou no catálogo local?</span><a class="btn secondary small" href="'+escSmart(getCantoNaLiturgiaGoogleUrl(rawQ))+'" target="_blank" rel="noopener noreferrer">🎼 O Canto na Liturgia</a><a class="btn secondary small" href="'+escSmart(getLaudateUrl(rawQ))+'" target="_blank" rel="noopener noreferrer">📖 Laudate</a></div>':'';
+ const header='<div class="song-search-summary"><b>'+count+'</b> resultado(s) no catálogo local'+(rawQ?' para “'+escSmart(rawQ)+'”':'')+'</div>';
+ const body=arr.map(s=>'<div class="song-select-item"><div class="song-select-item-header"><div class="song-select-title">'+escSmart(getSongTitle(s))+'</div><div class="song-select-meta">'+escSmart(getSongAuthor(s))+' '+(s.Tema?' · '+escSmart(s.Tema):'')+'</div></div><div class="song-select-actions"><button type="button" class="btn small program-use-song-btn" data-title="'+getSongTitle(s).replace(/"/g,'&quot;')+'" data-author="'+getSongAuthor(s).replace(/"/g,'&quot;')+'">Usar</button></div></div>').join('');
+ el.innerHTML=header+body+(arr.length?'': '<p class="small muted">Nenhum cântico encontrado no catálogo local.</p>')+external;
+ el.querySelectorAll('[data-title]').forEach(b=>b.onclick=()=>useSongInPart(window.currentSmartPart,b.dataset.title,b.dataset.author||''));
+}
 function useSongInPart(partId,title,author='',silent=false){
   const sel=document.getElementById(partId);if(!sel)return;
   let opt=Array.from(sel.options).find(o=>o.value===title && (!author || normSmart(o.dataset.author||'')===normSmart(author)));

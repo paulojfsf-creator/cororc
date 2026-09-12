@@ -2443,9 +2443,12 @@ main > .card:has(.clean-nav){position:relative!important;}
           <div class="col">
             <button type="submit" class="btn">Guardar domingo no histórico</button>
           </div>
-          <div class="col" style="text-align:right;">
-            <button type="button" class="btn secondary" id="assemblySheetBtn" style="margin-left:0.4rem;">Preparar folheto</button>
-<button type="button" class="btn secondary" id="assemblySheetBtnNoLyrics" style="margin-left:0.4rem;">Folheto simples</button>
+          <div class="col" style="text-align:right;display:flex;justify-content:flex-end;gap:.4rem;flex-wrap:wrap;">
+            <button type="button" class="btn secondary" id="assemblySheetBtn">Preparar folheto</button>
+            <button type="button" class="btn secondary" id="assemblySheetBtnNoLyrics">Folheto simples</button>
+            <button type="button" class="btn secondary" id="shareProgramWhatsAppBtn">📱 WhatsApp</button>
+            <button type="button" class="btn secondary" id="shareProgramEmailBtn">📧 Email</button>
+            <button type="button" class="btn" id="shareProgramDossierBtn">📦 Dossier + partituras</button>
           </div>
         </div>
       
@@ -2539,7 +2542,7 @@ main > .card:has(.clean-nav){position:relative!important;}
           <button type="button" class="btn secondary tiny" id="refreshCatalogBtn">Atualizar catálogo agora</button>
         </div>
         <div class="col">
-          <span id="catalogStatus" class="tiny muted">Catálogo carregado automaticamente ao abrir.</span><div class="tiny muted" style="margin-top:.3rem;">💡 Se o catálogo tiver uma coluna <b>Letra</b>, a letra é associada automaticamente por <b>nome + autor</b>.</div>
+          <span id="catalogStatus" class="tiny muted">Catálogo carregado automaticamente ao abrir.</span><div class="tiny muted" style="margin-top:.3rem;">💡 Pesquisa por <b>título, autor, tema, momento e celebração</b>. As fontes online incluem Laudate, O Canto na Liturgia e Cantólico.</div>
         </div>
       </div>
       <div class="row">
@@ -2832,9 +2835,15 @@ main > .card:has(.clean-nav){position:relative!important;}
       </div>
       <div class="col">
         <label for="songSelectTheme">Tema</label>
-        <select id="songSelectTheme">
-          <option value="">Todos</option>
-        </select>
+        <select id="songSelectTheme"><option value="">Todos os temas</option></select>
+      </div>
+      <div class="col">
+        <label for="songSelectAuthor">Autor / compositor</label>
+        <select id="songSelectAuthor"><option value="">Todos os autores</option></select>
+      </div>
+      <div class="col">
+        <label for="songSelectMoment">Momento litúrgico</label>
+        <select id="songSelectMoment"><option value="">Todos os momentos</option></select>
       </div>
     </div>
 
@@ -2843,6 +2852,7 @@ main > .card:has(.clean-nav){position:relative!important;}
       <div id="songSelectSuggestionsList"></div>
     </div>
 
+    <div class="small muted" style="margin:-.2rem 0 .65rem;padding:.55rem .7rem;background:rgba(23,105,170,.06);border-radius:.5rem;">🔎 <b>Pesquisa inteligente:</b> catálogo local + autor + tema + momento litúrgico. Quando não existir no catálogo, pode continuar a pesquisa diretamente no Laudate, O Canto na Liturgia ou Cantólico.</div>
     <div id="songSelectList" class="song-select-list">
       <p class="small muted">Catálogo a carregar…</p>
     </div>

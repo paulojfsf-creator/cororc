@@ -2081,6 +2081,48 @@ main > .card:has(.clean-nav){position:relative!important;}
 @media(max-width:800px){.leaflet-editor-item-actions{justify-content:flex-start}.leaflet-editor-toolbar-main{width:100%}}
 </style>
 
+
+<style id="coro-leaflet-v44">
+/* 4.4 — editor visual A4 em tempo real */
+.leaflet-editor-workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,480px);gap:0;min-height:0;height:calc(92vh - 155px)}
+.leaflet-editor-panel,.leaflet-live-panel{min-width:0;min-height:0;display:flex;flex-direction:column}
+.leaflet-editor-panel{border-right:1px solid var(--v4-line)}
+.leaflet-live-panel{background:#eef1f4}
+.leaflet-editor-panel-head{display:flex;align-items:center;justify-content:space-between;gap:.7rem;padding:.65rem .85rem;border-bottom:1px solid var(--v4-line);background:#fff;flex:0 0 auto}
+.leaflet-editor-panel-head .small{white-space:nowrap}
+.leaflet-editor-list{grid-template-columns:1fr!important;max-height:none!important;flex:1;overflow:auto;padding:.85rem}
+.leaflet-live-preview{position:relative;flex:1;overflow:auto;padding:18px;display:block}
+.leaflet-live-sheet{position:relative;width:794px;height:1123px;transform-origin:top left;background:#fff;box-shadow:0 2px 14px rgba(0,0,0,.14);margin:0 auto}
+.leaflet-live-sheet .leaflet-print-root{width:794px!important;height:1123px!important;min-height:1123px!important;padding:34px!important;box-sizing:border-box}
+.leaflet-live-sheet .leaflet-print-head{min-height:110px;padding-bottom:15px;margin-bottom:15px;gap:19px}
+.leaflet-live-sheet .leaflet-print-logo,.leaflet-live-sheet .leaflet-print-image{width:129px;height:102px}
+.leaflet-live-sheet .leaflet-print-title h1{font-size:20px;margin-bottom:7px}
+.leaflet-live-sheet .leaflet-print-title .date{font-size:11px}
+.leaflet-live-sheet .leaflet-print-title .season{font-size:10px;margin-top:4px}
+.leaflet-live-sheet .leaflet-print-grid{height:930px;gap:26px}
+.leaflet-live-sheet .leaflet-print-song{margin-bottom:12px}
+.leaflet-live-sheet .leaflet-print-song h2{font-size:11.5px}
+.leaflet-live-sheet .leaflet-print-song .author{font-size:9px;margin-bottom:4px}
+.leaflet-live-sheet .leaflet-print-song .moment{font-size:8px;margin-bottom:4px}
+.leaflet-live-sheet .leaflet-print-song .lyrics{font-size:9.5px;line-height:1.24}
+.leaflet-live-sheet .leaflet-print-footer{font-size:8px}
+.leaflet-live-sheet.compact .leaflet-print-song h2{font-size:10.8px}
+.leaflet-live-sheet.compact .leaflet-print-song .lyrics{font-size:8.8px;line-height:1.18}
+.leaflet-live-sheet.ultra-compact .leaflet-print-song h2{font-size:10px}
+.leaflet-live-sheet.ultra-compact .leaflet-print-song .lyrics{font-size:8.1px;line-height:1.12}
+@media(max-width:980px){.leaflet-editor-workspace{grid-template-columns:1fr;height:auto;max-height:calc(92vh - 155px);overflow:auto}.leaflet-editor-panel{border-right:0;border-bottom:1px solid var(--v4-line);min-height:360px}.leaflet-live-panel{min-height:520px}.leaflet-live-preview{min-height:470px}.leaflet-editor-list{overflow:visible!important}}
+</style>
+
+
+<style id="coro-v45-fixes">
+.program-moments-picker{border:1px solid var(--clean-line,#dfe3e8);background:#fff;padding:.85rem;margin:1rem 0 1.15rem}
+.program-moments-head{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;border-bottom:1px solid #edf0f3;padding-bottom:.7rem}
+.program-moments-actions{display:flex;gap:.35rem;flex-wrap:wrap}.program-moments-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.5rem .9rem;padding-top:.75rem}
+.program-moments-grid label{display:flex!important;align-items:center;gap:.45rem;padding:.4rem .45rem;border:1px solid #edf0f3;background:#fafbfc;font-weight:600!important;cursor:pointer}.program-moments-grid input{accent-color:#1769aa}
+.program-part-card.is-disabled{display:none!important}.people-add-row{display:flex;gap:.4rem;margin-top:.75rem}.people-add-row input{flex:1;min-width:0}.people-list{display:flex;flex-direction:column!important;gap:.35rem!important}.person-row{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.4rem .5rem;border-bottom:1px solid #edf0f3}.person-row .btn{margin:0!important}
+#assistantFillBtn{background:#1769aa!important;color:#fff!important;border-color:#1769aa!important}#assistantLaudateBtn{background:#fff!important;color:#4b5565!important;border-color:#dfe3e8!important}
+@media(max-width:900px){.program-moments-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:600px){.program-moments-grid{grid-template-columns:1fr}.program-moments-head{align-items:flex-start}}
+</style>
 </head>
 <body>
 <header>
@@ -2209,13 +2251,23 @@ main > .card:has(.clean-nav){position:relative!important;}
         </div>
 
         <div class="row">
-          <div class="col"><label for="salmistaPrograma">Salmista</label><input type="text" id="salmistaPrograma" placeholder="Nome do salmista"></div>
-          <div class="col"><label for="organistaPrograma">Organista</label><input type="text" id="organistaPrograma" placeholder="Nome do organista"></div>
+          <div class="col"><label for="salmistaPrograma">Salmista</label><select id="salmistaPrograma"></select></div>
+          <div class="col"><label for="organistaPrograma">Organista</label><select id="organistaPrograma"></select></div>
         </div>
 
         <div id="smartLiturgyPanel" style="margin:0.75rem 0;padding:1rem;background:var(--bg-soft);border-left:4px solid var(--primary);border-radius:0.5rem;">
           <strong>⛪ Contexto litúrgico</strong>
           <div id="smartLiturgyContent" class="small" style="margin-top:0.35rem;">Escolhe uma data para identificar a celebração.</div>
+        </div>
+
+        <div class="program-moments-picker" id="programMomentsPicker">
+          <div class="program-moments-head">
+            <div><strong>Momentos a utilizar</strong><div class="small muted">Escolha apenas os momentos que vão fazer parte desta celebração.</div></div>
+            <div class="program-moments-actions"><button type="button" class="btn secondary tiny" id="programMomentsCommonBtn">Usar momentos habituais</button><button type="button" class="btn secondary tiny" id="programMomentsClearBtn">Limpar</button></div>
+          </div>
+          <div class="program-moments-grid">
+            <label><input type="checkbox" data-moment-toggle="entrada"> Entrada</label><label><input type="checkbox" data-moment-toggle="atoPenitencial"> Ato Penitencial</label><label><input type="checkbox" data-moment-toggle="gloria"> Glória</label><label><input type="checkbox" data-moment-toggle="salmo"> Salmo Responsorial</label><label><input type="checkbox" data-moment-toggle="aclamacao"> Aclamação ao Evangelho</label><label><input type="checkbox" data-moment-toggle="ofertorio"> Ofertório</label><label><input type="checkbox" data-moment-toggle="santo"> Santo</label><label><input type="checkbox" data-moment-toggle="paiNosso"> Pai Nosso</label><label><input type="checkbox" data-moment-toggle="paz"> Paz</label><label><input type="checkbox" data-moment-toggle="cordeiro"> Cordeiro de Deus</label><label><input type="checkbox" data-moment-toggle="comunhao"> Comunhão</label><label><input type="checkbox" data-moment-toggle="acaoGracas"> Ação de Graças</label><label><input type="checkbox" data-moment-toggle="final"> Final</label>
+          </div>
         </div>
 
         <div id="programAssistantPanel" class="assistant-panel" style="margin:1rem 0;padding:1rem;border:1px solid var(--border);border-radius:.75rem;background:var(--bg-soft);">
@@ -2236,7 +2288,7 @@ main > .card:has(.clean-nav){position:relative!important;}
         <hr>
 
         <div class="row">
-          <div class="col">
+          <div class="col program-part-card" data-program-part="entrada">
             <label for="entrada">Entrada</label>
             <select id="entrada"></select>
             <div class="program-buttons">
@@ -2245,7 +2297,7 @@ main > .card:has(.clean-nav){position:relative!important;}
               <button type="button" class="btn secondary small program-media-btn" data-part-id="entrada">Vídeo/áudio</button>
             </div>
           </div>
-          <div class="col">
+          <div class="col program-part-card" data-program-part="atoPenitencial">
             <label for="atoPenitencial">Ato Penitencial</label>
             <select id="atoPenitencial"></select>
             <div class="program-buttons">
@@ -2257,7 +2309,7 @@ main > .card:has(.clean-nav){position:relative!important;}
         </div>
 
         <div class="row">
-          <div class="col">
+          <div class="col program-part-card" data-program-part="gloria">
             <label for="gloria">Glória</label>
             <select id="gloria"></select>
             <div class="program-buttons">
@@ -2266,7 +2318,7 @@ main > .card:has(.clean-nav){position:relative!important;}
               <button type="button" class="btn secondary small program-media-btn" data-part-id="gloria">Vídeo/áudio</button>
             </div>
           </div>
-          <div class="col">
+          <div class="col program-part-card" data-program-part="salmo">
             <label for="salmo">Salmo Responsorial</label>
             <select id="salmo"></select>
             <div class="program-buttons">
@@ -2278,7 +2330,7 @@ main > .card:has(.clean-nav){position:relative!important;}
         </div>
 
         <div class="row">
-          <div class="col">
+          <div class="col program-part-card" data-program-part="aclamacao">
             <label for="aclamacao">Aclamação ao Evangelho</label>
             <select id="aclamacao"></select>
             <div class="program-buttons">
@@ -2287,7 +2339,7 @@ main > .card:has(.clean-nav){position:relative!important;}
               <button type="button" class="btn secondary small program-media-btn" data-part-id="aclamacao">Vídeo/áudio</button>
             </div>
           </div>
-          <div class="col">
+          <div class="col program-part-card" data-program-part="ofertorio">
             <label for="ofertorio">Ofertório</label>
             <select id="ofertorio"></select>
             <div class="program-buttons">
@@ -2299,7 +2351,7 @@ main > .card:has(.clean-nav){position:relative!important;}
         </div>
 
         <div class="row">
-          <div class="col">
+          <div class="col program-part-card" data-program-part="santo">
             <label for="santo">Santo</label>
             <select id="santo"></select>
             <div class="program-buttons">
@@ -2308,7 +2360,7 @@ main > .card:has(.clean-nav){position:relative!important;}
               <button type="button" class="btn secondary small program-media-btn" data-part-id="santo">Vídeo/áudio</button>
             </div>
           </div>
-          <div class="col">
+          <div class="col program-part-card" data-program-part="paiNosso">
             <label for="paiNosso">Pai Nosso</label>
             <select id="paiNosso"></select>
             <div class="program-buttons">
@@ -2320,7 +2372,7 @@ main > .card:has(.clean-nav){position:relative!important;}
         </div>
 
         <div class="row">
-          <div class="col">
+          <div class="col program-part-card" data-program-part="paz">
             <label for="paz">Paz</label>
             <select id="paz"></select>
             <div class="program-buttons">
@@ -2329,7 +2381,7 @@ main > .card:has(.clean-nav){position:relative!important;}
               <button type="button" class="btn secondary small program-media-btn" data-part-id="paz">Vídeo/áudio</button>
             </div>
           </div>
-          <div class="col">
+          <div class="col program-part-card" data-program-part="cordeiro">
             <label for="cordeiro">Cordeiro de Deus</label>
             <select id="cordeiro"></select>
             <div class="program-buttons">
@@ -2341,7 +2393,7 @@ main > .card:has(.clean-nav){position:relative!important;}
         </div>
 
         <div class="row">
-          <div class="col">
+          <div class="col program-part-card" data-program-part="comunhao">
             <label for="comunhao">Comunhão</label>
             <select id="comunhao"></select>
             <div class="program-buttons">
@@ -2350,7 +2402,7 @@ main > .card:has(.clean-nav){position:relative!important;}
               <button type="button" class="btn secondary small program-media-btn" data-part-id="comunhao">Vídeo/áudio</button>
             </div>
           </div>
-          <div class="col">
+          <div class="col program-part-card" data-program-part="acaoGracas">
             <label for="acaoGracas">Ação de Graças</label>
             <select id="acaoGracas"></select>
             <div class="program-buttons">
@@ -2362,7 +2414,7 @@ main > .card:has(.clean-nav){position:relative!important;}
         </div>
 
         <div class="row">
-          <div class="col">
+          <div class="col program-part-card" data-program-part="final">
             <label for="final">Final</label>
             <select id="final"></select>
             <div class="program-buttons">
@@ -2530,8 +2582,8 @@ main > .card:has(.clean-nav){position:relative!important;}
           <div><span class="eyebrow">GESTÃO</span><h2>Pessoas</h2><p class="small muted">Salmistas e organistas usados nos programas do coro.</p></div>
         </div>
         <div class="people-grid">
-          <div class="card people-card"><div class="people-card-head"><div class="people-symbol">S</div><div><h3>Salmistas</h3><p class="small muted">Pessoas registadas nos programas.</p></div></div><div id="peopleSalmistas" class="people-list"><span class="muted">A carregar…</span></div></div>
-          <div class="card people-card"><div class="people-card-head"><div class="people-symbol">O</div><div><h3>Organistas</h3><p class="small muted">Pessoas registadas nos programas.</p></div></div><div id="peopleOrganistas" class="people-list"><span class="muted">A carregar…</span></div></div>
+          <div class="card people-card"><div class="people-card-head"><div class="people-symbol">S</div><div><h3>Salmistas</h3><p class="small muted">Pessoas registadas nos programas.</p></div></div><div class="people-add-row"><input type="text" id="newSalmistaName" placeholder="Nome do salmista"><button type="button" class="btn small" id="addSalmistaBtn">Adicionar</button></div><div id="peopleSalmistas" class="people-list"><span class="muted">A carregar…</span></div></div>
+          <div class="card people-card"><div class="people-card-head"><div class="people-symbol">O</div><div><h3>Organistas</h3><p class="small muted">Pessoas registadas nos programas.</p></div></div><div class="people-add-row"><input type="text" id="newOrganistaName" placeholder="Nome do organista"><button type="button" class="btn small" id="addOrganistaBtn">Adicionar</button></div><div id="peopleOrganistas" class="people-list"><span class="muted">A carregar…</span></div></div>
         </div>
       </div>
     </section>
@@ -3118,7 +3170,22 @@ main > .card:has(.clean-nav){position:relative!important;}
         <button type="button" class="btn primary small" id="leafletEditorPrint">Imprimir / PDF</button>
       </div>
     </div>
-    <div id="leafletEditorList" class="leaflet-editor-list"></div>
+    <div class="leaflet-editor-workspace">
+      <section class="leaflet-editor-panel" aria-label="Conteúdo do folheto">
+        <div class="leaflet-editor-panel-head">
+          <strong>Conteúdo</strong>
+          <span class="small muted">Edite à esquerda e veja o resultado à direita.</span>
+        </div>
+        <div id="leafletEditorList" class="leaflet-editor-list"></div>
+      </section>
+      <section class="leaflet-live-panel" aria-label="Pré-visualização A4">
+        <div class="leaflet-editor-panel-head">
+          <strong>Pré-visualização A4</strong>
+          <span class="small muted">Atualização em tempo real</span>
+        </div>
+        <div id="leafletEditorLivePreview" class="leaflet-live-preview" aria-live="polite"></div>
+      </section>
+    </div>
   </div>
 </div>
 </body>

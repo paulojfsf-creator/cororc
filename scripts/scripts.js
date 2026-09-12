@@ -1195,9 +1195,10 @@ function renderSongListModal(){
  const count=arr.length;
  const external=rawQ||mo?'<div class="song-online-search"><span>Não encontrou no catálogo local?</span><a class="btn secondary small" href="'+escSmart(getCantoNaLiturgiaGoogleUrl(rawQ||mo))+'" target="_blank" rel="noopener noreferrer">🎼 O Canto na Liturgia</a><a class="btn secondary small" href="'+escSmart(getLaudateUrl(rawQ||mo))+'" target="_blank" rel="noopener noreferrer">📖 Laudate</a><a class="btn secondary small" href="'+escSmart(getCantolicoUrl(rawQ||mo))+'" target="_blank" rel="noopener noreferrer">✝️ Cantólico</a></div>':'';
  const header='<div class="song-search-summary"><b>'+count+'</b> resultado(s)'+(rawQ?' para “'+escSmart(rawQ)+'”':'')+(mo?' · momento: '+escSmart(mo):'')+'</div>';
- const body=arr.map(s=>{const t=getSongTitle(s),a=getSongAuthor(s),m=getSongMomentLabel(s),score=getSongScoreUrl(s,a),links=getSongOnlineLinks(s,a);return '<div class="song-select-item"><div class="song-select-item-header"><div class="song-select-title">'+escSmart(t)+'</div><div class="song-select-meta">'+escSmart(a||'Autor não indicado')+(m?' · '+escSmart(m):'')+(s.Tema?' · '+escSmart(s.Tema):'')+'</div></div><div class="song-select-actions"><button type="button" class="btn small program-use-song-btn" data-title="'+t.replace(/"/g,'&quot;')+'" data-author="'+a.replace(/"/g,'&quot;')+'">Usar</button><a class="btn secondary small" href="'+escSmart(links.laudate)+'" target="_blank" rel="noopener noreferrer">📖 Letra/pauta</a>'+(score?'<a class="btn secondary small" href="'+escSmart(score)+'" target="_blank" rel="noopener noreferrer">📄 Partitura</a>':'')+'<a class="btn secondary small" href="'+escSmart(links.cantolico)+'" target="_blank" rel="noopener noreferrer">✝️ Cantólico</a></div></div>';}).join('');
+ const body=arr.map(s=>{const t=getSongTitle(s),a=getSongAuthor(s),m=getSongMomentLabel(s),score=getSongScoreUrl(s,a),links=getSongOnlineLinks(s,a);return '<div class="song-select-item"><div class="song-select-item-header"><div class="song-select-title">'+escSmart(t)+'</div><div class="song-select-meta">'+escSmart(a||'Autor não indicado')+(m?' · '+escSmart(m):'')+(s.Tema?' · '+escSmart(s.Tema):'')+'</div></div><div class="song-select-actions"><button type="button" class="btn small program-use-song-btn" data-title="'+t.replace(/"/g,'&quot;')+'" data-author="'+a.replace(/"/g,'&quot;')+'">Usar</button><a class="btn secondary small" href="'+escSmart(links.laudate)+'" target="_blank" rel="noopener noreferrer">📖 Letra/pauta</a>'+(score?'<button type="button" class="btn secondary small" data-preview-score="'+escSmart(score)+'" data-preview-title="'+escSmart(t)+'" data-preview-sub="'+escSmart(a||'')+'">🎼 Partitura</button>':'')+'<a class="btn secondary small" href="'+escSmart(links.cantolico)+'" target="_blank" rel="noopener noreferrer">✝️ Cantólico</a></div></div>';}).join('');
  el.innerHTML=header+body+(arr.length?'':'<p class="small muted">Nenhum cântico encontrado no catálogo local.</p>')+external;
  el.querySelectorAll('[data-title]').forEach(b=>b.onclick=()=>useSongInPart(window.currentSmartPart,b.dataset.title,b.dataset.author||''));
+ refreshPartituraPreviewButtons();
 }
 
 function useSongInPart(partId,title,author='',silent=false){
@@ -2422,3 +2423,39 @@ document.addEventListener('DOMContentLoaded',()=>{
   const ib=document.getElementById('importBackupBtn'), inp=document.getElementById('importBackupInput');
   ib?.addEventListener('click',()=>inp?.click()); inp?.addEventListener('change',e=>importCoroBackup(e.target.files?.[0]));
 });
+
+// ============================================
+// v5 — VISUALIZADOR DE PARTITURAS / FONTES
+// ============================================
+function openMediaPreview(url,title='',subtitle=''){
+  const modal=document.getElementById('mediaPreviewModal');
+  const body=document.getElementById('mediaPreviewBody');
+  const open=document.getElementById('mediaPreviewOpenBtn');
+  if(!modal||!body||!url)return false;
+  const u=String(url).trim();
+  document.getElementById('mediaPreviewTitle').textContent='🎼 '+(title||'Partitura');
+  document.getElementById('mediaPreviewSub').textContent=subtitle||'';
+  open.href=u;
+  const lower=u.toLowerCase().split('?')[0];
+  if(/\.(pdf)$/.test(lower)){
+    body.innerHTML='<iframe title="Partitura" src="'+escSmart(u)+'" style="width:100%;height:100%;border:0;background:#fff;"></iframe>';
+  }else if(/\.(png|jpe?g|webp|gif|svg)$/.test(lower)){
+    body.innerHTML='<img alt="Partitura" src="'+escSmart(u)+'" style="max-width:100%;max-height:100%;object-fit:contain;background:#fff;">';
+  }else{
+    body.innerHTML='<div style="padding:2rem;text-align:center"><div style="font-size:2rem">📄</div><p>Esta fonte não permite uma pré-visualização direta.</p><a class="btn" href="'+escSmart(u)+'" target="_blank" rel="noopener noreferrer">Abrir partitura</a></div>';
+  }
+  modal.hidden=false; modal.setAttribute('aria-hidden','false');
+  return true;
+}
+function closeMediaPreview(){const m=document.getElementById('mediaPreviewModal');if(m){m.hidden=true;m.setAttribute('aria-hidden','true');const b=document.getElementById('mediaPreviewBody');if(b)b.innerHTML='';}}
+function initMediaPreview(){
+  document.getElementById('mediaPreviewCloseBtn')?.addEventListener('click',closeMediaPreview);
+  document.getElementById('mediaPreviewDoneBtn')?.addEventListener('click',closeMediaPreview);
+  document.getElementById('mediaPreviewModal')?.addEventListener('click',e=>{if(e.target.id==='mediaPreviewModal')closeMediaPreview();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!document.getElementById('mediaPreviewModal')?.hidden)closeMediaPreview();});
+}
+function refreshPartituraPreviewButtons(){
+  document.querySelectorAll('[data-preview-score]').forEach(b=>{if(b.dataset.previewBound)return;b.dataset.previewBound='1';b.addEventListener('click',()=>openMediaPreview(b.dataset.previewScore,b.dataset.previewTitle||'Partitura',b.dataset.previewSub||''));});
+}
+
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',initMediaPreview);}else{initMediaPreview();}

@@ -958,13 +958,98 @@ function getUsageHistory(){try{const a=JSON.parse(localStorage.getItem('coroSong
 function lastUse(title){const key=normSmart(title);try{return getUsageHistory().filter(x=>normSmart(x.song||x.title)===key).sort((a,b)=>String(b.date).localeCompare(String(a.date)))[0]||null;}catch(e){return null;}}
 function usageCount(title){return getUsageHistory().filter(x=>normSmart(x.song||x.title)===normSmart(title)).length;}
 function currentProgramTitles(exceptPartId=''){return new Set(PROGRAM_PARTS.filter(p=>p.id!==exceptPartId).map(p=>document.getElementById(p.id)?.value||'').filter(Boolean).map(normSmart));}
+
+// ============================================
+// BASE DE PROPOSTAS LITÚRGICAS — fontes de referência
+// Prioridade: Cantoral Nacional (SNL) > Laudate > catálogo do coro.
+// A chave é celebração + ciclo + momento; não apenas "tempo litúrgico".
+// ============================================
+const LITURGICAL_MUSIC_PROPOSALS = {
+  '2026-12-25|Missa do Dia|B': {
+    sourceLabel:'Cantoral Nacional — Ano B',
+    sourceUrl:'https://www.liturgia.pt/musica/cantoralB.php',
+    laudateUrl:'https://www.canticos.pt/domingo/bn_dia/',
+    parts:{
+      entrada:[['Um Menino nos foi dado','',981],['No princípio, antes da criação','',644],['Glória! Hossana! Eis Jesus Cristo','',516]],
+      salmo:[['Todos os confins da terra','',963]],
+      comunhao:[['No princípio, antes de todos os tempos','',645],['Deus enviou ao mundo o seu Filho','',357]],
+      final:[['Ah! Vinde todos à porfia','',185],['Cantam, cantem os Anjos a Deus','',289]]
+    },
+    laudate:{
+      entrada:['Alegrem-se os céus e a terra','Bendito seja Deus','Cantemos cantemos ao Senhor','Cristo dará a liberdade','Deus enviou ao mundo','Ergue os teus olhos','Esta noite é de alegria','Exultemos de alegria','Hoje sobre nós resplandece','Jesus Cristo ontem e hoje','No princípio antes da criação','No princípio antes de todos','Noite de festa','Povos batei palmas','Senhor Tu és a luz','Um Menino nos foi dado'],
+      salmo:['Todos os confins da terra','Hoje nasceu o nosso Salvador'],
+      ofertorio:['Adeste fideles','Cristo dará a liberdade','Deus enviou ao mundo','Ergue os teus olhos','Esta noite é de alegria','Exultemos de alegria','Felizes as entranhas','Senhor Tu és a luz','Um Menino nos foi dado'],
+      comunhao:['Bendito seja Deus','Deus enviou ao mundo','Exultemos de alegria','Felizes as entranhas','Jesus Cristo ontem e hoje','No princípio antes da criação','No princípio antes de todos','O trigo que Deus semeou','Senhor Tu és a luz'],
+      acaoGracas:['Bendito seja Deus','Cantai comigo','Cantemos cantemos ao Senhor','Felizes as entranhas','No princípio antes de todos','Povos batei palmas','Senhor Tu és a luz'],
+      final:['Adeste fideles','Alegrem-se os céus e a terra','Cantai comigo','Cantemos à porfia','Cantemos cantemos ao Senhor','Cristãos alegria','Cristo dará a liberdade','É Natal salvação e luz','Jesus Cristo ontem e hoje','Noite de festa','Noite feliz','Povos batei palmas']
+    }
+  },
+  '2026-12-24|Missa da Noite|B': {
+    sourceLabel:'Cantoral Nacional — Ano B', sourceUrl:'https://www.liturgia.pt/musica/cantoralB.php', laudateUrl:'https://www.canticos.pt/domingo/bn_noite/',
+    parts:{entrada:[['Glória a Deus e paz na terra','',504],['Oh admirável noite – I','',759],['Oh admirável noite – II','',760]],salmo:[['Hoje nasceu','',526]],comunhao:[['O Verbo fez-Se carne – I','',753],['O Verbo fez-Se carne – II','',754],['O Verbo fez-Se carne – III','',755],['O Verbo fez-Se homem','',756],['A Vida que estava junto do Pai','',160]],final:[['Cristo nasceu: Vinde adoremos','',322],['Adeste fideles','',180]]}
+  },
+  '2026-12-25|Missa da Aurora|B': {
+    sourceLabel:'Cantoral Nacional — Ano B', sourceUrl:'https://www.liturgia.pt/musica/cantoralB.php', laudateUrl:'https://www.canticos.pt/domingo/bn_aurora/',
+    parts:{entrada:[['Hoje uma grande luz desceu','',528],['Brilha a luz da sua glória','',260]],salmo:[['Hoje sobre nós resplandece uma luz','',527]],comunhao:[['Os pastores vieram','',779],['O povo que estava nas trevas','',697]],final:[['Deus enviou ao mundo','',357],['Nós Vos saudamos, ó Mãe santa','',665]]}
+  }
+};
+
+const CELEBRATION_VARIANTS = {
+  '2026-12-24':[
+    {id:'Missa da Noite',label:'Natal — Missa da Noite'},
+    {id:'Missa da Vigília',label:'Natal — Missa da Vigília'}
+  ],
+  '2026-12-25':[
+    {id:'Missa da Aurora',label:'Natal — Missa da Aurora'},
+    {id:'Missa do Dia',label:'Natal — Missa do Dia'}
+  ]
+};
+function musicProposalKey(date,partId){
+  const variant=document.getElementById('celebrationVariant')?.value||'';
+  const cycle=getLiturgicalInfo(date||'').year||'A';
+  return `${date}|${variant}|${cycle}`;
+}
+function getMusicProposals(date,partId){
+  const key=musicProposalKey(date,partId), data=LITURGICAL_MUSIC_PROPOSALS[key];
+  return data?.parts?.[partId]||[];
+}
+function getMusicSourceInfo(date,partId){return LITURGICAL_MUSIC_PROPOSALS[musicProposalKey(date,partId)]||null;}
+function updateCelebrationVariantOptions(){
+  const date=document.getElementById('date')?.value, wrap=document.getElementById('celebrationVariantWrap'), sel=document.getElementById('celebrationVariant');
+  if(!wrap||!sel)return;
+  const variants=CELEBRATION_VARIANTS[date]||[];
+  const previous=sel.value;
+  if(!variants.length){wrap.hidden=true;sel.innerHTML='<option value="">Celebração normal</option>';return;}
+  wrap.hidden=false;
+  sel.innerHTML=variants.map(v=>`<option value="${escSmart(v.id)}">${escSmart(v.label)}</option>`).join('');
+  if(variants.some(v=>v.id===previous))sel.value=previous; else sel.value=variants[variants.length-1].id;
+}
+function renderLiturgicalProposalPreview(){
+  const box=document.getElementById('liturgicalProposalPreview'); if(!box)return;
+  const date=document.getElementById('date')?.value||'', variant=document.getElementById('celebrationVariant')?.value||'';
+  const info=getMusicSourceInfo(date,'entrada');
+  if(!info){box.hidden=true;box.innerHTML='';return;}
+  box.hidden=false;
+  box.innerHTML=`<div class="small"><b>📚 Fonte litúrgica prioritária:</b> ${escSmart(info.sourceLabel)} · <a href="${escSmart(info.sourceUrl)}" target="_blank" rel="noopener">Cantoral Nacional</a> · <a href="${escSmart(info.laudateUrl)}" target="_blank" rel="noopener">Laudate</a><br><span class="muted">A aplicação vai dar prioridade às propostas específicas de <b>${escSmart(variant)}</b>, antes do repertório geral do coro.</span></div>`;
+}
+function initCelebrationVariant(){
+  const date=document.getElementById('date'), sel=document.getElementById('celebrationVariant');
+  date?.addEventListener('change',()=>{updateCelebrationVariantOptions();renderLiturgicalProposalPreview();renderProgramAssistant();});
+  sel?.addEventListener('change',()=>{renderLiturgicalProposalPreview();renderProgramAssistant();});
+  updateCelebrationVariantOptions();renderLiturgicalProposalPreview();
+}
+
 function smartReasonScore(song,partId){
  const info=getLiturgicalInfo(document.getElementById('date')?.value||'');
  const title=getSongTitle(song), titleN=normSmart(title), tema=normSmart(song.Tema||''), tempo=normSmart(song.Tempo||''), obs=normSmart(song.Observações||song.Observacoes||'');
  const label=normSmart((PROGRAM_PARTS.find(p=>p.id===partId)||{}).label||'');
  const moment=normSmart(songMoment(song));
- const psalm=songPsalm(song), targetPsalm=String((window.CORO_READINGS_2026?.[document.getElementById('date')?.value||'']?.refrain)||info.psalm||'');
+ const proposalTitles=getMusicProposals(document.getElementById('date')?.value||'',partId).map(x=>normSmart(x[0]));
+ const isOfficialProposal=proposalTitles.includes(titleN);
+ const psalmProposal=getMusicProposals(document.getElementById('date')?.value||'',partId).find(x=>normSmart(x[0])===titleN);
+ const psalm= songPsalm(song), targetPsalm=String((window.CORO_READINGS_2026?.[document.getElementById('date')?.value||'']?.refrain)||info.psalm||'');
  let score=0, reasons=[];
+ if(isOfficialProposal){score+=125; reasons.push('proposta do Cantoral Nacional');}
  if(moment && (moment===label || moment.includes(label) || label.includes(moment))){score+=38; reasons.push('momento litúrgico');}
  else if(label && obs.includes(label)){score+=18; reasons.push('momento compatível');}
  const season=normSmart(info.time||info.season||'');
@@ -972,6 +1057,9 @@ function smartReasonScore(song,partId){
  const targetSeason=seasonAliases[season]||season;
  if(targetSeason && tempo.split(';').map(x=>normSmart(x)).some(x=>x===targetSeason || x.includes(targetSeason) || targetSeason.includes(x))){score+=22; reasons.push('tempo litúrgico');}
  const titleLit=normSmart(info.title||info.name||'');
+ const src=getMusicSourceInfo(document.getElementById('date')?.value||'',partId);
+ const laudateTitles=src?.laudate?.[partId]||[];
+ if(laudateTitles.some(x=>normSmart(x)===titleN)){score+=72; reasons.push('proposta Laudate');}
  if(titleLit && (tema.includes(titleLit)||titleLit.includes(tema)) && tema.length>5){score+=35; reasons.push('celebração específica');}
  const words=String(info.theme||'').toLowerCase().split(/[,;]+/).map(x=>normSmart(x)).filter(x=>x.length>3);
  const matches=words.filter(w=>tema.includes(w)||obs.includes(w)||titleN.includes(w));
@@ -1003,8 +1091,11 @@ function openSongSelectModal(partId){
 function buildSmartSuggestionList(partId){
  const box=document.getElementById('songSelectSuggestions'),list=document.getElementById('songSelectSuggestionsList');if(!box||!list)return;
  const info=getLiturgicalInfo(document.getElementById('date')?.value||''); const top=smartSuggestions(partId);
- list.innerHTML=(info.psalm&&partId==='salmo'?'<div class="small" style="margin-bottom:.5rem;padding:.5rem;background:rgba(37,99,235,.08);border-radius:.35rem;"><b>📖 Salmo do dia:</b> '+escSmart(info.psalm)+'</div>':'')+top.map(x=>{const t=getSongTitle(x.s),m=x.meta,lu=m.lu;const status=lu?('Último uso: '+lu.date):'⭐ Nunca utilizado';const why=m.reasons.slice(0,3).join(' · ');return '<div class="smart-suggestion-row"><div><b>'+escSmart(t)+'</b><div class="small muted">'+fitLabel(m.score)+' · '+escSmart(status)+(getSongAuthor(x.s)?' · '+escSmart(getSongAuthor(x.s)):'')+'</div><div class="small">'+escSmart(why)+'</div></div><button type="button" class="btn small" data-smart-title="'+t.replace(/"/g,'&quot;')+'">Usar</button></div>';}).join('')||'<p class="small muted">Não há sugestões disponíveis.</p>';
- box.style.display=top.length?'block':'none';list.querySelectorAll('[data-smart-title]').forEach(b=>b.onclick=()=>useSongInPart(partId,b.dataset.smartTitle,b.dataset.smartAuthor||''));
+ const source=getMusicSourceInfo(document.getElementById('date')?.value||'',partId);
+ const official=getMusicProposals(document.getElementById('date')?.value||'',partId);
+ const officialBox=source&&official.length?'<div class="official-proposals"><b>🥇 Propostas do Cantoral Nacional</b>'+official.map(x=>'<div class="official-proposal"><span>'+escSmart(x[0])+(x[2]?' <small>nº '+escSmart(x[2])+'</small>':'')+'</span><button type="button" class="btn small proposal-search-btn" data-proposal-title="'+escSmart(x[0])+'">Pesquisar</button></div>').join('')+'</div>':'';
+ list.innerHTML=officialBox+(info.psalm&&partId==='salmo'?'<div class="small" style="margin-bottom:.5rem;padding:.5rem;background:rgba(37,99,235,.08);border-radius:.35rem;"><b>📖 Salmo do dia:</b> '+escSmart(info.psalm)+'</div>':'')+top.map(x=>{const t=getSongTitle(x.s),m=x.meta,lu=m.lu;const status=lu?('Último uso: '+lu.date):'⭐ Nunca utilizado';const why=m.reasons.slice(0,3).join(' · ');return '<div class="smart-suggestion-row"><div><b>'+escSmart(t)+'</b><div class="small muted">'+fitLabel(m.score)+' · '+escSmart(status)+(getSongAuthor(x.s)?' · '+escSmart(getSongAuthor(x.s)):'')+'</div><div class="small">'+escSmart(why)+'</div></div><button type="button" class="btn small" data-smart-title="'+t.replace(/"/g,'&quot;')+'">Usar</button></div>';}).join('')||'<p class="small muted">Não há sugestões disponíveis.</p>';
+ box.style.display=(top.length||official.length)?'block':'none';list.querySelectorAll('[data-smart-title]').forEach(b=>b.onclick=()=>useSongInPart(partId,b.dataset.smartTitle,b.dataset.smartAuthor||'')); list.querySelectorAll('[data-proposal-title]').forEach(b=>b.onclick=()=>{const q=b.dataset.proposalTitle||'';const search=document.getElementById('songSelectSearch');if(search){search.value=q;renderSongListModal();}});
 }
 function renderSongListModal(){
  const el=document.getElementById('songSelectList');if(!el)return;
@@ -1918,6 +2009,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadCustomSongs();
   initCustomSongs();
   setupSmartSelectors();
+  initCelebrationVariant();
   PROGRAM_PARTS.forEach(p=>{
     const el=document.getElementById(p.id);
     if(el){el.dataset.selectedAuthor=el.selectedOptions?.[0]?.dataset?.author||el.dataset.selectedAuthor||'';autoApplyLyricsToPart(p.id);}

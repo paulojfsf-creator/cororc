@@ -1160,9 +1160,73 @@ function smartReasonScore(song,partId){
  return {score,reasons,lu,uses,partMoment:songMoment(song),psalm:psalm};
 }
 function scoreSmartSong(song,partId){return smartReasonScore(song,partId).score;}
+function exactLiturgicalAssociation(song,partId){
+ const date=document.getElementById('date')?.value||'', info=getLiturgicalInfo(date);
+ const tema=normSmart(song.Tema||''), obs=normSmart(song.Observações||song.Observacoes||''), title=normSmart(getSongTitle(song));
+ const celebration=normSmart(info.title||info.name||'');
+ const targetPsalm=normSmart(getTargetPsalm(date));
+ const psalm=normSmart(songPsalm(song));
+ // Para o Salmo, só aceitamos uma correspondência textual/referencial ao Salmo da celebração.
+ if(partId==='salmo') return !!targetPsalm && !!(psalm && (psalm===targetPsalm || psalm.includes(targetPsalm) || targetPsalm.includes(psalm)) || title && (title.includes(targetPsalm) || targetPsalm.includes(title)));
+ // Nos restantes momentos, a associação à celebração concreta tem prioridade absoluta.
+ if(!celebration) return false;
+ const variants=[celebration, celebration.replace(/\bdo\b|\bda\b|\bde\b/g,' '), celebration.replace(/domingo\s+/,'')].map(normSmart).filter(x=>x.length>7);
+ if(variants.some(v=>tema.includes(v)||obs.includes(v)||title.includes(v))) return true;
+ const roman=celebration.match(/domingo\s+(i{1,3}|iv|v?i{0,3}|x{0,3})\b/);
+ if(roman && tema.includes(roman[0])) return true;
+ return false;
+}
+function liturgicalSourceLinks(date,partId){
+ const info=getLiturgicalInfo(date||'');
+ const cycle=info.year||'A';
+ const q=encodeURIComponent((info.title||info.name||'')+' '+(partId||''));
+ const ps=encodeURIComponent(getTargetPsalm(date||'')||'');
+ return {
+   ocl:'https://ocantonaliturgia.pt/obras?search='+q,
+   laudate:getLaudateCelebrationUrl(date),
+   cantoral:cycle==='B'?'https://www.liturgia.pt/musica/cantoralB.php':cycle==='C'?'https://www.liturgia.pt/musica/cantoralC.php':'https://www.liturgia.pt/musica/cantoralA.php',
+   psalmOcl:'https://ocantonaliturgia.pt/obras?search='+ps
+ };
+}
 function smartSuggestions(partId){
- const used=currentProgramTitles(partId);
- return (songs||[]).filter(s=>!used.has(normSmart(getSongTitle(s)))).map(s=>({s,meta:smartReasonScore(s,partId)})).sort((a,b)=>b.meta.score-a.meta.score).slice(0,8);
+ const used=currentProgramTitles(partId), date=document.getElementById('date')?.value||'';
+ const all=(songs||[]).filter(s=>!used.has(normSmart(getSongTitle(s))));
+ const official=getMusicProposals(date,partId).map(x=>normSmart(x[0]));
+ // Regra fundamental: uma proposta oficial pode ser usada mesmo que o catálogo local
+ // ainda não tenha metadados de celebração preenchidos para esse cântico.
+ const officialSongs=official.length?all.filter(s=>official.includes(normSmart(getSongTitle(s)))):[];
+ // Depois entram apenas cânticos com associação litúrgica concreta já registada no catálogo.
+ const associated=all.filter(s=>!official.includes(normSmart(getSongTitle(s))) && exactLiturgicalAssociation(s,partId));
+ // Se não houver associação local, NÃO inventamos sugestões por palavras-chave/tempo litúrgico.
+ const ranked=[...officialSongs,...associated]
+   .map(s=>({s,meta:smartReasonScore(s,partId)}))
+   .sort((a,b)=>{
+      const ao=official.includes(normSmart(getSongTitle(a.s)))?1:0;
+      const bo=official.includes(normSmart(getSongTitle(b.s)))?1:0;
+      return bo-ao || b.meta.score-a.meta.score;
+   });
+ return ranked.slice(0,8);
+}
+function getLaudateCelebrationUrl(date){
+ const info=getLiturgicalInfo(date||'');
+ const cycle=String(info.year||'A').toLowerCase();
+ const title=normSmart(info.title||info.name||'');
+ const m=title.match(/domingo\s+([ivxlcdm]+)\s+do\s+tempo\s+comum/);
+ if(m){
+   const romans={i:1,ii:2,iii:3,iv:4,v:5,vi:6,vii:7,viii:8,ix:9,x:10,xi:11,xii:12,xiii:13,xiv:14,xv:15,xvi:16,xvii:17,xviii:18,xix:19,xx:20,xxi:21,xxii:22,xxiii:23,xxiv:24,xxv:25,xxvi:26,xxvii:27,xxviii:28,xxix:29,xxx:30,xxxi:31,xxxii:32,xxxiii:33,xxxiv:34};
+   const n=romans[m[1]];
+   if(n)return 'https://www.canticos.pt/domingo/'+cycle+'c_'+String(n).padStart(2,'0')+'/';
+ }
+ const special={
+   'domingo de pentecostes':'pentecostes',
+   'ascensao do senhor':'ascensao',
+   'domingo de ramos e da paixao do senhor':'ramos',
+   'domingo de pascoa da ressurreicao do senhor':'pascoa',
+   'natal do senhor':'bn_dia',
+   'sagrada familia de jesus maria e jose':'sagrada_familia'
+ };
+ const key=Object.keys(special).find(k=>title.includes(k));
+ return key?'https://www.canticos.pt/domingo/'+special[key]+'/':'https://www.canticos.pt/domingos/';
 }
 function fitLabel(score){return score>=75?'🟢 Muito adequado':score>=48?'🟡 Adequado':'⚪ Possível';}
 function openSongSelectModal(partId){
@@ -1179,8 +1243,11 @@ function buildSmartSuggestionList(partId){
  const date=document.getElementById('date')?.value||''; const info=getLiturgicalInfo(date); const top=smartSuggestions(partId);
  const source=getMusicSourceInfo(date,partId); const targetPsalm=getTargetPsalm(date); const special=getCelebrationLiturgyData(date);
  const official=getMusicProposals(document.getElementById('date')?.value||'',partId);
+ const links=liturgicalSourceLinks(date,partId);
+ const sourceBox='<div class="small" style="margin-bottom:.65rem;padding:.7rem;background:rgba(23,105,170,.055);border:1px solid rgba(23,105,170,.14);border-radius:.45rem;"><b>🎼 Repertório litúrgico desta celebração</b><br><span class="muted">A aplicação não apresenta cânticos genéricos como se fossem próprios desta liturgia. Quando o catálogo local não tem uma correspondência segura, consulte diretamente as fontes específicas:</span><div style="margin-top:.45rem;display:flex;gap:.4rem;flex-wrap:wrap"><a class="btn secondary small" href="'+links.ocl+'" target="_blank" rel="noopener">🎼 O Canto na Liturgia</a><a class="btn secondary small" href="'+links.laudate+'" target="_blank" rel="noopener">📖 Laudate — esta celebração</a><a class="btn secondary small" href="'+links.cantoral+'" target="_blank" rel="noopener">📚 Cantoral Nacional</a></div></div>' ;
  const officialBox=source&&official.length?'<div class="official-proposals"><b>🥇 Propostas do Cantoral Nacional</b>'+official.map(x=>'<div class="official-proposal"><span>'+escSmart(x[0])+(x[2]?' <small>nº '+escSmart(x[2])+'</small>':'')+'</span><button type="button" class="btn small proposal-search-btn" data-proposal-title="'+escSmart(x[0])+'">Pesquisar</button></div>').join('')+'</div>':'';
- list.innerHTML=officialBox+(targetPsalm&&partId==='salmo'?'<div class="small" style="margin-bottom:.5rem;padding:.65rem;background:rgba(37,99,235,.08);border-radius:.35rem;"><b>📖 Salmo da celebração:</b> '+(special?.psalmRef?escSmart(special.psalmRef)+' — ':'')+escSmart(targetPsalm)+'</div>':'')+top.map(x=>{const t=getSongTitle(x.s),m=x.meta,lu=m.lu;const status=lu?('Último uso: '+lu.date):'⭐ Nunca utilizado';const why=m.reasons.slice(0,3).join(' · ');return '<div class="smart-suggestion-row"><div><b>'+escSmart(t)+'</b><div class="small muted">'+fitLabel(m.score)+' · '+escSmart(status)+(getSongAuthor(x.s)?' · '+escSmart(getSongAuthor(x.s)):'')+'</div><div class="small">'+escSmart(why)+'</div></div><button type="button" class="btn small" data-smart-title="'+t.replace(/"/g,'&quot;')+'">Usar</button></div>';}).join('')||'<p class="small muted">Não há sugestões disponíveis.</p>';
+ const emptyNote=!top.length?'<div class="small" style="padding:.65rem;background:rgba(234,179,8,.08);border-radius:.4rem;">ℹ️ Não encontrei no catálogo local um cântico associado especificamente a esta celebração. Em vez de inventar uma sugestão, use as fontes litúrgicas acima para procurar repertório desta celebração.</div>':'';
+ list.innerHTML=sourceBox+officialBox+(targetPsalm&&partId==='salmo'?'<div class="small" style="margin-bottom:.5rem;padding:.65rem;background:rgba(37,99,235,.08);border-radius:.35rem;"><b>📖 Salmo da celebração:</b> '+(special?.psalmRef?escSmart(special.psalmRef)+' — ':'')+escSmart(targetPsalm)+'</div>':'')+top.map(x=>{const t=getSongTitle(x.s),m=x.meta,lu=m.lu;const status=lu?('Último uso: '+lu.date):'⭐ Nunca utilizado';const why=m.reasons.slice(0,3).join(' · ');return '<div class="smart-suggestion-row"><div><b>'+escSmart(t)+'</b><div class="small muted">'+fitLabel(m.score)+' · '+escSmart(status)+(getSongAuthor(x.s)?' · '+escSmart(getSongAuthor(x.s)):'')+'</div><div class="small">'+escSmart(why)+'</div></div><button type="button" class="btn small" data-smart-title="'+t.replace(/"/g,'&quot;')+'">Usar</button></div>';}).join('')+emptyNote;
  box.style.display=(top.length||official.length)?'block':'none';list.querySelectorAll('[data-smart-title]').forEach(b=>b.onclick=()=>useSongInPart(partId,b.dataset.smartTitle,b.dataset.smartAuthor||'')); list.querySelectorAll('[data-proposal-title]').forEach(b=>b.onclick=()=>{const q=b.dataset.proposalTitle||'';const search=document.getElementById('songSelectSearch');if(search){search.value=q;renderSongListModal();}});
 }
 function renderSongListModal(){

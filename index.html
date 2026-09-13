@@ -2162,19 +2162,21 @@ main > .card:has(.clean-nav){position:relative!important;}
     <nav class="tabs clean-nav">
       <button type="button" class="active" data-tab="tab-dashboard"><span class="nav-icon">⌂</span> Início</button>
       <button type="button" data-tab="tab-calendario"><span class="nav-icon">□</span> Calendário</button>
+      <button type="button" data-tab="tab-programa" data-focus-assistant="true"><span class="nav-icon">✦</span> Assistente</button>
       <button type="button" data-tab="tab-programa"><span class="nav-icon">＋</span> Programas</button>
-      <button type="button" data-tab="tab-catalogo"><span class="nav-icon">♪</span> Cânticos</button>
-      <button type="button" data-tab="tab-pessoas"><span class="nav-icon">○</span> Pessoas</button>
-      <button type="button" data-tab="tab-historico"><span class="nav-icon">◷</span> Histórico</button>
+      <button type="button" data-tab="tab-catalogo"><span class="nav-icon">♪</span> Repertório</button>
+      <button type="button" data-tab="tab-pessoas"><span class="nav-icon">○</span> Coro</button>
       <button type="button" class="more-toggle" id="moreNavBtn" aria-expanded="false"><span class="nav-icon">•••</span> Mais</button>
     </nav>
     <nav class="tabs-more" id="moreNav" hidden aria-label="Mais opções">
-      <button type="button" data-tab="tab-folhetos">Folhetos</button>
-      <button type="button" data-tab="tab-partituras">Partituras</button>
-      <button type="button" data-tab="tab-videos">Vídeos</button>
-      <button type="button" data-tab="tab-ensaios">Ensaios</button>
-      <button type="button" id="exportBackupBtn">Exportar dados</button>
-      <button type="button" data-tab="tab-diagnostico">🔍 Diagnóstico</button><button type="button" id="exportBackupBtn">Exportar dados</button><button type="button" id="importBackupBtn">Importar dados</button>
+      <button type="button" data-tab="tab-historico">◷ Histórico</button>
+      <button type="button" data-tab="tab-folhetos">📖 Folhetos</button>
+      <button type="button" data-tab="tab-ensaios">🎤 Ensaios</button>
+      <button type="button" data-tab="tab-partituras">📄 Partituras</button>
+      <button type="button" data-tab="tab-videos">🎥 Vídeos</button>
+      <button type="button" data-tab="tab-diagnostico">🔍 Diagnóstico</button>
+      <button type="button" id="exportBackupBtn">📤 Exportar dados</button>
+      <button type="button" id="importBackupBtn">📥 Importar dados</button>
       <input type="file" id="importBackupInput" accept="application/json" hidden>
     </nav>
 
@@ -2199,15 +2201,24 @@ main > .card:has(.clean-nav){position:relative!important;}
           </div>
         </div>
 
+        <div class="dash-card assistant-hero">
+          <div class="assistant-hero-icon">✦</div>
+          <div class="assistant-hero-main">
+            <div class="eyebrow">PRINCIPAL</div>
+            <h2 style="margin:.1rem 0 .25rem;">Assistente Litúrgico</h2>
+            <p class="dash-muted" style="margin:0;">Escolha a celebração e deixe a aplicação cruzar a liturgia, o repertório e o histórico do coro para preparar o programa.</p>
+          </div>
+          <button type="button" class="btn" id="dashboardAssistantBtn">✨ Abrir Assistente</button>
+        </div>
+
         <div class="dash-card">
           <h3>⚡ Ações rápidas</h3>
           <div class="dash-actions">
-            <button type="button" class="dash-action" data-dash-tab="tab-programa" id="dashNewProgramAction"><span>📅</span><b>Novo programa</b></button>
-            <button type="button" class="dash-action" data-dash-tab="tab-catalogo"><span>🎵</span><b>Consultar catálogo</b></button>
-            <button type="button" class="dash-action" data-dash-tab="tab-partituras"><span>📄</span><b>Ver partituras</b></button>
-            <button type="button" class="dash-action" data-dash-tab="tab-folhetos"><span>📖</span><b>Folhetos</b></button>
-            <button type="button" class="dash-action" data-dash-tab="tab-historico"><span>◷</span><b>Histórico</b></button>
-            <button type="button" class="dash-action" data-dash-tab="tab-ensaios"><span>👥</span><b>Ensaios</b></button>
+            <button type="button" class="dash-action dash-action-primary" data-dash-tab="tab-programa" id="dashNewProgramAction"><span>✨</span><b>Novo programa</b><small>Assistente Litúrgico</small></button>
+            <button type="button" class="dash-action" data-dash-tab="tab-calendario"><span>📅</span><b>Calendário</b><small>Ver celebrações</small></button>
+            <button type="button" class="dash-action" data-dash-tab="tab-catalogo"><span>🎵</span><b>Repertório</b><small>Cânticos e fichas</small></button>
+            <button type="button" class="dash-action" data-dash-tab="tab-pessoas"><span>👥</span><b>Coro</b><small>Salmistas e organistas</small></button>
+            <button type="button" class="dash-action" data-dash-tab="tab-historico"><span>◷</span><b>Histórico</b><small>Programas guardados</small></button>
           </div>
         </div>
 
@@ -2236,7 +2247,7 @@ main > .card:has(.clean-nav){position:relative!important;}
 
     <section id="tab-programa" class="tab">
       <form id="programForm">
-        <h2>Programa litúrgico</h2>
+        <h2>✨ Assistente Litúrgico e Programa</h2>
         <p class="small">Escolhe a data. A aplicação identifica a celebração, tempo litúrgico, ciclo, cor, leituras e Salmo e usa esse contexto para sugerir cânticos do repertório.</p>
 
         <div class="row">
@@ -2555,9 +2566,9 @@ main > .card:has(.clean-nav){position:relative!important;}
     </section>
 
     <section id="tab-catalogo" class="tab">
-      <h2>Catálogo de cânticos</h2>
+      <h2>🎵 Repertório do coro</h2>
       <p class="small">
-        O catálogo é carregado automaticamente a partir do Google Sheets.<br>
+        O repertório do coro reúne cânticos, fichas, associações litúrgicas, partituras e histórico.<br>
         Se necessário, podes carregar também um CSV manual.
       </p>
 

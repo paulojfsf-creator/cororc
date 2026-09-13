@@ -1,6 +1,6 @@
 // ============================================
 // 🎵 GESTÃO LITÚRGICA - CORO PAROQUIAL
-// Versão 8.0 - Reorganização e foco no Assistente
+// Versão 7.2 - Auditoria e consolidação
 // ============================================
 
 // ============================================
@@ -53,11 +53,6 @@ function initTabs() {
       const targetContent = document.getElementById(targetTab);
       if (targetContent) {
         targetContent.classList.add('active');
-      }
-      
-      if (button.dataset.focusAssistant === 'true') {
-        const panel = document.getElementById('programAssistantPanel');
-        if (panel) setTimeout(() => panel.scrollIntoView({behavior:'smooth', block:'start'}), 60);
       }
       
       // Salva tab ativa
@@ -580,9 +575,6 @@ function initDashboardV3(){
     else document.querySelector(`button[data-tab="${b.dataset.dashTab}"]`)?.click();
   }));
   ['dashboardCalendarBtn','dashboardAllCalendarBtn'].forEach(id=>document.getElementById(id)?.addEventListener('click',()=>document.querySelector('button[data-tab="tab-calendario"]')?.click()));
-  document.getElementById('dashboardAssistantBtn')?.addEventListener('click',()=>{
-    document.querySelector('button[data-tab="tab-programa"][data-focus-assistant="true"]')?.click();
-  });
   document.getElementById('dashboardHistoryBtn')?.addEventListener('click',()=>document.querySelector('button[data-tab="tab-historico"]')?.click());
   const close=()=>closeNewProgramModal();
   document.getElementById('newProgramCloseBtn')?.addEventListener('click',close);
@@ -2424,7 +2416,7 @@ function renderDiagnostics(){
   const checks=[];
   const add=(name,status,detail)=>checks.push({name,status,detail});
   const has=(sel)=>!!document.querySelector(sel);
-  add('Navegação principal', has('.tabs button[data-tab="tab-dashboard"]')&&has('.tabs button[data-tab="tab-catalogo"]')?'ok':'fail','Início, Calendário, Assistente, Programas, Repertório e Coro disponíveis.');
+  add('Navegação principal', has('.tabs button[data-tab="tab-dashboard"]')&&has('.tabs button[data-tab="tab-catalogo"]')?'ok':'fail','Início, Calendário, Programas, Cânticos, Pessoas e Histórico disponíveis.');
   add('Menu Mais', has('#moreNav')&&has('#exportBackupBtn')&&has('#importBackupBtn')?'ok':'fail','Folhetos, Partituras, Vídeos, Ensaios, Diagnóstico e importação/exportação.');
   add('Ficha do Cântico', has('#songProfileModal')&&has('#songMetadataEditorModal')?'ok':'fail','Ficha e edição de metadados locais presentes.');
   add('Assistente explicável', has('#programAssistantPanel')&&has('#suggestionWhyModal')?'ok':'fail','Sugestões, confiança e explicação “Porquê?”.');

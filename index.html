@@ -2174,7 +2174,7 @@ main > .card:has(.clean-nav){position:relative!important;}
       <button type="button" data-tab="tab-videos">Vídeos</button>
       <button type="button" data-tab="tab-ensaios">Ensaios</button>
       <button type="button" id="exportBackupBtn">Exportar dados</button>
-      <button type="button" id="importBackupBtn">Importar dados</button>
+      <button type="button" data-tab="tab-diagnostico">🔍 Diagnóstico</button><button type="button" id="exportBackupBtn">Exportar dados</button><button type="button" id="importBackupBtn">Importar dados</button>
       <input type="file" id="importBackupInput" accept="application/json" hidden>
     </nav>
 
@@ -2503,7 +2503,23 @@ main > .card:has(.clean-nav){position:relative!important;}
     <!-- Container invisível para geração de folhetos (usado pela funcionalidade de Folhetos Guardados) -->
     <div id="previewContainer" style="display: none;"></div>
 
-    <section id="tab-folhetos" class="tab">
+    <section id="tab-diagnostico" class="tab">
+  <h2>🔍 Diagnóstico da aplicação</h2>
+  <p class="small muted">Verificação das funcionalidades disponíveis e dos principais dados litúrgicos. Esta área existe para tornar visível o que está realmente ativo.</p>
+  <div id="diagnosticSummary" class="card" style="padding:1rem;margin:.8rem 0;"></div>
+  <div id="diagnosticChecks"></div>
+  <div class="card" style="padding:1rem;margin-top:1rem;">
+    <h3 style="margin-top:0">ℹ️ Como interpretar</h3>
+    <div class="small">
+      <p><b>✅ Funcional</b> — a função está presente e o teste interno passou.</p>
+      <p><b>⚠️ Parcial</b> — existe código ou dados, mas há uma limitação que deve ser conhecida.</p>
+      <p><b>❌ Ausente</b> — não está implementada ou o teste falhou.</p>
+      <p class="muted">As fontes online continuam a ser externas; a aplicação não copia automaticamente letras ou partituras protegidas.</p>
+    </div>
+  </div>
+</section>
+
+<section id="tab-folhetos" class="tab">
       <h2>📋 Folhetos Guardados</h2>
       <p class="small">Os folhetos ficam guardados apenas neste dispositivo (localStorage).</p>
       
@@ -2550,7 +2566,7 @@ main > .card:has(.clean-nav){position:relative!important;}
           <button type="button" class="btn secondary tiny" id="refreshCatalogBtn">Atualizar catálogo agora</button>
         </div>
         <div class="col">
-          <span id="catalogStatus" class="tiny muted">Catálogo carregado automaticamente ao abrir.</span><div class="tiny muted" style="margin-top:.3rem;">💡 Pesquisa por <b>título, autor, tema, momento e celebração</b>. As fontes online incluem Laudate, O Canto na Liturgia e Cantólico.</div>
+          <span id="catalogStatus" class="tiny muted">Catálogo carregado automaticamente ao abrir.</span><button type="button" class="btn secondary tiny" id="reconcileSongsBtn" style="margin-left:.5rem;">🔗 Reconciliar repertório</button><div class="tiny muted" style="margin-top:.3rem;">💡 Pesquisa por <b>título, autor, tema, momento e celebração</b>. As fontes online incluem Laudate, O Canto na Liturgia e Cantólico.</div>
         </div>
       </div>
       <div class="row">
@@ -3286,6 +3302,23 @@ window.CORO_LIT2026={
         <div id="leafletEditorLivePreview" class="leaflet-live-preview" aria-live="polite"></div>
       </section>
     </div>
+  </div>
+</div>
+
+<!-- 7.1 — Reconciliação de referências do Programas 2026 -->
+<div id="reconcileSongsModal" class="modal-backdrop" hidden>
+  <div class="modal" style="max-width:1000px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;">
+    <div class="modal-header">
+      <div><h3 style="margin-bottom:.2rem">🔗 Reconciliar referências</h3><div id="reconcileSongsSub" class="small muted"></div></div>
+      <button type="button" class="btn secondary small" id="reconcileSongsClose">Fechar</button>
+    </div>
+    <div class="modal-body" style="overflow:auto;">
+      <div class="small" style="padding:.75rem;background:rgba(23,105,170,.06);border:1px solid rgba(23,105,170,.14);border-radius:.5rem;margin-bottom:1rem;">
+        <b>Como funciona:</b> estas referências ficaram sem correspondência automática no catálogo. A aplicação apresenta possíveis correspondências, mas <b>nunca associa automaticamente</b>. Só a confirmação do utilizador cria uma associação.
+      </div>
+      <div id="reconcileSongsList"></div>
+    </div>
+    <div class="modal-actions"><button type="button" class="btn secondary" id="reconcileSongsClose2">Fechar</button></div>
   </div>
 </div>
 </body>

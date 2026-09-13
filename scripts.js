@@ -1,6 +1,6 @@
 // ============================================
 // 🎵 GESTÃO LITÚRGICA - CORO PAROQUIAL
-// Versão 6.0 - Assistente Litúrgico
+// Versão 7.2 - Auditoria e consolidação
 // ============================================
 
 // ============================================
@@ -70,6 +70,8 @@ function initTabs() {
       } else if (targetTab === 'tab-dashboard') {
         updateDashboard();
         renderCalendar();
+      } else if (targetTab === 'tab-diagnostico') {
+        renderDiagnostics();
       }
     });
   });
@@ -959,7 +961,10 @@ function getSongProfileData(title){
  const song=(songs||[]).find(s=>normSmart(getSongTitle(s))===normSmart(title))||null;
  if(!song) return null;
  const meta=songLiturgicalMetadata(song), prefs=getChoirPreferences().filter(p=>normSmart(p.title)===normSmart(title));
- const usage=getUsageHistory().filter(x=>normSmart(x.song||x.title)===normSmart(title)).sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+ const directUsage=getUsageHistory().filter(x=>normSmart(x.song||x.title)===normSmart(title));
+ const enrichedUsage=(songLiturgicalMetadata(song).historicalAssociations||[]).map(a=>({date:a.date||'',section:a.moment||a.part||'',liturgicalTitle:a.celebration||'',song:title}));
+ const seenUsage=new Set(directUsage.map(x=>[x.date,x.section||x.part||'',x.liturgicalTitle||''].join('|')));
+ const usage=[...directUsage,...enrichedUsage.filter(x=>{const k=[x.date,x.section||'',x.liturgicalTitle||''].join('|');if(seenUsage.has(k))return false;seenUsage.add(k);return true;})].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
  const official=[];
  Object.entries(LITURGICAL_MUSIC_PROPOSALS||{}).forEach(([key,src])=>Object.entries(src.parts||{}).forEach(([part,arr])=>(arr||[]).forEach(x=>{if(normSmart(x[0])===normSmart(title)) official.push({key,part,label:x[0],number:x[2]||''});})));
  return {song,meta,prefs,usage,official};
@@ -1401,7 +1406,7 @@ function liturgicalConfidence(song,partId){
  if(official) return {level:'official',label:'🥇 Proposta oficial',rank:500,reason:'Associado diretamente pelo Cantoral Nacional à celebração e ao momento.'};
  const ix=window.CORO_SONG_LITURGICAL_INDEX?.[title];
  const cycle=normSmart(info.year||''); const celebration=normSmart(info.title||info.name||'');
- if(ix?.associations?.some(a=>normSmart(a.celebration)===celebration && normSmart(a.cycle)===cycle && normSmart(a.part)===normSmart(partId))) return {level:'historical-exact',label:'🟢 Histórico exato',rank:450,reason:'O próprio coro já utilizou este cântico nesta celebração, ciclo e momento.'};
+ if(ix?.associations?.some(a=>normSmart(a.celebration)===celebration && (!a.cycle || normSmart(a.cycle)===cycle) && normSmart(a.part)===normSmart(partId))) return {level:'historical-exact',label:'🟢 Histórico exato',rank:450,reason:'O próprio coro já utilizou este cântico nesta celebração e momento; o ciclo histórico não estava registado nessa linha.'};
  if(exactLiturgicalAssociation(song,partId)) return {level:'associated',label:'🟢 Associado à celebração',rank:400,reason:'Existe uma associação concreta no catálogo para esta celebração.'};
  const meta=songLiturgicalMetadata(song), moment=normSmart(songMoment(song)||meta.moment||'');
  const label=normSmart((PROGRAM_PARTS.find(p=>p.id===partId)||{}).label||'');
@@ -2403,6 +2408,35 @@ function initPartituraSearch(){
 }
 
 // ============================================
+// 7.2 — DIAGNÓSTICO VISÍVEL
+// ============================================
+function renderDiagnostics(){
+  const summary=document.getElementById('diagnosticSummary'), box=document.getElementById('diagnosticChecks');
+  if(!summary||!box)return;
+  const checks=[];
+  const add=(name,status,detail)=>checks.push({name,status,detail});
+  const has=(sel)=>!!document.querySelector(sel);
+  add('Navegação principal', has('.tabs button[data-tab="tab-dashboard"]')&&has('.tabs button[data-tab="tab-catalogo"]')?'ok':'fail','Início, Calendário, Programas, Cânticos, Pessoas e Histórico disponíveis.');
+  add('Menu Mais', has('#moreNav')&&has('#exportBackupBtn')&&has('#importBackupBtn')?'ok':'fail','Folhetos, Partituras, Vídeos, Ensaios, Diagnóstico e importação/exportação.');
+  add('Ficha do Cântico', has('#songProfileModal')&&has('#songMetadataEditorModal')?'ok':'fail','Ficha e edição de metadados locais presentes.');
+  add('Assistente explicável', has('#programAssistantPanel')&&has('#suggestionWhyModal')?'ok':'fail','Sugestões, confiança e explicação “Porquê?”.');
+  add('Preferências do coro', typeof recordChoirPreference==='function'&&typeof choirPreferenceFor==='function'?'ok':'fail','Escolhas manuais podem alimentar o ranking sem alterar a validade litúrgica.');
+  add('Reconciliação do repertório', has('#reconcileSongsModal')&&typeof renderReconciliation==='function'?'ok':'fail','Correspondências do Excel são confirmadas manualmente.');
+  const ps=liturgicalDiagnostics();
+  add('Salmos de Natal', ps.every(x=>x.ok)?'ok':'fail', ps.map(x=>`${x.variant}: ${x.ok?'OK':'ERRO'}`).join(' · '));
+  const d='2026-09-13', info=getLiturgicalInfo(d), pd=getOfficialPsalmData(d);
+  add('13/09/2026', info.year==='A'&&normSmart(pd.refrain).includes(normSmart('O Senhor é clemente e compassivo'))?'ok':'warn', `Ano ${info.year||'?'} · ${pd.ref||'sem referência'} · ${pd.refrain||'sem refrão'}`);
+  const manualCount=Object.keys(getManualSongMetadata()).length;
+  const prefCount=getChoirPreferences().length;
+  const recCount=Object.keys(getReconciliationMap()).length;
+  add('Dados locais', 'ok', `${songs.length} cânticos carregados · ${manualCount} fichas editadas · ${prefCount} preferências · ${recCount} reconciliações processadas.`);
+  const ok=checks.filter(x=>x.status==='ok').length, warns=checks.filter(x=>x.status==='warn').length, fails=checks.filter(x=>x.status==='fail').length;
+  summary.innerHTML=`<div style="display:flex;gap:1rem;flex-wrap:wrap"><b>Estado: ${fails?'⚠️ requer atenção':warns?'🟡 com avisos':'✅ operacional'}</b><span>✅ ${ok}</span><span>⚠️ ${warns}</span><span>❌ ${fails}</span></div>`;
+  box.innerHTML=checks.map(c=>`<div class="card" style="padding:.85rem;margin:.55rem 0"><div><b>${c.status==='ok'?'✅':c.status==='warn'?'⚠️':'❌'} ${escSmart(c.name)}</b></div><div class="small muted" style="margin-top:.25rem">${escSmart(c.detail)}</div></div>`).join('');
+}
+window.CORO_RUN_DIAGNOSTICS=renderDiagnostics;
+
+// ============================================
 // INICIALIZAÇÃO
 // ============================================
 
@@ -2412,6 +2446,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Sistemas principais
   initTabs();
   initMoreNav();
+  renderDiagnostics();
   initTheme();
   initDashboardV3();
   initCalendar();
@@ -2789,3 +2824,45 @@ function refreshPartituraPreviewButtons(){
 }
 
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',initMediaPreview);}else{initMediaPreview();}
+
+
+// ============================================
+// 7.1 — RECONCILIAÇÃO DE REFERÊNCIAS DO EXCEL
+// As associações só são gravadas após confirmação manual.
+// ============================================
+const CORO_UNMATCHED_2026 = {"Deus, Pai de Nosso Senhor Jesus Cristo, ilumine os olhos do nosso coração, para sabermos a que esperança fomos chamados.":[{"month":"Agosto","date":"2026-08-30","celebration":"DOMINGO XXII DO TEMPO COMUM","moment":"","author":""}],"Tu, menino, serás chamado profeta do Altíssimo, \nirás à frente do Senhor a preparar os seus caminhos.":[{"month":"Junho","date":"2026-06-24","celebration":"NASCIMENTO DE SÃO JOÃO BATISTA – SOLENIDADE","moment":"","author":""}],"Maria foi elevada ao Céu: \nalegra-se a multidão dos Anjos":[{"month":"Agosto","date":"2026-08-15","celebration":"ASSUNÇÃO DA VIRGEM SANTA MARIA – SOLENIDADE","moment":"","author":""}],"Tu és Pedro, e sobre esta pedra  edificarei a minha Igreja \ne as portas do inferno não prevalecerão contra ela":[{"month":"Agosto","date":"2026-08-23","celebration":"DOMINGO XXI DO TEMPO COMUM","moment":"","author":""}],"Eu sou o caminho, a verdade e a vida, diz o Senhor; \nninguém vai ao Pai senão por mim.":[{"month":"Maio","date":"2026-05-03","celebration":"DOMINGO V DA PÁSCOA Dia da Mãe","moment":"","author":""}],"Bendito sejais, ó Pai, Senhor do céu e da terra, \nporque revelastes aos pequeninos os mistérios do reino.":[{"month":"Julho","date":"2026-07-05","celebration":"DOMINGO XIV DO TEMPO COMUM","moment":"","author":""},{"month":"Julho","date":"2026-07-19","celebration":"DOMINGO XVI DO TEMPO COMUM","moment":"","author":""},{"month":"Julho","date":"2026-07-26","celebration":"DOMINGO XVII DO TEMPO COMUM","moment":"","author":""}],"Se alguém Me ama, guardará a minha palavra. \nMeu Pai o amará e faremos nele a nossa morada":[{"month":"Maio","date":"2026-05-10","celebration":"DOMINGO VI DA PÁSCOA","moment":"","author":""}],"Alegrai-vos e exultai,\nporque é grande nos Céus a vossa recompensa.":[{"month":"Fevereiro","date":"2026-02-01","celebration":"DOMINGO IV DO TEMPO COMUM","moment":"","author":""}],"A semente é a palavra de Deus e o semeador é Cristo. \nQuem O encontra viverá eternamente.":[{"month":"Julho","date":"2026-07-12","celebration":"DOMINGO XV DO TEMPO COMUM","moment":"","author":""}],"Louvado sejais, Senhor, \npelos povos de toda a terra.":[{"month":"Agosto","date":"2026-08-16","celebration":"DOMINGO XX DO TEMPO COMUM","moment":"Salmo","author":"M. Luis"}],"Ide e ensinai todos os povos, diz o Senhor: \nEu estou sempre convosco até ao fim dos tempos.":[{"month":"Maio","date":"2026-05-17","celebration":"DOMINGO VII DA PÁSCOA\nASCENSÃO DO SENHOR","moment":"","author":""}],"Eu sou o bom pastor, diz o Senhor: \nconheço as minhas ovelhas e elas conhecem-Me.":[{"month":"Abril","date":"2026-04-26","celebration":"DOMINGO IV DA PÁSCOA","moment":"","author":""}],"Eu confio no Senhor, \na minha alma espera na sua palavra":[{"month":"Agosto","date":"2026-08-09","celebration":"DOMINGO XIX DO TEMPO COMUM","moment":"","author":""}],"Disse o Senhor a Tomé:\n«Porque Me viste, acreditaste; felizes os que acreditam sem terem visto.":[{"month":"Abril","date":"2026-04-12","celebration":"DOMINGO II DA PÁSCOA ou da Divina Misericórdia","moment":"","author":""}],"Sois ditosa, ó Virgem Santa Maria, sois digníssima de todos os louvores,porque de Vós nasceu o sol da justiça, Cristo, nosso Deus.":[{"month":"Maio","date":"13 de Maio","celebration":"Nossa Senhora do Rosário de Fátima","moment":"","author":""}],"Vimos a sua estrela no Oriente \ne viemos adorar o Senhor.":[{"month":"Janeiro","date":"2026-01-04","celebration":"EPIFANIA DO SENHOR","moment":"","author":""}],"O Espírito da verdade dará testemunho de Mim, diz o Senhor, e vós também dareis testemunho de Mim.":[{"month":"Junho","date":"2026-06-21","celebration":"DOMINGO XII DO TEMPO COMUM","moment":"","author":""},{"month":"Junho","date":"20/06/2026","celebration":"Sacramento da Confirmação  Vesp XII TC","moment":"","author":""}],"Meu Deus, meu Deus, \nporque me abandonastes?":[{"month":"Março","date":"2026-03-29","celebration":"DOMINGO DE RAMOS NA PAIXÃO DO SENHOR","moment":"Salmo","author":"Az. Oliveira"}],"Bendito sejais, ó Pai, Senhor do céu e da terra,\nporque revelastes aos pequeninos\nos mistérios do reino.":[{"month":"Fevereiro","date":"2026-02-15","celebration":"DOMINGO VI DO TEMPO COMUM","moment":"","author":""}],"Cristo, nosso Cordeiro Pascal, foi imolado:\ncelebremos a festa do Senhor.":[{"month":"Abril","date":"2026-04-05","celebration":"DOMINGO DE PÁSCOA DA RESSURREIÇÃO DO SENHOR","moment":"","author":""}],"Glória ao Pai e ao Filho e ao Espírito Santo, \nao Deus que é, que era e que há-de vir.":[{"month":"Maio","date":"2026-05-31","celebration":"DOMINGO IX DO TEMPO COMUM\nSANTÍSSIMA TRINDADE","moment":"","author":""}],"O espirito do Senhor encheu a terra":[{"month":"Junho","date":"20/06/2026","celebration":"Sacramento da Confirmação  Vesp XII TC","moment":"","author":"M. Simões"}],"Nem só de pão vive o homem,\nmas de toda a palavra que sai da boca de Deus":[{"month":"Agosto","date":"2026-08-02","celebration":"DOMINGO XVIII DO TEMPO COMUM","moment":"","author":""}],"Vinde, Espírito Santo,  enchei os corações dos vossos fiéis e acendei neles o fogo do vosso amor.":[{"month":"Maio","date":"2026-05-24","celebration":"DOMINGO DE PENTECOSTES","moment":"","author":""}],"Cristo obedeceu até à morte e morte de cruz. \nPor isso Deus O exaltou e Lhe deu um nome \nque está acima de todos os nomes.":[{"month":"Março","date":"2026-03-29","celebration":"DOMINGO DE RAMOS NA PAIXÃO DO SENHOR","moment":"","author":""}],"No meio da nuvem luminosa, ouviu-se a voz do Pai: \n«Este é o meu Filho muito amado: escutai-O».":[{"month":"Março","date":"2026-03-01","celebration":"DOMINGO II DA QUARESMA","moment":"","author":""}],"Senhor, Vós sois o Salvador do mundo: \ndai-nos a água viva, para não termos sede.":[{"month":"Março","date":"2026-03-08","celebration":"DOMINGO III DA QUARESMA","moment":"","author":""}],"Nem só de pão vive o homem,\nmas de toda a palavra que sai da boca de Deus.":[{"month":"Fevereiro","date":"2026-02-22","celebration":"DOMINGO I DA QUARESMA","moment":"","author":""}],"As minhas ovelhas ouvem a minha voz, diz o Senhor;\nEu conheço as minhas ovelhas e elas seguem-Me.":[{"month":"Setembro","date":"2026-09-27","celebration":"DOMINGO XXVI DO TEMPO COMUM","moment":"","author":""}],"Eu sou a luz do mundo, diz o Senhor:\nquem Me segue terá a luz da vida.":[{"month":"Fevereiro","date":"2026-02-08","celebration":"DOMINGO V DO TEMPO COMUM","moment":"","author":""}],"Louvarei para sempre o vosso nome, \nSenhor, meu Deus e meu Rei.":[{"month":"Julho","date":"2026-07-05","celebration":"DOMINGO XIV DO TEMPO COMUM","moment":"Salmo","author":"M. Luis"}],"Dou-vos um mandamento novo, diz o Senhor: \namai-vos uns aos outros como Eu vos amei.":[{"month":"Setembro","date":"2026-09-13","celebration":"DOMINGO XXIV DO TEMPO COMUM","moment":"","author":""}],"Virão adorar-Vos, Senhor, \ntodos os povos da terra.":[{"month":"Janeiro","date":"2026-01-04","celebration":"EPIFANIA DO SENHOR","moment":"Salmo","author":"M.Luis"}],"Eu sou a ressurreição e a vida, diz o Senhor. \nQuem acredita em Mim não morrerá para sempre.":[{"month":"Março","date":"2026-03-22","celebration":"DOMINGO V DA QUARESMA","moment":"","author":""}],"Jesus proclamava o evangelho do reino\ne curava todas as doenças entre o povo.":[{"month":"Agosto","date":"2026-08-16","celebration":"DOMINGO XX DO TEMPO COMUM","moment":"","author":""}],"Está próximo o reino de Deus. Arrependei-vos e acreditai no Evangelho.":[{"month":"Junho","date":"2026-06-14","celebration":"DOMINGO XI DO TEMPO COMUM","moment":"","author":""}],"Bendito, bendito o que vem                  Glória honra e louvor":[{"month":"Março","date":"2026-03-29","celebration":"DOMINGO DE RAMOS NA PAIXÃO DO SENHOR","moment":"Entrada","author":"M.Luis              F. Santos"}],"Nós somos o povo de Deus, \nas ovelhas do seu rebanho.":[{"month":"Junho","date":"2026-06-14","celebration":"DOMINGO XI DO TEMPO COMUM","moment":"Salmo","author":"M.Luis"}],"Senhor Jesus, abri-nos as Escrituras,\nfalai-nos e inflamai o nosso coração.":[{"month":"Abril","date":"2026-04-19","celebration":"DOMINGO III DA PÁSCOA","moment":"","author":""}],"Vós sois geração eleita, sacerdócio real, nação santa, \npara anunciar os louvores de Deus, \nque vos chamou das trevas à sua luz admirável.":[{"month":"Junho","date":"2026-06-28","celebration":"DOMINGO XIII DO TEMPO COMUM","moment":"","author":""}],"Eu sou a luz do mundo, diz o Senhor.\nQuem Me segue terá a luz da vida":[{"month":"Março","date":"2026-03-15","celebration":"DOMINGO IV DA QUARESMA","moment":"","author":""}],"Mandai Senhor o vosso espirito":[{"month":"Junho","date":"20/06/2026","celebration":"Sacramento da Confirmação  Vesp XII TC","moment":"","author":"M. Luis"}],"Em Cristo, Deus reconcilia o mundo consigo \ne confiou-nos a palavra da reconciliação.":[{"month":"Setembro","date":"2026-09-06","celebration":"DOMINGO XXIII DO TEMPO COMUM","moment":"","author":""}],"Abriram-se os céus e ouviu-se a voz do Pai: \n«Este é o meu Filho muito amado: escutai-O».":[{"month":"Janeiro","date":"2026-01-11","celebration":"Batismo do Senhor","moment":"","author":""}],"Abri, Senhor, os nossos corações, \npara aceitarmos a palavra do vosso Filho.":[{"month":"Setembro","date":"2026-09-20","celebration":"DOMINGO XXV DO TEMPO COMUM","moment":"","author":""}],"Muitas vezes e de muitos modos falou Deus antigamente aos nossos pais pelos Profetas. \nNestes dias, que são os últimos, Deus falou-nos por seu Filho.":[{"month":"Janeiro","date":"2026-01-01","celebration":"SANTA MARIA, MÃE DE DEUS","moment":"","author":""}]};
+function getReconciliationMap(){try{const x=JSON.parse(localStorage.getItem('coroReconciliation_v1')||'{}');return x&&typeof x==='object'?x:{};}catch(e){return {};}}
+function saveReconciliationMap(x){localStorage.setItem('coroReconciliation_v1',JSON.stringify(x||{}));}
+function levenshteinSmart(a,b){a=String(a);b=String(b);const m=a.length,n=b.length;if(!m)return n;if(!n)return m;let prev=Array.from({length:n+1},(_,i)=>i);for(let i=1;i<=m;i++){const cur=[i];for(let j=1;j<=n;j++)cur[j]=Math.min(cur[j-1]+1,prev[j]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));prev=cur;}return prev[n];}
+function reconcileScore(a,b){a=normSmart(a);b=normSmart(b);if(!a||!b)return 0;if(a===b)return 1;if(a.includes(b)||b.includes(a))return .88;const ta=new Set(a.split(' ').filter(x=>x.length>2)),tb=new Set(b.split(' ').filter(x=>x.length>2));const inter=[...ta].filter(x=>tb.has(x)).length, union=new Set([...ta,...tb]).size;const j=union?inter/union:0;const d=1-levenshteinSmart(a,b)/Math.max(a.length,b.length);return Math.max(j*.72,d*.45);}
+function reconcileCandidates(raw){return (songs||[]).map(s=>({s,score:reconcileScore(raw,getSongTitle(s))})).filter(x=>x.score>=.16).sort((a,b)=>b.score-a.score).slice(0,5);}
+function reconcileContext(raw){return CORO_UNMATCHED_2026[raw]||[];}
+function reconcileLabel(x){return x>=.82?'Correspondência forte':x>=.55?'Possível correspondência':x>=.32?'Correspondência fraca':'Baixa confiança';}
+function renderReconciliation(){
+ const list=document.getElementById('reconcileSongsList');if(!list)return;const map=getReconciliationMap();
+ const entries=Object.keys(CORO_UNMATCHED_2026).filter(k=>!map[normSmart(k)]);
+ const sub=document.getElementById('reconcileSongsSub');if(sub)sub.textContent=`${entries.length} referências ainda por reconciliar · ${Object.keys(map).length} já processadas`; const rb=document.getElementById('reconcileSongsBtn'); if(rb) rb.textContent=entries.length?`🔗 Reconciliar repertório · ${entries.length} pendentes`:'🔗 Reconciliar repertório · concluído';
+ if(!entries.length){list.innerHTML='<div class="card" style="padding:1rem"><b>✓ Não há referências pendentes.</b><div class="small muted">Todas as referências desta lista já foram reconciliadas.</div></div>';return;}
+ list.innerHTML=entries.map((raw,i)=>{const cand=reconcileCandidates(raw),ctx=reconcileContext(raw);const contextText=ctx.slice(0,3).map(c=>[c.date,c.moment,c.celebration].filter(Boolean).join(' · ')).join(' | ');return `<div class="card reconcile-item" data-reconcile-raw="${escSmart(raw).replace(/"/g,'&quot;')}" style="padding:1rem;margin:.6rem 0"><div style="display:flex;justify-content:space-between;gap:.7rem;align-items:flex-start"><div style="min-width:0"><b>${escSmart(raw).replace(/\n/g,'<br>')}</b>${contextText?`<div class="small muted" style="margin-top:.35rem">${escSmart(contextText)}</div>`:''}</div><span class="tiny muted">${i+1}/${entries.length}</span></div><div style="margin-top:.7rem">${cand.length?cand.map((x,j)=>`<div class="reconcile-candidate" style="display:flex;align-items:center;gap:.5rem;padding:.45rem 0;border-top:1px solid var(--border-subtle)"><div style="flex:1"><b>${escSmart(getSongTitle(x.s))}</b>${getSongAuthor(x.s)?` <span class="small muted">· ${escSmart(getSongAuthor(x.s))}</span>`:''}<div class="tiny muted">${reconcileLabel(x.score)} · ${Math.round(x.score*100)}%</div></div><button type="button" class="btn small" data-reconcile-accept="${escSmart(getSongTitle(x.s)).replace(/"/g,'&quot;')}">Associar</button></div>`).join(''):'<div class="small muted">Não foram encontradas correspondências suficientemente próximas.</div>'}</div><div style="display:flex;gap:.4rem;margin-top:.65rem"><button type="button" class="btn secondary tiny" data-reconcile-skip>Ignorar</button></div></div>`;}).join('');
+ list.querySelectorAll('[data-reconcile-accept]').forEach(btn=>btn.addEventListener('click',()=>{const item=btn.closest('[data-reconcile-raw]');const raw=item?.dataset.reconcileRaw||'';const title=btn.dataset.reconcileAccept||'';if(!raw||!title)return;const map=getReconciliationMap();const contexts=reconcileContext(raw);map[normSmart(raw)]={raw,title,confirmedAt:new Date().toISOString(),contexts};saveReconciliationMap(map);renderReconciliation();renderSongsTable();renderProgramAssistant();}));
+ list.querySelectorAll('[data-reconcile-skip]').forEach(btn=>btn.addEventListener('click',()=>{const item=btn.closest('[data-reconcile-raw]');const raw=item?.dataset.reconcileRaw||'';if(!raw)return;const map=getReconciliationMap();map[normSmart(raw)]={raw,title:'',ignored:true,confirmedAt:new Date().toISOString(),contexts:reconcileContext(raw)};saveReconciliationMap(map);renderReconciliation();}));
+}
+function openReconciliation(){const m=document.getElementById('reconcileSongsModal');if(!m)return;renderReconciliation();m.hidden=false;m.setAttribute('aria-hidden','false');}
+function closeReconciliation(){const m=document.getElementById('reconcileSongsModal');if(m){m.hidden=true;m.setAttribute('aria-hidden','true');}}
+function reconciledAliasesForSong(title){const key=normSmart(title),out=[];const map=getReconciliationMap();Object.values(map).forEach(v=>{if(v&&v.title&&normSmart(v.title)===key)out.push(v);});return out;}
+function reconciliationAssociationsForSong(title){return reconciledAliasesForSong(title).flatMap(v=>(v.contexts||[]).map(c=>({date:c.date||'',part:'',moment:c.moment||'',celebration:c.celebration||'',cycle:'',source:'Programas 2026.xlsx — reconciliação manual',originalTitle:v.raw||''})));
+}
+// Integra as reconciliações confirmadas na ficha sem alterar os dados originais.
+const _songLiturgicalMetadata_71 = songLiturgicalMetadata;
+songLiturgicalMetadata = function(song){const base=_songLiturgicalMetadata_71(song);const extra=reconciliationAssociationsForSong(getSongTitle(song));if(extra.length){base.historicalAssociations=[...(base.historicalAssociations||[]),...extra];base.historicalDates=Array.from(new Set([...(base.historicalDates||[]),...extra.map(x=>x.date).filter(Boolean)]));base.historicalCelebrations=Array.from(new Set([...(base.historicalCelebrations||[]),...extra.map(x=>x.celebration).filter(Boolean)]));base.historicalMoments=Array.from(new Set([...(base.historicalMoments||[]),...extra.map(x=>x.moment).filter(Boolean)]));base.reconciledAliases=Array.from(new Set(extra.map(x=>x.originalTitle).filter(Boolean)));}return base;};
+const _usageCount_71=usageCount,_lastUse_71=lastUse;
+usageCount=function(title){const aliases=reconciledAliasesForSong(title).map(x=>normSmart(x.raw));return _usageCount_71(title)+getUsageHistory().filter(x=>aliases.includes(normSmart(x.song||x.title))).length;};
+lastUse=function(title){const aliases=reconciledAliasesForSong(title).map(x=>normSmart(x.raw));const arr=getUsageHistory().filter(x=>normSmart(x.song||x.title)===normSmart(title)||aliases.includes(normSmart(x.song||x.title))).sort((a,b)=>String(b.date).localeCompare(String(a.date)));return arr[0]||null;};
+function initReconciliation(){
+ document.getElementById('reconcileSongsBtn')?.addEventListener('click',openReconciliation);
+ document.getElementById('reconcileSongsClose')?.addEventListener('click',closeReconciliation);
+ document.getElementById('reconcileSongsClose2')?.addEventListener('click',closeReconciliation);
+ document.getElementById('reconcileSongsModal')?.addEventListener('click',e=>{if(e.target.id==='reconcileSongsModal')closeReconciliation();});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!document.getElementById('reconcileSongsModal')?.hidden)closeReconciliation();});
+}
+document.addEventListener('DOMContentLoaded',initReconciliation);

@@ -61,3 +61,7 @@ Versão 7.0: enriquecimento automático da biblioteca a partir do ficheiro `Prog
 - Vinde, Espírito Santo,  enchei os corações dos vossos fiéis e acendei neles o fogo do vosso amor.
 - Virão adorar-Vos, Senhor,  todos os povos da terra.
 - Vós sois geração eleita, sacerdócio real, nação santa,  para anunciar os louvores de Deus,  que vos chamou das trevas à sua luz admirável.
+
+
+## 7.1 — Reconciliação
+Inclui ferramenta manual para reconciliar as 46 referências que não tiveram correspondência automática no Programas 2026.xlsx. As associações só são gravadas após confirmação e passam a alimentar o histórico/ficha do cântico sem substituir os dados originais.
